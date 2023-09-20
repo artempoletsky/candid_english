@@ -10,3 +10,8 @@
     overflow: auto;
     max-height: 800px;
 }
+
+.word {
+    color: rgb(28, 17, 131);
+    text-decoration: underline;
+}

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import css from './wordlist.module.css';
 
 type Word = {
+  id: string,
   word: string,
   level: string,
   part: string
@@ -13,6 +14,7 @@ export default function WordList({ data }: { data: Array<Word> }) {
 
   let [level, setLevel] = useState("any");
   let [part, setPart] = useState("any");
+  let [searchQuery, setSearchQuery] = useState("");
 
   const levelOptions: { [key: string]: string } = {
     any: 'Any',
@@ -41,6 +43,7 @@ export default function WordList({ data }: { data: Array<Word> }) {
   const filterFn = (e: Word) => {
     if (level != "any" && level != e.level) return false;
     if (part != "any" && part != e.part) return false;
+    if (searchQuery != "" && !e.word.startsWith(searchQuery)) return false;
     return true;
   };
 
@@ -54,12 +57,16 @@ export default function WordList({ data }: { data: Array<Word> }) {
       <select id="part_select" value={part} onChange={e => setPart(e.target.value)}>
         {partOptionsArr}
       </select>
+      <label htmlFor="search_q">Search: </label>
+      <input id="search_q" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
       <div className={css.container}>
         <table className={css.table}>
           <tbody>
             {data.filter(filterFn).map((el: Word) =>
               <tr>
-                <td>{el.word}</td>
+                <td>
+                  <a className={css.word} target="_blank" href={"https://www.oxfordlearnersdictionaries.com/definition/english/" + el.id}>{el.word}</a>
+                </td>
                 <td>{el.part} </td>
                 <td>{el.level}</td>
               </tr>
