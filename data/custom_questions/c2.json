@@ -1,0 +1,52 @@
+[
+    {
+        "answer": "ballot",
+        "question": "The opposition proposed to deface the {...} papers",
+        "options": ["voting", "election", "electoral"]
+    },
+    {
+        "answer": "plastic",
+        "question": "a red {...} car",
+        "options": ["fast", "small", "good"]
+    },
+    {
+        "answer": "avenge",
+        "question": "<strong>To get back at</strong> means to {...}",
+        "options": ["return", "rebate", "descend"]
+    },
+    {
+        "answer": "at",
+        "question": "To critize is to get {...}",
+        "options": ["by", "off", "out"]
+    },
+    {
+        "answer": "have you known",
+        "question": "How long {} him?",
+        "options": ["you have knowing", "you know", "you knew"]
+    },
+    {
+        "answer": "lose",
+        "question": "To get down <strong>doesn't mean</strong> to {}",
+        "options": ["dance", "reduce", "write"]
+    },
+    {
+        "answer": "a means to an end",
+        "question": "It's nothing personal, but it was {...}",
+        "options": ["the mean to an end", "mean to an end", "means to end"]
+    },
+    {
+        "answer": "hit",
+        "question": "A synonym for \"clout\" is {...}",
+        "options": ["bar", "truck", "explore"]
+    },
+    {
+        "answer": "attack",
+        "question": "an asthma {...}",
+        "options": ["fit", "bout", "seizure"]
+    },
+    {
+        "answer": "a vehicle used for carrying the coffin",
+        "question": "A hearse is {...}",
+        "options": ["a type of a sail", "a feeling of great worry or unhappiness", "an area that somebody cannot see"]
+    }
+]

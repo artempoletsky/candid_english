@@ -3,9 +3,14 @@
 @tailwind utilities;
 
 :root {
+  --foregound-hue: 202;
+  --foregound-hsl: var(--foregound-hue), 88%, 10%;
+
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+
+
 }
 
 @media (prefers-color-scheme: dark) {
@@ -30,4 +35,21 @@ html {
 body {
   max-width: 800px;
   margin: 0 auto;
+}
+
+button {
+  border: 1px solid hsl(var(--foregound-hue), 100%, 13%);
+  background-color: hsl(var(--foregound-hue), 45%, 87%);
+  background-image: linear-gradient(to top,
+      transparent, white);
+  color: hsl(var(--foregound-hsl));
+  padding: .3rem 1rem;
+  /*border-radius: 10px;*/
+  box-shadow: 2px 2px 4px hsla(var(--foregound-hue), 12%, 18%, 0.8), 
+  inset -1px -1px 3px hsl(var(--foregound-hue), 10%, 52%);
+}
+
+.txt-vol {
+  text-shadow: 1px 1px 0px rgba(255, 255, 255, 1),
+  -1px -1px 1px rgba(0, 0, 0, 0.25);
 }
