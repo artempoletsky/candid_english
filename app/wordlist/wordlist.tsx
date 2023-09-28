@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import css from './wordlist.module.css';
+import debounce from 'lodash.debounce';
 
 type Word = {
   id: string,
@@ -34,7 +35,13 @@ export default function WordList({ data }: { data: Array<Word> }) {
     verb: 'Verb',
     adjective: 'Adjective',
     adverb: 'Adverb',
-    preposition: 'Preposition'
+    preposition: 'Preposition',
+    conjunction: 'Conjunction',
+    determiner: 'Determiner',
+    pronoun: 'Pronoun',
+    number: 'Number',
+    'modal verb': 'Modal verb',
+    other: 'Other'
   };
 
   const levelOptionsArr = Object.keys(levelOptions)
@@ -45,7 +52,14 @@ export default function WordList({ data }: { data: Array<Word> }) {
 
   const filterFn = (e: Word) => {
     if (level != "any" && level != e.level) return false;
-    if (part != "any" && part != e.part) return false;
+    if (part != "any" && part != e.part) {
+      if (part == "other") {
+        return !partOptions[e.part];
+      }
+      else {
+        return false;
+      }
+    }
     if (searchQuery != "" && !e.word.startsWith(searchQuery)) return false;
     if (excludedWords.includes(e.word)) return false;
     return true;
@@ -65,7 +79,7 @@ export default function WordList({ data }: { data: Array<Word> }) {
           {partOptionsArr}
         </select>
         <label htmlFor="search_q">Search: </label>
-        <input id="search_q" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
+        <input id="search_q" onChange={debounce(e => setSearchQuery(e.target.value), 300)} />
       </div>
       <label htmlFor="filter_file">Exclude words from list:</label>
       <input id="filter_file" type="file" onChange={e => {
