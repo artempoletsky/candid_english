@@ -3,7 +3,7 @@ import { useState } from 'react';
 import css from './wordlist.module.css';
 import debounce from 'lodash.debounce';
 
-type Word = {
+export type Word = {
   id: string,
   word: string,
   level: string,
@@ -12,7 +12,6 @@ type Word = {
 };
 
 const REVERSO_LANG = "russian";
-
 
 export default function WordList({ data }: { data: Array<Word> }) {
 

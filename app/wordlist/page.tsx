@@ -2,12 +2,9 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import WordList from './wordlist';
 
+import { Word } from './wordlist';
 
-import fs from 'fs'
-
-const data = JSON.parse(fs.readFileSync("./grab_data/words_light.json", { encoding: "utf8" }));
-
-// import styles from './custom.module.css';
+import fs from 'fs/promises'
 
 export const metadata: Metadata = {
   title: 'Explore Oxford\'s 5000 wordlist',
@@ -17,11 +14,14 @@ export const metadata: Metadata = {
 
 let level: string = 'any';
 
-export default function BlogMain() {
+export default async function WordlistPage() {
+  const data: string = await fs.readFile("./grab_data/words_light.json", { encoding: "utf8" });
+  const words: Array<Word> = JSON.parse(data);
+  
   return (
     <div className="">
       <h1 className="foo">Wordlist</h1>
-      <WordList data={data}></WordList>
+      <WordList data={words}></WordList>
       <Link href="/">Back to the main page</Link>
     </div>
   );
