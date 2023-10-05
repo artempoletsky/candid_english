@@ -11,6 +11,8 @@ type Word = {
   use_in_test: boolean
 };
 
+const REVERSO_LANG = "russian";
+
 
 export default function WordList({ data }: { data: Array<Word> }) {
 
@@ -105,10 +107,11 @@ export default function WordList({ data }: { data: Array<Word> }) {
             {words.map((el: Word) =>
               <tr key={el.id}>
                 {testEditMode ?
-                  <td>
+                  <td className={css.checkbox_td}>
                     <input type='checkbox' checked={el.use_in_test} onChange={e => el.use_in_test = e.target.checked} />
                   </td> : ''}
                 <td>
+                  <a className="small icon reverso" title="Search word on Reverso" target="_blank" href={`https://context.reverso.net/translation/english-${REVERSO_LANG}/${el.word}`}></a>
                   <a className={css.word} target="_blank" href={"https://www.oxfordlearnersdictionaries.com/definition/english/" + el.id}>{el.word}</a>
                 </td>
                 <td>{el.part} </td>
