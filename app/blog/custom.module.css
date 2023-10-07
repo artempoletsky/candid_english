@@ -2,3 +2,8 @@
     max-width: 800px;
     margin: 0 auto;
 }
+
+.date {
+  display: block;
+  color: var(--light);
+}

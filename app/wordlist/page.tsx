@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import WordList from './wordlist';
+import Layout from '../components/layout';
 
 import { Word } from './wordlist';
 
@@ -19,10 +20,10 @@ export default async function WordlistPage() {
   const words: Array<Word> = JSON.parse(data);
   
   return (
-    <div className="">
+    <Layout>
       <h1 className="foo">Wordlist</h1>
       <WordList data={words}></WordList>
       <Link href="/">Back to the main page</Link>
-    </div>
+    </Layout>
   );
 }
