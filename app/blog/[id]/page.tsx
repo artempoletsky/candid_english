@@ -9,18 +9,21 @@ export async function generateStaticParams() {
   return getAllPostIds();
 }
 
+type Props = {
+  params: { id: string }
+}
+
 import { Metadata } from 'next'
 export const metadata: Metadata = {
-  title: 'Blog',
-  description: 'A blog about English language.',
+  title: '',
+  description: '',
 };
 
-
-export default async function BlogArticle({ params }: { params: any }) {
+export default async function BlogArticle({ params }: Props) {
 
   const postData: BlogPage = await getPostData(params.id);
   metadata.title = postData.title;
-  // const allPostsData = getSortedPostsData();
+  metadata.description = postData.description;
   return (
     <Layout>
       <h1>{postData.title}</h1>
@@ -28,7 +31,6 @@ export default async function BlogArticle({ params }: { params: any }) {
       <Link href="/">Back to the main page</Link>
     </Layout>
   );
-
 };
 
 

@@ -11,7 +11,16 @@ export type BlogPage = {
   html: string,
   date: Date,
   title: string,
+  description: string,
 };
+
+const BlogPageDefaults: BlogPage = {
+  id: '',
+  html: '',
+  date: new Date(),
+  title: '',
+  description: ''
+}
 
 export type BlogMeta = {
   id: string,
@@ -20,7 +29,7 @@ export type BlogMeta = {
 };
 
 
-export function getSortedPostsData() {
+export function getSortedPostsData(): Array<BlogMeta> {
   // Get file names under /posts
   const fileNames = fs.readdirSync(postsDirectory);
   const allPostsData: Array<BlogMeta> = fileNames.map((fileName) => {
@@ -50,17 +59,15 @@ export function getSortedPostsData() {
   });
 }
 
-export function getAllPostIds() {
+export function getAllPostIds(): Array<{ id: string }> {
   const fileNames = fs.readdirSync(postsDirectory);
 
-  return fileNames.map((fileName) => {
-    return {
-      id: fileName.replace(/\.md$/, ''),
-    };
-  });
+  return fileNames.map((fileName) => (
+    { id: fileName.replace(/\.md$/, '') }
+  ));
 }
 
-export async function getPostData(id: string) {
+export async function getPostData(id: string): Promise<BlogPage> {
   const fullPath = path.join(postsDirectory, `${id}.md`);
   const fileContents = fs.readFileSync(fullPath, 'utf8');
 
@@ -72,12 +79,11 @@ export async function getPostData(id: string) {
     .process(matterResult.content);
   const html = processedContent.toString();
 
-  const result: BlogPage = {
+  return {
+    ...BlogPageDefaults,
     id,
     html,
-    ...matterResult.data as { date: Date, title: string },
+    ...matterResult.data,
   };
-  // Combine the data with the id
-  return result;
 }
 
