@@ -2,18 +2,19 @@
 import { useState } from 'react';
 import css from './wordlist.module.css';
 import debounce from 'lodash.debounce';
+import initWordsLocalStorage from '../edit_my_wordlist/my_wordlist';
 
 export type Word = {
   id: string,
   word: string,
   level: string,
-  part: string,
-  use_in_test: boolean
+  part: string
 };
 
 const REVERSO_LANG = "russian";
 
 export default function WordList({ data }: { data: Array<Word> }) {
+  initWordsLocalStorage();
 
   let [level, setLevel] = useState("any");
   let [part, setPart] = useState("any");
