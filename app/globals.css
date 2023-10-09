@@ -80,6 +80,17 @@ html {
   background-image: url("/reverso.png");
 }
 
+.icon.thumbs_up {
+  background-image: url("/thumbs.png");
+  background-size: 35px auto;
+}
+
+.icon.thumbs_down {
+  background-image: url("/thumbs.png");
+  background-size: 35px auto;
+  background-position: 18px 0;
+}
+
 .icon.small {
   width: 18px;
   height: 18px;

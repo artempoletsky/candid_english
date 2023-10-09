@@ -70,7 +70,7 @@ export default function WordList({ data }: { data: Array<Word> }) {
     .map(key => <option key={key} value={key}>{partOptions[key]}</option>);
 
   const filterFn = (e: Word) => {
-    if (hideLearnedMode && myWords.includes(e.word)) {
+    if (hideLearnedMode && myWords.includes(e.word.toLowerCase())) {
       return false;
     }
     if (level != "any" && level != e.level) return false;
@@ -82,7 +82,7 @@ export default function WordList({ data }: { data: Array<Word> }) {
         return false;
       }
     }
-    if (searchQuery != "" && !e.word.startsWith(searchQuery)) return false;
+    if (searchQuery != "" && !e.word.match(new RegExp(`^${searchQuery}.*?$`, 'i'))) return false;
     if (excludedWords.includes(e.word)) return false;
     return true;
   };
@@ -101,25 +101,8 @@ export default function WordList({ data }: { data: Array<Word> }) {
           {partOptionsArr}
         </select>
         <label htmlFor="search_q">Search: </label>
-        <input id="search_q" onChange={debounce(e => setSearchQuery(e.target.value), 300)} />
+        <input id="search_q" autoComplete="off" onChange={debounce(e => setSearchQuery(e.target.value), 300)} />
       </div>
-      <label htmlFor="filter_file">Exclude words from list:</label>
-      <input id="filter_file" type="file" onChange={e => {
-        const files = e.target.files;
-        if (!files) return;
-        const file = files[0];
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const text: String = e.target!.result as String;
-          setExcludedWords(text.split("\n").slice(2).map(line => line.split(/[\s;,]/)[0]));
-        }
-        reader.readAsText(file);
-      }} />
-      <button className="txt-vol rounded-xl" onClick={() => {
-        let input: HTMLInputElement = document.getElementById("filter_file") as HTMLInputElement;
-        input.value = "";
-        setExcludedWords([]);
-      }}>Clear</button>
       Word count: {wordCount}
       <div>
         <Link href="/edit_my_wordlist">Edit my wordlist</Link>
@@ -135,7 +118,7 @@ export default function WordList({ data }: { data: Array<Word> }) {
                   {!hideLearnedMode ?
                     <input type='checkbox' checked={isKnownWord(el.word)} onChange={e => toggleWord(el.word, e.target.checked)} />
                     :
-                    <i className="small icon reverso" title="Mark as learned" onClick={e => toggleWord(el.word, true)}></i>
+                    <i className="small icon thumbs_up cursor-pointer" title="Mark as learned" onClick={e => toggleWord(el.word, true)}></i>
                   }
                 </td>
                 <td>

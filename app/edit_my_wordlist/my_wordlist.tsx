@@ -69,6 +69,14 @@ export function removeWordlists(wordlists: string[]): Promise<string[]> {
   });
 }
 
+
+export function clearMyWords(): Promise<string[]> {
+  return updateWordlists({
+    removed: store.get("my_words")
+  });
+}
+
+
 export default function MyWordlist() {
   initWordsLocalStorage();
   let [myWords, setMyWords] = useState<string[]>([]);
@@ -107,14 +115,40 @@ export default function MyWordlist() {
 
   return (
     <div>
-      <Link href="/wordlist">Explore Oxford's wordlist</Link>
-      <ul className={css.container}>
-        {myWords.map(word => <li className="flex" key={word}><span className="grow">{word}</span> <button onClick={() => removeWord(word)}>Remove</button></li>)}
-      </ul>
       <div className="flex">
         <input autoComplete="off" className="grow mr-2" type="text" name="new_word" value={newWord} onChange={e => setNewWord(e.target.value)} />
         <button onClick={addNewWord}>Add new word</button>
       </div>
+      <div>
+        <label htmlFor="filter_file">Add words from a file:</label>
+        <input id="filter_file" type="file" onChange={e => {
+          const input = e.target;
+          const files = input.files;
+          if (!files) return;
+          const file = files[0];
+          const reader = new FileReader();
+          reader.onload = function (e: ProgressEvent<FileReader>) {
+            if (e.target) {
+              const text: string = e.target.result + '';
+              const words = text.split("\n").slice(2)
+                .map(line => line.split(/[\s;,]/)[0].toLowerCase())
+                .filter((w: string) => w.match(/^\p{L}.*/u));
+
+
+              addWords(words)
+                .then(updateViewWords)
+              // console.log(words);
+            }
+            input.value = '';
+          }
+          reader.readAsText(file);
+        }} />
+
+
+        <button onClick={e => clearMyWords().then(updateViewWords)}>Remove all words</button>
+      </div>
+
+      <Link href="/wordlist">Explore Oxford's wordlist</Link>
       <div className="flex">
         <button className="grow" onClick={e => addWordlists(['a1']).then(updateViewWords)}>Add A1</button>
         <button className="grow" onClick={e => addWordlists(['a2']).then(updateViewWords)}>Add A2</button>
@@ -129,6 +163,12 @@ export default function MyWordlist() {
         <button className="grow" onClick={e => removeWordlists(['b2']).then(updateViewWords)}>Remove B2</button>
         <button className="grow" onClick={e => removeWordlists(['c1']).then(updateViewWords)}>Remove C1</button>
       </div>
+      <ul className={css.container}>
+        {myWords.map(word => <li className="flex" key={word}>
+          <span className="grow">{word}</span>
+          <i className="small icon thumbs_down cursor-pointer" title="Remove" onClick={() => removeWord(word)}></i>
+        </li>)}
+      </ul>
     </div>
   );
 }
