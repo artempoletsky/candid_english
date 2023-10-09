@@ -23,11 +23,11 @@ export default function WordList({ data }: { data: Array<Word> }) {
 
   const levelOptions: { [key: string]: string } = {
     any: 'Any',
-    a1: 'a1',
-    a2: 'a2',
-    b1: 'b1',
-    b2: 'b2',
-    c1: 'c1',
+    a1: 'A1',
+    a2: 'A2',
+    b1: 'B1',
+    b2: 'B2',
+    c1: 'C1',
   };
 
   const partOptions: { [key: string]: string } = {
