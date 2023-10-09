@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import store from 'store';
 import css from '../wordlist/wordlist.module.css';
 import { uniq, pull } from 'lodash';
+import Link from 'next/link'
 
 export function initWordsLocalStorage(): string[] {
   let myWords = store.get('my_words');
@@ -106,6 +107,7 @@ export default function MyWordlist() {
 
   return (
     <div>
+      <Link href="/wordlist">Explore Oxford's wordlist</Link>
       <ul className={css.container}>
         {myWords.map(word => <li className="flex" key={word}><span className="grow">{word}</span> <button onClick={() => removeWord(word)}>Remove</button></li>)}
       </ul>

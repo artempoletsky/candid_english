@@ -59,7 +59,6 @@ export async function POST(req: NextRequest) {
     const words = getWordlist(wordlistName);
     res.removed = [...res.removed, ...words];
   }
-  console.log(res.removed);
 
   return NextResponse.json(res, {
     status: 200

@@ -1,8 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import css from './wordlist.module.css';
 import debounce from 'lodash.debounce';
-import initWordsLocalStorage from '../edit_my_wordlist/my_wordlist';
+import { initWordsLocalStorage, addWords, removeWords } from '../edit_my_wordlist/my_wordlist';
+import Link from 'next/link'
 
 export type Word = {
   id: string,
@@ -14,7 +15,23 @@ export type Word = {
 const REVERSO_LANG = "russian";
 
 export default function WordList({ data }: { data: Array<Word> }) {
-  initWordsLocalStorage();
+  let [myWords, setSetMyWordsView] = useState<string[]>([]);
+
+  let [hideLearnedMode, setHideLearnedMode] = useState(true);
+
+  useEffect(() => {
+    // myWords = initWordsLocalStorage();
+    setSetMyWordsView(initWordsLocalStorage());
+  }, []);
+
+  function isKnownWord(word: string) {
+    return myWords.includes(word);
+  }
+
+  function toggleWord(word: string, isKnown: boolean) {
+    const fn = isKnown ? addWords : removeWords;
+    fn([word]).then(words => setSetMyWordsView(words));
+  }
 
   let [level, setLevel] = useState("any");
   let [part, setPart] = useState("any");
@@ -53,6 +70,9 @@ export default function WordList({ data }: { data: Array<Word> }) {
     .map(key => <option key={key} value={key}>{partOptions[key]}</option>);
 
   const filterFn = (e: Word) => {
+    if (hideLearnedMode && myWords.includes(e.word)) {
+      return false;
+    }
     if (level != "any" && level != e.level) return false;
     if (part != "any" && part != e.part) {
       if (part == "other") {
@@ -101,15 +121,23 @@ export default function WordList({ data }: { data: Array<Word> }) {
         setExcludedWords([]);
       }}>Clear</button>
       Word count: {wordCount}
+      <div>
+        <Link href="/edit_my_wordlist">Edit my wordlist</Link>
+        <label>&nbsp;<input type="checkbox" checked={hideLearnedMode} onChange={e => setHideLearnedMode(e.target.checked)} /> Hide learned words</label>
+      </div>
+
       <div className={css.container}>
         <table className={css.table}>
           <tbody>
             {words.map((el: Word) =>
               <tr key={el.id}>
-                {testEditMode ?
-                  <td className={css.checkbox_td}>
-                    <input type='checkbox' checked={el.use_in_test} onChange={e => el.use_in_test = e.target.checked} />
-                  </td> : ''}
+                <td className={css.checkbox_td}>
+                  {!hideLearnedMode ?
+                    <input type='checkbox' checked={isKnownWord(el.word)} onChange={e => toggleWord(el.word, e.target.checked)} />
+                    :
+                    <i className="small icon reverso" title="Mark as learned" onClick={e => toggleWord(el.word, true)}></i>
+                  }
+                </td>
                 <td>
                   <a className="small icon reverso" title="Search word on Reverso" target="_blank" href={`https://context.reverso.net/translation/english-${REVERSO_LANG}/${el.word}`}></a>
                   <a className={css.word} target="_blank" href={"https://www.oxfordlearnersdictionaries.com/definition/english/" + el.id}>{el.word}</a>
