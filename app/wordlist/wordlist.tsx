@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import css from './wordlist.module.css';
 import debounce from 'lodash.debounce';
-import { initWordsLocalStorage, addWords, removeWords } from '../edit_my_wordlist/my_wordlist';
+import { initWordsLocalStorage, addWords, removeWords, isWordLearned } from '~/app/edit_my_wordlist/my_wordlist';
 import Link from 'next/link'
 
 export type Word = {
@@ -24,9 +24,7 @@ export default function WordList({ data }: { data: Array<Word> }) {
     setSetMyWordsView(initWordsLocalStorage());
   }, []);
 
-  function isKnownWord(word: string) {
-    return myWords.includes(word);
-  }
+
 
   function toggleWord(word: string, isKnown: boolean) {
     const fn = isKnown ? addWords : removeWords;
@@ -116,7 +114,7 @@ export default function WordList({ data }: { data: Array<Word> }) {
               <tr key={el.id}>
                 <td className={css.checkbox_td}>
                   {!hideLearnedMode ?
-                    <input type='checkbox' checked={isKnownWord(el.word)} onChange={e => toggleWord(el.word, e.target.checked)} />
+                    <input type='checkbox' checked={isWordLearned(el.word)} onChange={e => toggleWord(el.word, e.target.checked)} />
                     :
                     <i className="small icon thumbs_up cursor-pointer" title="Mark as learned" onClick={e => toggleWord(el.word, true)}></i>
                   }

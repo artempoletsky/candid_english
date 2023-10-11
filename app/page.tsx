@@ -35,6 +35,7 @@ export default function Home() {
           <h2><Link href="/wordlist">Explore Oxford's wordlist</Link></h2>
           <h2><Link href="/test">Test your level of English</Link></h2>
           <h2><Link href="/edit_my_wordlist">Edit your personal wordlist</Link></h2>
+          <h2><Link href="/subtitles">Learn English with subtitles</Link></h2>
           {/* <Image
           className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert block m-auto"
           src="/next.svg"

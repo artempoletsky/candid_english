@@ -8,6 +8,10 @@ import css from '../wordlist/wordlist.module.css';
 import { uniq, pull } from 'lodash';
 import Link from 'next/link'
 
+export function isWordLearned(word: string) {
+  return store.get('my_words').includes(word.toLowerCase());
+}
+
 export function initWordsLocalStorage(): string[] {
   let myWords = store.get('my_words');
   if (!myWords) {
@@ -76,6 +80,24 @@ export function clearMyWords(): Promise<string[]> {
   });
 }
 
+export function saveTextFile(fileName: string, textData: string) {
+  let blobData = new Blob([textData], { type: "text/plain" });
+  let url = window.URL.createObjectURL(blobData);
+
+  let a = document.createElement("a");
+  a.setAttribute('style', 'display: none');
+  document.body.appendChild(a);
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  window.URL.revokeObjectURL(url);
+  a.remove();
+}
+
+export function saveMyWordlist() {
+  saveTextFile('my_wordlist.txt', store.get("my_words").join("\r\n"));
+}
+
 
 export default function MyWordlist() {
   initWordsLocalStorage();
@@ -111,7 +133,7 @@ export default function MyWordlist() {
     }).then(updateViewWords)
   }
 
-
+  const wordCount = myWords.length;
 
   return (
     <div>
@@ -120,7 +142,7 @@ export default function MyWordlist() {
         <button onClick={addNewWord}>Add new word</button>
       </div>
       <div>
-        <label htmlFor="filter_file">Add words from a file:</label>
+        <label htmlFor="filter_file">Import from file:</label>
         <input id="filter_file" type="file" onChange={e => {
           const input = e.target;
           const files = input.files;
@@ -130,7 +152,7 @@ export default function MyWordlist() {
           reader.onload = function (e: ProgressEvent<FileReader>) {
             if (e.target) {
               const text: string = e.target.result + '';
-              const words = text.split("\n").slice(2)
+              const words = text.split("\n")
                 .map(line => line.split(/[\s;,]/)[0].toLowerCase())
                 .filter((w: string) => w.match(/^\p{L}.*/u));
 
@@ -143,9 +165,14 @@ export default function MyWordlist() {
           }
           reader.readAsText(file);
         }} />
+        <button onClick={saveMyWordlist}>Export to file</button>
 
-
-        <button onClick={e => clearMyWords().then(updateViewWords)}>Remove all words</button>
+        <button onClick={e => {
+          const promptResult = prompt('Are you sure? Type \"DELETE\" to delete all words.');
+          if (promptResult == 'DELETE') {
+            clearMyWords().then(updateViewWords);
+          }
+        }}>Remove all words</button>
       </div>
 
       <Link href="/wordlist">Explore Oxford's wordlist</Link>
@@ -163,6 +190,8 @@ export default function MyWordlist() {
         <button className="grow" onClick={e => removeWordlists(['b2']).then(updateViewWords)}>Remove B2</button>
         <button className="grow" onClick={e => removeWordlists(['c1']).then(updateViewWords)}>Remove C1</button>
       </div>
+
+      Word count: {wordCount}
       <ul className={css.container}>
         {myWords.map(word => <li className="flex" key={word}>
           <span className="grow">{word}</span>
