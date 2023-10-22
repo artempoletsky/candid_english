@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react';
 import css from './wordlist.module.css';
 import debounce from 'lodash.debounce';
-import { initWordsLocalStorage, addWords, removeWords, isWordLearned } from '~/app/edit_my_wordlist/my_wordlist';
+import { addWords, removeWords } from '~/app/edit_my_wordlist/my_wordlist';
+import { isWordLearned, WordsDict, getMyWords } from '~/lib/words_storage';
 import Link from 'next/link'
 
 export type Word = {
@@ -14,61 +15,55 @@ export type Word = {
 
 const REVERSO_LANG = "russian";
 
+
+const levelOptions: { [key: string]: string } = {
+  any: 'Any',
+  a1: 'A1',
+  a2: 'A2',
+  b1: 'B1',
+  b2: 'B2',
+  c1: 'C1',
+};
+
+const partOptions: { [key: string]: string } = {
+  any: 'Any',
+  noun: 'Noun',
+  verb: 'Verb',
+  adjective: 'Adjective',
+  adverb: 'Adverb',
+  preposition: 'Preposition',
+  conjunction: 'Conjunction',
+  determiner: 'Determiner',
+  pronoun: 'Pronoun',
+  number: 'Number',
+  'modal verb': 'Modal verb',
+  other: 'Other'
+};
+
+const levelOptionsArr = Object.keys(levelOptions)
+.map(key => <option key={key} value={key}>{levelOptions[key]}</option>);
+
+const partOptionsArr = Object.keys(partOptions)
+.map(key => <option key={key} value={key}>{partOptions[key]}</option>);
+
 export default function WordList({ data }: { data: Array<Word> }) {
-  let [myWords, setSetMyWordsView] = useState<string[]>([]);
+  let [myWords, setSetMyWordsView] = useState<WordsDict>({ ...getMyWords() });
 
   let [hideLearnedMode, setHideLearnedMode] = useState(true);
 
-  useEffect(() => {
-    // myWords = initWordsLocalStorage();
-    setSetMyWordsView(initWordsLocalStorage());
-  }, []);
-
-
-
   function toggleWord(word: string, isKnown: boolean) {
     const fn = isKnown ? addWords : removeWords;
-    fn([word]).then(words => setSetMyWordsView(words));
+    fn([word]).then(words => setSetMyWordsView({ ...words }));
   }
 
   let [level, setLevel] = useState("any");
   let [part, setPart] = useState("any");
   let [searchQuery, setSearchQuery] = useState("");
   let [excludedWords, setExcludedWords] = useState<Array<String>>([]);
-  let testEditMode = true;
-
-  const levelOptions: { [key: string]: string } = {
-    any: 'Any',
-    a1: 'A1',
-    a2: 'A2',
-    b1: 'B1',
-    b2: 'B2',
-    c1: 'C1',
-  };
-
-  const partOptions: { [key: string]: string } = {
-    any: 'Any',
-    noun: 'Noun',
-    verb: 'Verb',
-    adjective: 'Adjective',
-    adverb: 'Adverb',
-    preposition: 'Preposition',
-    conjunction: 'Conjunction',
-    determiner: 'Determiner',
-    pronoun: 'Pronoun',
-    number: 'Number',
-    'modal verb': 'Modal verb',
-    other: 'Other'
-  };
-
-  const levelOptionsArr = Object.keys(levelOptions)
-    .map(key => <option key={key} value={key}>{levelOptions[key]}</option>);
-
-  const partOptionsArr = Object.keys(partOptions)
-    .map(key => <option key={key} value={key}>{partOptions[key]}</option>);
-
+ 
+ 
   const filterFn = (e: Word) => {
-    if (hideLearnedMode && myWords.includes(e.word.toLowerCase())) {
+    if (hideLearnedMode && myWords[e.word.toLowerCase()]) {
       return false;
     }
     if (level != "any" && level != e.level) return false;
@@ -104,7 +99,13 @@ export default function WordList({ data }: { data: Array<Word> }) {
       Word count: {wordCount}
       <div>
         <Link href="/edit_my_wordlist">Edit my wordlist</Link>
-        <label>&nbsp;<input type="checkbox" checked={hideLearnedMode} onChange={e => setHideLearnedMode(e.target.checked)} /> Hide learned words</label>
+        <label>&nbsp;<input type="checkbox" checked={hideLearnedMode} onChange={e => {
+          const now = Date.now();
+          setHideLearnedMode(e.target.checked);
+          requestAnimationFrame(() => {
+            console.log((Date.now() - now) / 1000);
+          });
+        }} /> Hide learned words</label>
       </div>
 
       <div className={css.container}>
@@ -120,7 +121,7 @@ export default function WordList({ data }: { data: Array<Word> }) {
                   }
                 </td>
                 <td>
-                  <a className="small icon reverso" title="Search word on Reverso" target="_blank" href={`https://context.reverso.net/translation/english-${REVERSO_LANG}/${el.word}`}></a>
+                  <a className="small icon reverso mr-1" title="Search word on Reverso" target="_blank" href={`https://context.reverso.net/translation/english-${REVERSO_LANG}/${el.word}`}></a>
                   <a className={css.word} target="_blank" href={"https://www.oxfordlearnersdictionaries.com/definition/english/" + el.id}>{el.word}</a>
                 </td>
                 <td>{el.part} </td>

@@ -3,27 +3,13 @@
 import { UpdateWordsResponse } from '../update_known_words/route';
 import { Word } from '../wordlist/wordlist';
 import { useState, useEffect } from 'react';
-import store from 'store';
 import css from '../wordlist/wordlist.module.css';
 import { uniq, pull } from 'lodash';
 import Link from 'next/link'
-
-export function isWordLearned(word: string) {
-  return store.get('my_words').includes(word.toLowerCase());
-}
-
-export function initWordsLocalStorage(): string[] {
-  let myWords = store.get('my_words');
-  if (!myWords) {
-    myWords = [];
-    store.set('my_words', myWords);
-    store.set('last_words_update', Date.now());
-  }
-  return myWords;
-}
+import { getMyWords, saveMyWords, WordsDict } from '~/lib/words_storage';
 
 
-export function updateWordlists(requestBody: any): Promise<string[]> {
+export function updateWordlists(requestBody: any): Promise<WordsDict> {
   return fetch('/update_known_words', {
     method: 'POST',
     headers: {
@@ -34,49 +20,58 @@ export function updateWordlists(requestBody: any): Promise<string[]> {
     .then(updateLocalStorage);
 }
 
-export function updateLocalStorage(response: UpdateWordsResponse): Promise<string[]> {
+export function updateLocalStorage(response: UpdateWordsResponse): Promise<WordsDict> {
   const { added, removed, updateTimestamp } = response;
-  let words = store.get('my_words');
+  const words: WordsDict = getMyWords();
 
-  pull(words, ...removed);
-  words = uniq([...words, ...added]);
+  removed.forEach(w => {
+    delete words[w];
+  });
 
-  words = words.sort((a: string, b: string) => a.toLowerCase() > b.toLowerCase() ? 0 : -1);
+  // pull(words, ...removed);
 
-  store.set('my_words', words);
-  store.set('last_words_update', updateTimestamp);
+  added.forEach(w => {
+    words[w] = true;
+  });
+
+  // words = words.sort((a: string, b: string) => a.toLowerCase() > b.toLowerCase() ? 0 : -1);
+
+  // store.set('my_words', words);
+  // store.set('last_words_update', updateTimestamp);
+  saveMyWords();
+
 
   return new Promise(resolve => resolve(words));
 }
 
-export function addWords(words: string[]): Promise<string[]> {
+export function addWords(words: string[]): Promise<WordsDict> {
   return updateWordlists({
     added: words
   });
 }
 
-export function removeWords(words: string[]): Promise<string[]> {
+export function removeWords(words: string[]): Promise<WordsDict> {
   return updateWordlists({
     removed: words
   });
 }
 
-export function addWordlists(wordlists: string[]): Promise<string[]> {
+export function addWordlists(wordlists: string[]): Promise<WordsDict> {
   return updateWordlists({
     addedWordlists: wordlists
   });
 }
 
-export function removeWordlists(wordlists: string[]): Promise<string[]> {
+export function removeWordlists(wordlists: string[]): Promise<WordsDict> {
   return updateWordlists({
     removedWordlists: wordlists
   });
 }
 
 
-export function clearMyWords(): Promise<string[]> {
+export function clearMyWords(): Promise<WordsDict> {
   return updateWordlists({
-    removed: store.get("my_words")
+    removed: Object.keys(getMyWords())
   });
 }
 
@@ -100,18 +95,20 @@ export function saveMyWordlist() {
 
 
 export default function MyWordlist() {
-  initWordsLocalStorage();
-  let [myWords, setMyWords] = useState<string[]>([]);
+  // initWordsLocalStorage();
+  let [myWords, setMyWords] = useState<WordsDict>(getMyWords());
   let [newWord, setNewWord] = useState<string>('');
+  let [updateTrigger, setUpdateTrigger] = useState(0);
 
 
   useEffect(() => {
     // update some client side state to say it is now safe to render the client-side only component
-    setMyWords(store.get('my_words'));
+    // setMyWords(store.get('my_words'));
   }, []);
 
-  function updateViewWords(words: string[]): Promise<string[]> {
-    setMyWords(words);
+  function updateViewWords(words: WordsDict): Promise<WordsDict> {
+    // setMyWords(words);
+    setUpdateTrigger(Math.random());
     return new Promise(resolve => resolve(words))
   }
 
@@ -133,7 +130,8 @@ export default function MyWordlist() {
     }).then(updateViewWords)
   }
 
-  const wordCount = myWords.length;
+  const wordsArr = Object.keys(myWords).sort();
+  const wordCount = wordsArr.length;
 
   return (
     <div>
@@ -192,8 +190,8 @@ export default function MyWordlist() {
       </div>
 
       Word count: {wordCount}
-      <ul className={css.container}>
-        {myWords.map(word => <li className="flex" key={word}>
+      <ul className={css.container} data-update={updateTrigger}>
+        {wordsArr.map(word => <li className="flex" key={word}>
           <span className="grow">{word}</span>
           <i className="small icon thumbs_down cursor-pointer" title="Remove" onClick={() => removeWord(word)}></i>
         </li>)}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import { reject } from 'lodash';
+import lemmatize from "~/lib/lemmatizer";
 
 export type Subtitle = {
   id: number;
@@ -45,110 +46,29 @@ export function parseSRT(text: string): Subtitle[] {
   return subs;
 }
 
-const words_dict: { [key: string]: any } = JSON.parse(fs.readFileSync('./grab_data/words_dict.json', { encoding: 'utf8' }));
-
-// console.log(words_dict);
-const extraWordForms: { [key: string]: string } = {
-  an: 'a',
-  gotta: 'get',
-  gonna: 'go',
-  okay: 'ok',
-  wanna: 'want',
-  "'cause": 'because',
-  kinda: 'kind',
-  ca: 'can',
-  wo: 'will',
-  shoulda: 'should',
-  "'em": "them",
-}
-
-
-// function cutNCheck(word: string, tail: string): string {
-//   if (irregularVerbs[word]) {
-//     return irregularVerbs[word];
-//   }
-//   const cut: string = word.replace(new RegExp(tail + '$'), '');
-//   if (irregularVerbs[cut]) {
-//     return irregularVerbs[cut];
-//   }
-//   if (words_dict[cut]) {
-//     return cut;
-//   }
-//   return '';
-// }
-
-const nonReplaceableSuffixes = ["'d", "'ll", "'ve", "'re", "n't", "'s", "s'", "'m"];
-// const tails = ['', 'd', 'ed', 'er', 'est', 'ing', 's'];
-
-
-const lemmatizer = require('wink-lemmatizer');
-export function lemmatize(word: string): string {
-  if (word.match(/[0-9]/g)) {
-    return '';
-  }
-
-  word = word.toLowerCase().replace(new RegExp(`(${nonReplaceableSuffixes.join(')|(')})$`), '');
-
-  if (extraWordForms[word]) {
-    return extraWordForms[word];
-  }
-  const noSymbols = word.replace(/[^\p{L}'\s]/gu, '');
-
-  // if (words_dict[noSymbols]) {
-  //   return noSymbols;
-  // }
-
-  const verb = lemmatizer.verb(noSymbols);
-  if (verb != noSymbols) {
-    return verb;
-  }
-  const noun = lemmatizer.noun(noSymbols);
-  if (noun != noSymbols) {
-    return noun;
-  }
-  const adjective = lemmatizer.adjective(noSymbols);
-  if (adjective != noSymbols) {
-    return adjective;
-  }
-
-  /*
-  for (const tail of tails) {
-    const cut = cutNCheck(noSymbols, tail);
-    if (cut) {
-      return cut;
-    }
-  }*/
-
-  return noSymbols || '';
-}
-
 
 export function atomizeSRT(subs: Subtitle[]): AtomizedWord[] {
   const dict: { [key: string]: AtomizedWord } = {};
 
   for (const sub of subs) {
-    const words: string[] = sub.text
-      .trim()
-      .split(/[\s-,!?.;]+/);
-
-    for (const w of words) {
-      const defaultForm = lemmatize(w);
-      if (!defaultForm) {
+    const subLemmas = lemmatize(sub.text);
+    for (const lemma in subLemmas) {
+      const count = subLemmas[lemma].count;
+      if (dict[lemma]) {
+        dict[lemma].count += count;
         continue;
       }
-      if (dict[defaultForm]) {
-        dict[defaultForm].count++;
-        continue;
-      };
-      dict[defaultForm] = {
-        id: defaultForm,
-        word: w,
+      
+      dict[lemma] = {
+        id: lemma,
+        word: subLemmas[lemma].word,
+        count,
         sentence: JSON.stringify({
           time: sub.time,
-          text: sub.text,
-        }),
-        count: 1
+          text: sub.text
+        })
       };
+
     }
   }
 
