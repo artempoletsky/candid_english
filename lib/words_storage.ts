@@ -2,22 +2,17 @@
 
 import { debounce } from "lodash";
 
-export type WordsDict = {
-  [key: string]: boolean
-};
+let myWords: Record<string, boolean>;
 
-let myWords: WordsDict;
-
-function fromArray(array: string[]): WordsDict {
+function fromArray(array: string[]): Record<string, boolean> {
   myWords = {};
-  array.reduce((res, el: string) => {
+  return array.reduce((res, el: string) => {
     res[el] = true;
     return res;
   }, myWords);
-  return myWords;
-};
+}
 
-export function getMyWords(): WordsDict {
+export function getMyWords(): Record<string, boolean> {
   if (myWords) {
     return myWords;
   }

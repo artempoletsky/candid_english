@@ -1,8 +1,8 @@
 
 
-const Overrides: Record<string, string> = require("../data/lemmatizer/lemma_overrides.json");
-const Irregular: Record<string, string> = require("../data/lemmatizer/irregular_verbs.json");
-let WordsDict: Record<string, number> = require("../data/lemmatizer/all_words.json");
+
+
+
 
 export type LemmatizeResult = {
   sentence: string,
@@ -23,14 +23,30 @@ const Suffixes = {
   "th": "",
 };
 
+import fs from "fs";
+let WordsDict: Record<string, number>;
+let Overrides: Record<string, string>;
+let Irregular: Record<string, string>;
+const CWD = process.cwd();
 export function invalidateDict() {
-  delete require.cache[Object.keys(require.cache).find(k => k.endsWith('all_words.json')) as string];
-  WordsDict = require("../data/lemmatizer/all_words.json");
+  // delete require.cache[Object.keys(require.cache).find(k => k.endsWith('all_words.json')) as string];
+  WordsDict = JSON.parse(fs.readFileSync(CWD + "/data/lemmatizer/all_words.json", { encoding: "utf8" }));
+  Overrides = JSON.parse(fs.readFileSync(CWD + "/data/lemmatizer/lemma_overrides.json", { encoding: "utf8" }));
+  Irregular = JSON.parse(fs.readFileSync(CWD + "/data/lemmatizer/irregular_verbs.json", { encoding: "utf8" }));
 }
+invalidateDict();
 
-export function lemmatizeWord(word: string, dict: Record<string, any>, { searchWordInDict }: Record<string, boolean> = {
+type LemmatizeWordOptions = {
+  searchWordInDict: boolean
+};
+const LemmatizeWordOptionsDefault: LemmatizeWordOptions = {
   searchWordInDict: true
-}) {
+};
+export function lemmatizeWord(word: string, dict: Record<string, any>, options?: LemmatizeWordOptions) {
+  options = options ? { ...LemmatizeWordOptionsDefault, ...options } : LemmatizeWordOptionsDefault;
+
+  const { searchWordInDict } = options;
+
   let lemma = word, suffix = "";
 
   if (searchWordInDict && dict[word]) {
@@ -56,27 +72,26 @@ export function lemmatizeWord(word: string, dict: Record<string, any>, { searchW
       return lemma;
     }
   }
- 
+
   //fif ->five
   if (suffix == "th" && lemma.endsWith('f')) {
     return lemma.slice(0, -1) + 've';
   }
 
-
-  //bushe
-  if (lemma.endsWith('she')) {
-    return lemma.slice(0, -1);
-  }
-
   //goe
-  if (lemma.endsWith('oe')) {
-    return lemma.slice(0, -1);
+  //toche
+  //bushe
+  let ss = ["she", "che", "oe"];
+  for (const s of ss) {
+    if (lemma.endsWith(s)) {
+      return lemma.slice(0, -1);
+    }
   }
 
   //worri -> worry
   //bodie -> body
-  let t2Suffixes = ['ie', 'i'];
-  for (const s of t2Suffixes) {
+  ss = ['ie', 'i'];
+  for (const s of ss) {
     if (lemma.endsWith(s)) {
       let l = lemma.slice(0, -s.length);
       if (dict[l + 'y']) {
@@ -88,6 +103,18 @@ export function lemmatizeWord(word: string, dict: Record<string, any>, { searchW
   //hop -> hope
   if (dict[lemma + 'e']) {
     return lemma + 'e';
+  }
+  
+  if (lemma.endsWith("ve")) {
+    //serve
+    if (dict[lemma]) {
+      return lemma;
+    }
+    //wolve
+    let l = lemma.slice(0, -2);
+    if (dict[l + 'f']) {
+      return l + 'f';
+    }
   }
 
   if (dict[lemma]) {
@@ -111,35 +138,32 @@ export default function lemmatize(text: string): Record<string, LemmatizeResult>
       if (word.match(/[0-9]/g)) {
         return false;
       }
-      if (word.match(/^[^ia]$/i)) {
-        return false;
-      }
       return true;
-    }).map(initialWord => {
-      let word = initialWord.toLowerCase();
+    }).map(word => {
+      let lemma = word.toLowerCase();
       for (const suffix of suffixesToRemove) {
-        if (word.endsWith(suffix)) {
-          word = word.replace(suffix, '');
+        if (lemma.endsWith(suffix)) {
+          lemma = lemma.slice(0, -suffix.length);
           break;
         }
       }
 
-      let lemma;
-      if (Overrides[word]) {
-        lemma = Overrides[word];
-      } else if (Irregular[word]) {
-        lemma = Irregular[word];
+      if (Overrides[lemma]) {
+        lemma = Overrides[lemma];
+      } else if (Irregular[lemma]) {
+        lemma = Irregular[lemma];
       } else {
-        lemma = lemmatizeWord(word, WordsDict);
+        lemma = lemmatizeWord(lemma, WordsDict);
       }
 
       return {
-        word: initialWord,
+        word,
         lemma,
         count: 1,
         sentence
       } as LemmatizeResult;
     }).filter(({ lemma }) => {
+      lemma = lemma.replace(/[']/, '');
       return lemma.length > 1 || lemma == 'i' || lemma == 'a';
     });
     dict = words.reduce((d, lr) => {

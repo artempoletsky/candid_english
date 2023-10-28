@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { addWords } from "~/app/edit_my_wordlist/my_wordlist";
 
 import { pull } from "lodash";
+import AdjustDropdown from "./adjust_dropdown";
 
 type AtomizedWordResponse = {
   data: {
@@ -70,6 +71,7 @@ export default function SubtitlesComp() {
               <td className="whitespace-nowrap">
                 <i onClick={e => addWords([w.id]).then(words => setMyWords({ ...words }))} title="Mark as learned" className="icon small thumbs_up cursor-pointer mr-2"></i>
                 <i onClick={e => discardWord(w)} title="Discard" className="icon small thumbs_down m-0 cursor-pointer mr-2"></i>
+                <AdjustDropdown word={w} removeCall={discardWord}></AdjustDropdown>
               </td>
               <td>{w.count}</td>
               <td>{w.id}</td>

@@ -34,14 +34,17 @@ describe("Simplify", () => {
     expect(allWordsDict["bushes"]).toBeUndefined();
     expect(allWordsDict["goes"]).toBeUndefined();
     expect(allWordsDict["fifth"]).toBeUndefined();
+    expect(allWordsDict["wo"]).toBeUndefined();
 
 
   });
+  xtest("serves to wolves", () => {
+    let lemmas = lemmatize("serves to wolves");
 
-  xtest("crossing", () => {
-    let lemmas = lemmatize("crossing");
-    expect(lemmas["cross"].count).toEqual(1);
+    expect(lemmas["serve"]).toBeDefined();
+    expect(lemmas["wolf"]).toBeDefined();
   });
+
 });
 
 describe("Lemmatizer", () => {
@@ -194,4 +197,22 @@ describe("Lemmatizer", () => {
     let lemmas = lemmatize("crossing");
     expect(lemmas["cross"].count).toEqual(1);
   });
+
+  test("won't", () => {
+    let lemmas = lemmatize("won't");
+    expect(lemmas["will"].count).toEqual(1);
+  });
+
+  test("touches", () => {
+    let lemmas = lemmatize("touches");
+    expect(lemmas["touch"].count).toEqual(1);
+  });
+
+  test("serves to wolves", () => {
+    let lemmas = lemmatize("serves to wolves");
+
+    expect(lemmas["serve"]).toBeDefined();
+    expect(lemmas["wolf"]).toBeDefined();
+  });
+
 });

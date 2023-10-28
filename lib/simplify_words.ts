@@ -1,15 +1,13 @@
 import words from 'an-array-of-english-words';
-import fs from 'fs';
+// import fs from 'fs';
 // import lemmatize from "~/lib/wink_lemmatizer";
+import { rfs, wfs } from './util';
+import { LemmatizerBlacklist, LemmatizerWhitelist, LemmatizerWordlist } from '~/lib/paths';
+
+let BlackList: Record<string, number>;
+let WhiteList: Record<string, number>;
 
 
-const BlackList: Record<string, number> = toDict(require("../data/lemmatizer/blacklist.json"));
-let WhiteList: Record<string, number> = require("../grab_data/words_dict.json");
-
-WhiteList = {
-  ...WhiteList,
-  ...toDict(require("../data/lemmatizer/whitelist.json"))
-}
 
 
 import { lemmatizeWord, invalidateDict } from "~/lib/lemmatizer";
@@ -35,6 +33,13 @@ export default function simplify(): Record<string, number> {
   //   return true;
   // }));
 
+  WhiteList = {
+    ...rfs("/grab_data/words_dict.json"),
+    ...toDict(rfs(LemmatizerWhitelist))
+  };
+
+  BlackList = toDict(rfs(LemmatizerBlacklist));
+
   const fullDict = toDict(words);
 
   for (const word in fullDict) {
@@ -45,11 +50,11 @@ export default function simplify(): Record<string, number> {
     if (WhiteList[word]) {
       continue;
     }
-   
+
     const lemma = lemmatizeWord(word, fullDict, {
       searchWordInDict: false
     });
-    if (word == 'fifth') debugger;
+
     if (word != lemma) {
       delete fullDict[word];
     }
@@ -63,8 +68,7 @@ export default function simplify(): Record<string, number> {
       delete fullDict[word + 'e'];
     }
   }
-
-  fs.writeFileSync('./data/lemmatizer/all_words.json', JSON.stringify(fullDict));
+  wfs(LemmatizerWordlist, fullDict);
 
   invalidateDict();
   return fullDict;
