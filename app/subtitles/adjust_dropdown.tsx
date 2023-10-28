@@ -48,8 +48,12 @@ export default function ({ word, removeCall }: { word: AtomizedWord, removeCall:
             {wordStr} with
             <input type="text" value={lemma} onChange={(e) => setLemma(e.target.value)} />
           </li>
-          <li> <input type="text" value={whiteListCandidate} onChange={(e) => setWhiteListCandidate(e.target.value)} /><button onClick={() => toList(wordStr, "white").then(onSuccess)}> to whitelist</button></li>
-          <li> <input type="text" value={blackListCandidate} onChange={(e) => setBlackListCandidate(e.target.value)} /><button onClick={() => toList(id, "black").then(onSuccess)}> to blacklist</button></li>
+          <li>
+            <input type="text" value={whiteListCandidate} onChange={(e) => setWhiteListCandidate(e.target.value)} />
+            <button onClick={() => toList(whiteListCandidate, "white").then(onSuccess)}> to whitelist</button></li>
+          <li>
+            <input type="text" value={blackListCandidate} onChange={(e) => setBlackListCandidate(e.target.value)} />
+            <button onClick={() => toList(blackListCandidate, "black").then(onSuccess)}> to blacklist</button></li>
         </ul>
       }
     </div>

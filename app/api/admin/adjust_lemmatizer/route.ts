@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import simplify from "~/lib/simplify_words";
 import { rfs, wfs } from "~/lib/util";
-import { LemmatizerBlacklist, LemmatizerWhitelist, LemmatizerOverrides } from '~/lib/paths';
+import { LemmatizerBlacklist, LemmatizerWhitelist, LemmatizerOverrides } from "~/lib/paths";
 
 const CWD = process.cwd();
 
