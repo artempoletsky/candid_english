@@ -24,16 +24,18 @@ const Suffixes = {
   "th": "",
 };
 
-import fs from "fs";
+import { wfs, rfs } from "./util";
+import { LemmatizerWordlist, LemmatizerIrregular, LemmatizerOverrides } from "./paths";
+
 let WordsDict: Record<string, number>;
 let Overrides: Record<string, string>;
 let Irregular: Record<string, string>;
 const CWD = process.cwd();
 export function invalidateDict() {
   // delete require.cache[Object.keys(require.cache).find(k => k.endsWith('all_words.json')) as string];
-  WordsDict = JSON.parse(fs.readFileSync(CWD + "/data/lemmatizer/all_words.json", { encoding: "utf8" }));
-  Overrides = JSON.parse(fs.readFileSync(CWD + "/data/lemmatizer/lemma_overrides.json", { encoding: "utf8" }));
-  Irregular = JSON.parse(fs.readFileSync(CWD + "/data/lemmatizer/irregular_verbs.json", { encoding: "utf8" }));
+  WordsDict = rfs(LemmatizerWordlist);
+  Overrides = rfs(LemmatizerOverrides);
+  Irregular = rfs(LemmatizerIrregular);
 }
 invalidateDict();
 
@@ -157,7 +159,7 @@ export default function lemmatize(text: string): Record<string, LemmatizeResult>
       } else {
         lemma = lemmatizeWord(lemma, WordsDict);
       }
-      
+
       return {
         word,
         lemma,
