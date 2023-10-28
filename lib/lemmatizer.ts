@@ -77,6 +77,11 @@ export function lemmatizeWord(word: string, dict: Record<string, any>, options?:
     }
   }
 
+  //jinxes boxes
+  if ((suffix == "s" || suffix == "s'") && lemma.endsWith('xe')){
+    return lemma.slice(0, -1);
+  }
+
   //fif ->five
   if (suffix == "th" && lemma.endsWith('f')) {
     return lemma.slice(0, -1) + 've';

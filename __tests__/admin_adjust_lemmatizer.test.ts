@@ -1,6 +1,6 @@
 import { describe, test, expect } from "@jest/globals"
 import { LemmatizerOverrides, LemmatizerBlacklist, LemmatizerWhitelist, LemmatizerWordlist } from '~/lib/paths'
-import { addToList, POST } from "~/app/admin/adjust_lemmatizer/route";
+import { addToList, POST } from "~/app/api/admin/adjust_lemmatizer/route";
 import { NextRequest } from "next/server"
 // import fs from "fs"
 import { wfs, rfs } from "~/lib/util";

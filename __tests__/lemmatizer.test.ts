@@ -26,6 +26,7 @@ describe("Simplify", () => {
     expect(allWordsDict["go"]).toBeDefined();
     expect(allWordsDict["five"]).toBeDefined();
     expect(allWordsDict["enforcer"]).toBeDefined();
+    expect(allWordsDict["jinx"]).toBeDefined();
 
 
     expect(allWordsDict["bodies"]).toBeUndefined();
@@ -37,14 +38,16 @@ describe("Simplify", () => {
     expect(allWordsDict["fifth"]).toBeUndefined();
     expect(allWordsDict["wo"]).toBeUndefined();
     expect(allWordsDict["enforcers"]).toBeUndefined();
+    expect(allWordsDict["jinxes"]).toBeUndefined();
 
 
   });
 
-  xtest("enforcers'	", () => {
-    let lemmas = lemmatize("enforcers'	");
+  xtest("jinxes boxes", () => {
+    let lemmas = lemmatize("jinxes boxes");
 
-    expect(lemmas["enforcer"]).toBeDefined();
+    expect(lemmas["jinx"]).toBeDefined();
+    expect(lemmas["box"]).toBeDefined();
   });
 });
 
@@ -226,5 +229,12 @@ describe("Lemmatizer", () => {
     let lemmas = lemmatize("enforcers'	");
 
     expect(lemmas["enforcer"]).toBeDefined();
+  });
+
+  test("jinxes boxes", () => {
+    let lemmas = lemmatize("jinxes boxes");
+
+    expect(lemmas["jinx"]).toBeDefined();
+    expect(lemmas["box"]).toBeDefined();
   });
 });

@@ -1,16 +1,14 @@
 'use client';
 
-import { UpdateWordsResponse } from '../update_known_words/route';
-import { Word } from '../wordlist/wordlist';
+import { UpdateWordsResponse } from '~/app/api/update_known_words/route';
 import { useState, useEffect } from 'react';
 import css from '../wordlist/wordlist.module.css';
-import { uniq, pull } from 'lodash';
 import Link from 'next/link'
 import { getMyWords, saveMyWords } from '~/lib/words_storage';
 
 
 export function updateWordlists(requestBody: any): Promise<Record<string, boolean>> {
-  return fetch('/update_known_words', {
+  return fetch('/api/update_known_words', {
     method: 'POST',
     headers: {
     },
