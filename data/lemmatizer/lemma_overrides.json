@@ -1,4 +1,5 @@
 {
+  "ai": "be",
   "shoes": "shoe",
   "men": "man",
   "women": "woman",
@@ -15,5 +16,6 @@
   "fuss": "fuss",
   "meters": "meter",
   "wo": "will",
-  "booth": "booth"
+  "booth": "booth",
+  "barbies": "barbie"
 }

@@ -6,10 +6,10 @@ import { useState, useEffect } from 'react';
 import css from '../wordlist/wordlist.module.css';
 import { uniq, pull } from 'lodash';
 import Link from 'next/link'
-import { getMyWords, saveMyWords, WordsDict } from '~/lib/words_storage';
+import { getMyWords, saveMyWords } from '~/lib/words_storage';
 
 
-export function updateWordlists(requestBody: any): Promise<WordsDict> {
+export function updateWordlists(requestBody: any): Promise<Record<string, boolean>> {
   return fetch('/update_known_words', {
     method: 'POST',
     headers: {
@@ -20,9 +20,9 @@ export function updateWordlists(requestBody: any): Promise<WordsDict> {
     .then(updateLocalStorage);
 }
 
-export function updateLocalStorage(response: UpdateWordsResponse): Promise<WordsDict> {
+export function updateLocalStorage(response: UpdateWordsResponse): Promise<Record<string, boolean>> {
   const { added, removed, updateTimestamp } = response;
-  const words: WordsDict = getMyWords();
+  const words: Record<string, boolean> = getMyWords();
 
   removed.forEach(w => {
     delete words[w];
@@ -44,32 +44,32 @@ export function updateLocalStorage(response: UpdateWordsResponse): Promise<Words
   return new Promise(resolve => resolve(words));
 }
 
-export function addWords(words: string[]): Promise<WordsDict> {
+export function addWords(words: string[]): Promise<Record<string, boolean>> {
   return updateWordlists({
     added: words
   });
 }
 
-export function removeWords(words: string[]): Promise<WordsDict> {
+export function removeWords(words: string[]): Promise<Record<string, boolean>> {
   return updateWordlists({
     removed: words
   });
 }
 
-export function addWordlists(wordlists: string[]): Promise<WordsDict> {
+export function addWordlists(wordlists: string[]): Promise<Record<string, boolean>> {
   return updateWordlists({
     addedWordlists: wordlists
   });
 }
 
-export function removeWordlists(wordlists: string[]): Promise<WordsDict> {
+export function removeWordlists(wordlists: string[]): Promise<Record<string, boolean>> {
   return updateWordlists({
     removedWordlists: wordlists
   });
 }
 
 
-export function clearMyWords(): Promise<WordsDict> {
+export function clearMyWords(): Promise<Record<string, boolean>> {
   return updateWordlists({
     removed: Object.keys(getMyWords())
   });
@@ -96,7 +96,7 @@ export function saveMyWordlist() {
 
 export default function MyWordlist() {
   // initWordsLocalStorage();
-  let [myWords, setMyWords] = useState<WordsDict>(getMyWords());
+  let [myWords, setMyWords] = useState<Record<string, boolean>>(getMyWords());
   let [newWord, setNewWord] = useState<string>('');
   let [updateTrigger, setUpdateTrigger] = useState(0);
 
@@ -106,7 +106,7 @@ export default function MyWordlist() {
     // setMyWords(store.get('my_words'));
   }, []);
 
-  function updateViewWords(words: WordsDict): Promise<WordsDict> {
+  function updateViewWords(words: Record<string, boolean>): Promise<Record<string, boolean>> {
     // setMyWords(words);
     setUpdateTrigger(Math.random());
     return new Promise(resolve => resolve(words))
@@ -192,8 +192,8 @@ export default function MyWordlist() {
       Word count: {wordCount}
       <ul className={css.container} data-update={updateTrigger}>
         {wordsArr.map(word => <li className="flex" key={word}>
-          <span className="grow">{word}</span>
           <i className="small icon thumbs_down cursor-pointer" title="Remove" onClick={() => removeWord(word)}></i>
+          <span className="grow">{word}</span>
         </li>)}
       </ul>
     </div>

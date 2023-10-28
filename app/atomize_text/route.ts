@@ -12,6 +12,7 @@ export type Subtitle = {
 export type AtomizedWord = {
   word: string,
   id: string,
+  isInDictionary: boolean,
   sentence: string,
   count: number
 }
@@ -58,11 +59,12 @@ export function atomizeSRT(subs: Subtitle[]): AtomizedWord[] {
         dict[lemma].count += count;
         continue;
       }
-      
+
       dict[lemma] = {
         id: lemma,
         word: subLemmas[lemma].word,
         count,
+        isInDictionary: subLemmas[lemma].isInDictionary,
         sentence: JSON.stringify({
           time: sub.time,
           text: sub.text

@@ -1,6 +1,6 @@
 'use client';
 
-import { WordsDict, getMyWords } from '~/lib/words_storage';
+import { getMyWords } from '~/lib/words_storage';
 import axios from 'axios';
 
 import { AtomizedWord } from '~/app/atomize_text/route';
@@ -16,7 +16,7 @@ type AtomizedWordResponse = {
   }
 };
 
-function uploadFile(input: HTMLInputElement):Promise<AtomizedWordResponse> {
+function uploadFile(input: HTMLInputElement): Promise<AtomizedWordResponse> {
 
   if (!input || !input.files || !input.files[0]) {
     return new Promise((resolve, reject) => { reject() });
@@ -34,7 +34,7 @@ function uploadFile(input: HTMLInputElement):Promise<AtomizedWordResponse> {
 
 export default function SubtitlesComp() {
   let [words, setWords] = useState<AtomizedWord[]>([]);
-  let [myWords, setMyWords] = useState<WordsDict>({});
+  let [myWords, setMyWords] = useState<Record<string, boolean>>({});
   useEffect(() => {
     setMyWords({ ...getMyWords() });
   }, []);
@@ -42,13 +42,46 @@ export default function SubtitlesComp() {
     const json = JSON.parse(s);
     return (<span title={json.time}>{json.text}</span>)
   }
+  const inDict: AtomizedWord[] = [];
+  const notInDict: AtomizedWord[] = [];
 
-  let filteredWords = words.filter(({ id }) => !myWords[id]);
+  for (const lres of words) {
+    if (myWords[lres.id]) continue;
+
+    const arr = lres.isInDictionary ? inDict : notInDict;
+    arr.push(lres);
+  }
+
+  // let filteredWords = words.filter(({ id }) => !myWords[id]);
   // console.log(filteredWords);
 
   function discardWord(w: AtomizedWord) {
     words = words.filter(word => word.id != w.id);
     setWords(words);
+  }
+
+
+  function printTable(array: AtomizedWord[]) {
+    return <>
+      Words count: {array.length}
+      <table>
+        <tbody>
+          {array.map(w => (
+            <tr key={w.id}>
+              <td className="whitespace-nowrap">
+                <i onClick={e => addWords([w.id]).then(words => setMyWords({ ...words }))} title="Mark as learned" className="icon small thumbs_up cursor-pointer mr-2"></i>
+                <i onClick={e => discardWord(w)} title="Discard" className="icon small thumbs_down m-0 cursor-pointer mr-2"></i>
+                <AdjustDropdown word={w} removeCall={discardWord}></AdjustDropdown>
+              </td>
+              <td>{w.count}</td>
+              <td>{w.id}</td>
+              <td onClick={e => console.log(w)} >{formatSentence(w.sentence)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
+
   }
   return (
     <div>
@@ -63,23 +96,13 @@ export default function SubtitlesComp() {
           setWords(res.data.words);
         });
       }} />
-      Words count: {filteredWords.length}
-      <table>
-        <tbody>
-          {filteredWords.map(w => (
-            <tr key={w.id}>
-              <td className="whitespace-nowrap">
-                <i onClick={e => addWords([w.id]).then(words => setMyWords({ ...words }))} title="Mark as learned" className="icon small thumbs_up cursor-pointer mr-2"></i>
-                <i onClick={e => discardWord(w)} title="Discard" className="icon small thumbs_down m-0 cursor-pointer mr-2"></i>
-                <AdjustDropdown word={w} removeCall={discardWord}></AdjustDropdown>
-              </td>
-              <td>{w.count}</td>
-              <td>{w.id}</td>
-              <td onClick={e => console.log(w)} >{formatSentence(w.sentence)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {printTable(inDict)}
+
+      {notInDict.length != 0 && <>
+        <h3>Probably not English words:</h3>
+        {printTable(notInDict)}
+      </>}
+
     </div>
   );
 }

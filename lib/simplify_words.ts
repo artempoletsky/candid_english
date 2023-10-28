@@ -8,8 +8,6 @@ let BlackList: Record<string, number>;
 let WhiteList: Record<string, number>;
 
 
-
-
 import { lemmatizeWord, invalidateDict } from "~/lib/lemmatizer";
 
 
@@ -42,11 +40,16 @@ export default function simplify(): Record<string, number> {
 
   const fullDict = toDict(words);
 
+  for (const word in WhiteList) {
+    fullDict[word] = 1;
+  }
+
   for (const word in fullDict) {
     if (BlackList[word]) {
       delete fullDict[word];
       continue;
     }
+
     if (WhiteList[word]) {
       continue;
     }

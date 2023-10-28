@@ -9,6 +9,7 @@ export type LemmatizeResult = {
   lemma: string,
   count: number,
   word: string,
+  isInDictionary: boolean,
 };
 
 const DoubleConsonants = ['rr', 'tt', 'pp', 'dd', 'gg', 'kk', 'zz', 'cc', 'bb', 'nn', 'mm'];
@@ -104,7 +105,7 @@ export function lemmatizeWord(word: string, dict: Record<string, any>, options?:
   if (dict[lemma + 'e']) {
     return lemma + 'e';
   }
-  
+
   if (lemma.endsWith("ve")) {
     //serve
     if (dict[lemma]) {
@@ -128,6 +129,7 @@ const suffixesToRemove = ["'m", "'ve", "'re", "'d", "n't", "'s", "'ll"];
 export default function lemmatize(text: string): Record<string, LemmatizeResult> {
   let dict: Record<string, LemmatizeResult> = {};
   const sentences = text.split(/[.!?]/);
+  const isLemmaInDict: Record<string, boolean> = {};
 
   for (const sentence of sentences) {
 
@@ -155,12 +157,13 @@ export default function lemmatize(text: string): Record<string, LemmatizeResult>
       } else {
         lemma = lemmatizeWord(lemma, WordsDict);
       }
-
+      
       return {
         word,
         lemma,
         count: 1,
-        sentence
+        sentence,
+        isInDictionary: !!WordsDict[lemma],
       } as LemmatizeResult;
     }).filter(({ lemma }) => {
       lemma = lemma.replace(/[']/, '');

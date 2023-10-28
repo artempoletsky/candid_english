@@ -2,7 +2,7 @@
 import { describe, expect, test, beforeAll } from "@jest/globals";
 
 // import lemmatize from "../lib/wink_lemmatizer";
-import  lemmatize from "../lib/lemmatizer";
+import lemmatize from "../lib/lemmatizer";
 import simplify from "../lib/simplify_words";
 
 const xdescribe = (...args: any) => { };
@@ -25,6 +25,7 @@ describe("Simplify", () => {
     expect(allWordsDict["drape"]).toBeDefined();
     expect(allWordsDict["go"]).toBeDefined();
     expect(allWordsDict["five"]).toBeDefined();
+    expect(allWordsDict["enforcer"]).toBeDefined();
 
 
     expect(allWordsDict["bodies"]).toBeUndefined();
@@ -35,16 +36,16 @@ describe("Simplify", () => {
     expect(allWordsDict["goes"]).toBeUndefined();
     expect(allWordsDict["fifth"]).toBeUndefined();
     expect(allWordsDict["wo"]).toBeUndefined();
+    expect(allWordsDict["enforcers"]).toBeUndefined();
 
 
   });
-  xtest("serves to wolves", () => {
-    let lemmas = lemmatize("serves to wolves");
 
-    expect(lemmas["serve"]).toBeDefined();
-    expect(lemmas["wolf"]).toBeDefined();
+  xtest("enforcers'	", () => {
+    let lemmas = lemmatize("enforcers'	");
+
+    expect(lemmas["enforcer"]).toBeDefined();
   });
-
 });
 
 describe("Lemmatizer", () => {
@@ -215,4 +216,15 @@ describe("Lemmatizer", () => {
     expect(lemmas["wolf"]).toBeDefined();
   });
 
+  test("runnin'	", () => {
+    let lemmas = lemmatize("runnin' ");
+
+    expect(lemmas["run"]).toBeDefined();
+  });
+
+  test("enforcers'	", () => {
+    let lemmas = lemmatize("enforcers'	");
+
+    expect(lemmas["enforcer"]).toBeDefined();
+  });
 });
