@@ -24,8 +24,9 @@ const Suffixes = {
   "th": "",
 };
 
-import { wfs, rfs } from "./util";
+import { wfs, rfs, createIfNotExists } from "./util";
 import { LemmatizerWordlist, LemmatizerIrregular, LemmatizerOverrides } from "./paths";
+createIfNotExists(LemmatizerWordlist, {});
 
 let WordsDict: Record<string, number>;
 let Overrides: Record<string, string>;
