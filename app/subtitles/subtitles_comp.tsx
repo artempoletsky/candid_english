@@ -3,7 +3,7 @@
 import { getMyWords } from '~/lib/words_storage';
 import axios from 'axios';
 
-import { AtomizedWord } from '~/app/atomize_text/route';
+import { AtomizedWord } from '~/app/api/atomize_text/route';
 import { useState, useEffect } from 'react';
 import { addWords } from "~/app/edit_my_wordlist/my_wordlist";
 
@@ -26,7 +26,7 @@ function uploadFile(input: HTMLInputElement): Promise<AtomizedWordResponse> {
   data.append('file', input.files[0]);
   // data.append('user', 'hubot');
 
-  const promise = axios.post('/atomize_text', data);
+  const promise = axios.post('/api/atomize_text', data);
 
   return promise;
 }
