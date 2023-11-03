@@ -40,14 +40,14 @@ describe("Simplify", () => {
     expect(allWordsDict["enforcers"]).toBeUndefined();
     expect(allWordsDict["jinxes"]).toBeUndefined();
 
-
   });
 
-  xtest("jinxes boxes", () => {
-    let lemmas = lemmatize("jinxes boxes");
+  xtest("missing promises", () => {
+    let lemmas = lemmatize("missing promises");
+    console.log(lemmas);
 
-    expect(lemmas["jinx"]).toBeDefined();
-    expect(lemmas["box"]).toBeDefined();
+    expect(lemmas["miss"]).toBeDefined();
+    expect(lemmas["promise"]).toBeDefined();
   });
 });
 
@@ -236,5 +236,13 @@ describe("Lemmatizer", () => {
 
     expect(lemmas["jinx"]).toBeDefined();
     expect(lemmas["box"]).toBeDefined();
+  });
+
+  test("missing promises", () => {
+    let lemmas = lemmatize("missing promises");
+    console.log(lemmas);
+
+    expect(lemmas["miss"]).toBeDefined();
+    expect(lemmas["promise"]).toBeDefined();
   });
 });

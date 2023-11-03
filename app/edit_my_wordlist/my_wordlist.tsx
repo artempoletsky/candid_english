@@ -38,8 +38,7 @@ export function updateLocalStorage(response: UpdateWordsResponse): Promise<Recor
   // store.set('last_words_update', updateTimestamp);
   saveMyWords();
 
-
-  return new Promise(resolve => resolve(words));
+  return Promise.resolve(words);
 }
 
 export function addWords(words: string[]): Promise<Record<string, boolean>> {
@@ -107,7 +106,8 @@ export default function MyWordlist() {
   function updateViewWords(words: Record<string, boolean>): Promise<Record<string, boolean>> {
     // setMyWords(words);
     setUpdateTrigger(Math.random());
-    return new Promise(resolve => resolve(words))
+    
+    return Promise.resolve(words);
   }
 
   function addNewWord() {

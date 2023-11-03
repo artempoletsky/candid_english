@@ -19,7 +19,7 @@ type AtomizedWordResponse = {
 function uploadFile(input: HTMLInputElement): Promise<AtomizedWordResponse> {
 
   if (!input || !input.files || !input.files[0]) {
-    return new Promise((resolve, reject) => { reject() });
+    return Promise.reject();
   }
 
   var data = new FormData();
