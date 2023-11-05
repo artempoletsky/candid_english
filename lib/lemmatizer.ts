@@ -22,6 +22,7 @@ const Suffixes = {
   "s": "",
   "s'": "",
   "th": "",
+  "ly": "",
 };
 
 import { wfs, rfs, createIfNotExists } from "./util";
@@ -138,7 +139,7 @@ export function lemmatizeWord(word: string, dict: Record<string, any>, options?:
 const suffixesToRemove = ["'m", "'ve", "'re", "'d", "n't", "'s", "'ll"];
 export default function lemmatize(text: string): Record<string, LemmatizeResult> {
   let dict: Record<string, LemmatizeResult> = {};
-  const sentences = text.split(/[.!?]/);
+  const sentences = text.split(/[.!?—]/);
   const isLemmaInDict: Record<string, boolean> = {};
 
   for (const sentence of sentences) {

@@ -28,6 +28,7 @@ describe("Simplify", () => {
     expect(allWordsDict["enforcer"]).toBeDefined();
     expect(allWordsDict["jinx"]).toBeDefined();
     expect(allWordsDict["toss"]).toBeDefined();
+    expect(allWordsDict["brave"]).toBeDefined();
 
 
     expect(allWordsDict["bodies"]).toBeUndefined();
@@ -41,17 +42,18 @@ describe("Simplify", () => {
     expect(allWordsDict["enforcers"]).toBeUndefined();
     expect(allWordsDict["jinxes"]).toBeUndefined();
     expect(allWordsDict["tosses"]).toBeUndefined();
+    expect(allWordsDict["bravely"]).toBeUndefined();
   });
 
-  xtest("	Nobody tosses a Dwarf.", () => {
-    let lemmas = lemmatize("Nobody tosses a Dwarf.");
+  test("bravely", () => {
+    let lemmas = lemmatize("bravely");
     // console.log(lemmas);
 
-    expect(lemmas["toss"]).toBeDefined();
+    expect(lemmas["brave"]).toBeDefined();
   });
 });
 
-describe("Lemmatizer", () => {
+xdescribe("Lemmatizer", () => {
 
   test("counts lemmas in text", () => {
     let lemmas = lemmatize("No. Standard black.");

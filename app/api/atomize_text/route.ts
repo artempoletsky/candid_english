@@ -74,7 +74,13 @@ export function atomizeSRT(subs: Subtitle[]): AtomizedWord[] {
     }
   }
 
-  return Object.values(dict).sort((e1, e2) => e2.count - e1.count);
+  return Object.values(dict).sort((e1, e2) => {
+    let dCount = e2.count - e1.count;
+    if (dCount != 0) {
+      return dCount;
+    }
+    return e1.id.length - e2.id.length;
+  });
 }
 
 
