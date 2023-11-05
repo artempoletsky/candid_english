@@ -19,7 +19,7 @@ export type AtomizedWord = {
 
 
 export function parseSRT(text: string): Subtitle[] {
-  const subsRaw = text.split("\r\n");
+  const subsRaw = text.split(/[\n\r]+/);
   const subs: Subtitle[] = [];
   let i = -1;
 

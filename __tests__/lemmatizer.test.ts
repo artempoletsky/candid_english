@@ -27,6 +27,7 @@ describe("Simplify", () => {
     expect(allWordsDict["five"]).toBeDefined();
     expect(allWordsDict["enforcer"]).toBeDefined();
     expect(allWordsDict["jinx"]).toBeDefined();
+    expect(allWordsDict["toss"]).toBeDefined();
 
 
     expect(allWordsDict["bodies"]).toBeUndefined();
@@ -39,15 +40,14 @@ describe("Simplify", () => {
     expect(allWordsDict["wo"]).toBeUndefined();
     expect(allWordsDict["enforcers"]).toBeUndefined();
     expect(allWordsDict["jinxes"]).toBeUndefined();
-
+    expect(allWordsDict["tosses"]).toBeUndefined();
   });
 
-  xtest("missing promises", () => {
-    let lemmas = lemmatize("missing promises");
-    console.log(lemmas);
+  xtest("	Nobody tosses a Dwarf.", () => {
+    let lemmas = lemmatize("Nobody tosses a Dwarf.");
+    // console.log(lemmas);
 
-    expect(lemmas["miss"]).toBeDefined();
-    expect(lemmas["promise"]).toBeDefined();
+    expect(lemmas["toss"]).toBeDefined();
   });
 });
 
@@ -240,9 +240,14 @@ describe("Lemmatizer", () => {
 
   test("missing promises", () => {
     let lemmas = lemmatize("missing promises");
-    console.log(lemmas);
 
     expect(lemmas["miss"]).toBeDefined();
     expect(lemmas["promise"]).toBeDefined();
+  });
+
+  test("Nobody tosses a Dwarf.", () => {
+    let lemmas = lemmatize("Nobody tosses a Dwarf.");
+
+    expect(lemmas["toss"]).toBeDefined();
   });
 });

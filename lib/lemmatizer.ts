@@ -69,17 +69,19 @@ export function lemmatizeWord(word: string, dict: Record<string, any>, options?:
     return word;
   }
 
+  //jinxes boxes
+  //misses tosses
+  if ((suffix == "s" || suffix == "s'") && (lemma.endsWith('xe') || lemma.endsWith('sse'))) {
+    return lemma.slice(0, -1);
+  }
+
+
   for (let s of DoubleConsonants) {
     //hopp -> hop
     if (lemma.endsWith(s)) {
       lemma = lemma.slice(0, -1);
       return lemma;
     }
-  }
-
-  //jinxes boxes
-  if ((suffix == "s" || suffix == "s'") && lemma.endsWith('xe')){
-    return lemma.slice(0, -1);
   }
 
   //fif ->five
