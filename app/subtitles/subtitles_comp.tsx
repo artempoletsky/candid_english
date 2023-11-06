@@ -38,10 +38,20 @@ export default function SubtitlesComp() {
   useEffect(() => {
     setMyWords({ ...getMyWords() });
   }, []);
-  function formatSentence(s: string) {
-    const json = JSON.parse(s);
-    return (<span title={json.time}>{json.text}</span>)
+
+
+  function formatSentence(word: AtomizedWord) {
+    const json = JSON.parse(word.sentence);
+    let text = json.text.replace(word.word, `<b>${word.word}</b>`);
+    return (<span title={json.time} dangerouslySetInnerHTML={{ __html: text }}></span>);
   }
+
+  function copySentenceToClipboard(word: AtomizedWord) {
+    const json = JSON.parse(word.sentence);
+    let text = json.text.replace(word.word, `<b>${word.word}</b>`);
+    navigator.clipboard.writeText(text);
+  }
+
   const inDict: AtomizedWord[] = [];
   const notInDict: AtomizedWord[] = [];
 
@@ -75,7 +85,7 @@ export default function SubtitlesComp() {
               </td>
               <td>{w.count}</td>
               <td>{w.id}</td>
-              <td onClick={e => console.log(w)} >{formatSentence(w.sentence)}</td>
+              <td onClick={e => copySentenceToClipboard(w)} >{formatSentence(w)}</td>
             </tr>
           ))}
         </tbody>
