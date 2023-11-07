@@ -14,10 +14,12 @@ export type LemmatizeResult = {
 
 const DoubleConsonants = ['rr', 'tt', 'pp', 'dd', 'gg', 'kk', 'zz', 'cc', 'bb', 'nn', 'mm'];
 const Suffixes = {
+  "ers": "",
+  "ers'": "",
+
   "ing": "",
   "in'": "",
   "er": "",
-  "ers": "",
   "est": "",
   "ed": "",
   "s": "",
@@ -73,13 +75,27 @@ export function lemmatizeWord(word: string, dict: Record<string, any>, options?:
 
   //jinxes boxes
   //misses tosses
-  if ((suffix == "s" || suffix == "s'") && (lemma.endsWith('xe') || lemma.endsWith('sse'))) {
+  if ((suffix == "ers" || suffix == "ers'")) {
+    if (dict[lemma + 'er']) {
+      return lemma + 'er';
+    }
+  }
+
+  if (suffix == "s'") {
+    suffix = "s";
+  } else if (suffix == "in'") {
+    suffix = "ing";
+  }
+  
+  //jinxes boxes
+  //misses tosses
+  if ((suffix == "s") && (lemma.endsWith('xe') || lemma.endsWith('sse'))) {
     return lemma.slice(0, -1);
   }
 
   //promises
   //biases
-  if ((suffix == "s" || suffix == "s'") && lemma.endsWith('se')) {
+  if ((suffix == "s") && lemma.endsWith('se')) {
     if (dict[lemma]) {
       return lemma;
     }

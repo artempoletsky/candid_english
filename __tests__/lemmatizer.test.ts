@@ -29,6 +29,7 @@ describe("Simplify", () => {
     expect(allWordsDict["jinx"]).toBeDefined();
     expect(allWordsDict["toss"]).toBeDefined();
     expect(allWordsDict["brave"]).toBeDefined();
+    expect(allWordsDict["answer"]).toBeDefined();
 
 
     expect(allWordsDict["bodies"]).toBeUndefined();
@@ -43,13 +44,14 @@ describe("Simplify", () => {
     expect(allWordsDict["jinxes"]).toBeUndefined();
     expect(allWordsDict["tosses"]).toBeUndefined();
     expect(allWordsDict["bravely"]).toBeUndefined();
+    expect(allWordsDict["answers"]).toBeUndefined();
   });
 
-  xtest("biases", () => {
-    let lemmas = lemmatize("biases");
+  xtest("answers", () => {
+    let lemmas = lemmatize("answer");
     // console.log(lemmas);
 
-    expect(lemmas["bias"]).toBeDefined();
+    expect(lemmas["answer"]).toBeDefined();
   });
 });
 
@@ -260,5 +262,10 @@ describe("Lemmatizer", () => {
   test("buyers", () => {
     let lemmas = lemmatize("buyers");
     expect(lemmas["buy"]).toBeDefined();
+  });
+
+  test("answers", () => {
+    let lemmas = lemmatize("answer");
+    expect(lemmas["answer"]).toBeDefined();
   });
 });
