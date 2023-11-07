@@ -17,6 +17,7 @@ const Suffixes = {
   "ing": "",
   "in'": "",
   "er": "",
+  "ers": "",
   "est": "",
   "ed": "",
   "s": "",
@@ -76,6 +77,14 @@ export function lemmatizeWord(word: string, dict: Record<string, any>, options?:
     return lemma.slice(0, -1);
   }
 
+  //promises
+  //biases
+  if ((suffix == "s" || suffix == "s'") && lemma.endsWith('se')) {
+    if (dict[lemma]) {
+      return lemma;
+    }
+    return lemma.slice(0, -1);
+  }
 
   for (let s of DoubleConsonants) {
     //hopp -> hop
