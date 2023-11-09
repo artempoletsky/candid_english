@@ -9,7 +9,7 @@ export function wfs(filename: string, data: any, options?: WFSOptions) {
   const { pretty = false } = options || {};
 
   if (pretty) {
-    return fs.writeFileSync(CWD + filename, JSON.stringify(data, null, 2));
+    return fs.writeFileSync(CWD + filename, JSON.stringify(data, null, 2).replace(/\n/g, "\r\n"));
   } else {
     return fs.writeFileSync(CWD + filename, JSON.stringify(data));
   }
