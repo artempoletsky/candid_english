@@ -6,6 +6,7 @@ import { addWords, removeWords } from '~/app/edit_my_wordlist/my_wordlist';
 import { isWordLearned, getMyWords } from '~/lib/words_storage';
 import Link from 'next/link'
 import DictLink from "@/dictlink";
+import useSWR from "swr";
 
 export type Word = {
   id: string,
@@ -47,24 +48,40 @@ const levelOptionsArr = Object.keys(levelOptions)
 const partOptionsArr = Object.keys(partOptions)
   .map(key => <option key={key} value={key}>{partOptions[key]}</option>);
 
-export default function WordList({ data }: { data: Array<Word> }) {
-  let [myWords, setSetMyWordsView] = useState<Record<string, boolean>>({ ...getMyWords() });
+const fetcher = (...args: any) => fetch.apply(this, args).then(res => res.json())
 
+export default function WordList({ words }: { words?: Array<Word> }) {
+  let [myWords, setSetMyWordsView] = useState<Record<string, boolean>>({ ...getMyWords() });
   let [hideLearnedMode, setHideLearnedMode] = useState(true);
 
-  function toggleWord(word: string, isKnown: boolean) {
-    const fn = isKnown ? addWords : removeWords;
-    fn([word]).then(words => setSetMyWordsView({ ...words }));
-  }
 
   let [level, setLevel] = useState("any");
   let [part, setPart] = useState("any");
   let [searchQuery, setSearchQuery] = useState("");
   let [excludedWords, setExcludedWords] = useState<Array<String>>([]);
 
+  const dataEmpty = !words;
+  if (dataEmpty) {
+    words = [];
+  }
+  const { data, error, isLoading } = useSWR('/api/get_oxford_list', fetcher);
+
+  if (isLoading) {
+    return (<div>loading...</div>);
+  }
+
+  if (error) {
+    return (<div>Loading has failed</div>);
+  }
+
+  function toggleWord(word: string, isKnown: boolean) {
+    const fn = isKnown ? addWords : removeWords;
+    fn([word]).then(words => setSetMyWordsView({ ...words }));
+  }
+
 
   const filterFn = (e: Word) => {
-    if (hideLearnedMode && myWords[e.word.toLowerCase()]) {
+    if (hideLearnedMode && isWordLearned(e.word)) {
       return false;
     }
     if (level != "any" && level != e.level) return false;
@@ -81,8 +98,8 @@ export default function WordList({ data }: { data: Array<Word> }) {
     return true;
   };
 
-  const words = data.filter(filterFn);
-  const wordCount = words.length;
+  const filteredWords = data.filter(filterFn);
+  const wordCount = filteredWords.length;
   return (
     <>
       <div className="flex">
@@ -99,7 +116,6 @@ export default function WordList({ data }: { data: Array<Word> }) {
       </div>
       Word count: {wordCount}
       <div>
-        <Link href="/edit_my_wordlist">Edit my wordlist</Link>
         <label>&nbsp;<input type="checkbox" checked={hideLearnedMode} onChange={e => {
           const now = Date.now();
           setHideLearnedMode(e.target.checked);
@@ -110,13 +126,13 @@ export default function WordList({ data }: { data: Array<Word> }) {
       </div>
 
       <div className={css.container}>
-        <table className={css.table}>
+        <table className="w-full table">
           <tbody>
-            {words.map((el: Word) =>
+            {filteredWords.map((el: Word) =>
               <tr key={el.id}>
                 <td className={css.checkbox_td}>
                   {!hideLearnedMode ?
-                    <input type='checkbox' checked={isWordLearned(el.word)} onChange={e => toggleWord(el.word, e.target.checked)} />
+                    <input className="checkbox" type="checkbox" checked={isWordLearned(el.word)} onChange={e => toggleWord(el.word, e.target.checked)} />
                     :
                     <i className="small icon thumbs_up cursor-pointer" title="Mark as learned" onClick={e => toggleWord(el.word, true)}></i>
                   }

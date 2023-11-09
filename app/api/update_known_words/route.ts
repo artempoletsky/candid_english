@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import { Word } from "~/app/wordlist/wordlist";
+
+import { rfs } from "~/lib/util";
+import { OXFORD_BY_LEVEL } from "~/lib/paths";
 
 export type UpdateWordsRequest = {
   added: string[],
@@ -31,7 +32,8 @@ function getWordlist(wordlistName: string): string[] {
   if (wordlists[wordlistName]) {
     return wordlists[wordlistName];
   }
-  wordlists = JSON.parse(fs.readFileSync('./grab_data/words_level.json', { encoding: 'utf-8' }));
+
+  wordlists = rfs(OXFORD_BY_LEVEL);
 
   return wordlists[wordlistName] || [];
 }
@@ -47,8 +49,8 @@ export async function POST(req: NextRequest) {
     ...reqBody
   };
 
-  res.added = request.added;
-  res.removed = request.removed;
+  res.added = request.added.map(w => w.toLowerCase());
+  res.removed = request.removed.map(w => w.toLowerCase());
 
   for (const wordlistName of request.addedWordlists) {
     const words = getWordlist(wordlistName);

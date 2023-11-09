@@ -48,5 +48,5 @@ export const saveMyWords = debounce(() => {
 
 
 export function isWordLearned(word: string): boolean {
-  return myWords[word] || false;
+  return myWords[word.toLowerCase()] || false;
 }
