@@ -3,8 +3,9 @@ import { useState, useEffect } from 'react';
 import css from './wordlist.module.css';
 import debounce from 'lodash.debounce';
 import { addWords, removeWords } from '~/app/edit_my_wordlist/my_wordlist';
-import { isWordLearned, WordsDict, getMyWords } from '~/lib/words_storage';
+import { isWordLearned, getMyWords } from '~/lib/words_storage';
 import Link from 'next/link'
+import DictLink from "@/dictlink";
 
 export type Word = {
   id: string,
@@ -13,7 +14,7 @@ export type Word = {
   part: string
 };
 
-const REVERSO_LANG = "russian";
+
 
 
 const levelOptions: { [key: string]: string } = {
@@ -41,13 +42,13 @@ const partOptions: { [key: string]: string } = {
 };
 
 const levelOptionsArr = Object.keys(levelOptions)
-.map(key => <option key={key} value={key}>{levelOptions[key]}</option>);
+  .map(key => <option key={key} value={key}>{levelOptions[key]}</option>);
 
 const partOptionsArr = Object.keys(partOptions)
-.map(key => <option key={key} value={key}>{partOptions[key]}</option>);
+  .map(key => <option key={key} value={key}>{partOptions[key]}</option>);
 
 export default function WordList({ data }: { data: Array<Word> }) {
-  let [myWords, setSetMyWordsView] = useState<WordsDict>({ ...getMyWords() });
+  let [myWords, setSetMyWordsView] = useState<Record<string, boolean>>({ ...getMyWords() });
 
   let [hideLearnedMode, setHideLearnedMode] = useState(true);
 
@@ -60,8 +61,8 @@ export default function WordList({ data }: { data: Array<Word> }) {
   let [part, setPart] = useState("any");
   let [searchQuery, setSearchQuery] = useState("");
   let [excludedWords, setExcludedWords] = useState<Array<String>>([]);
- 
- 
+
+
   const filterFn = (e: Word) => {
     if (hideLearnedMode && myWords[e.word.toLowerCase()]) {
       return false;
@@ -121,8 +122,8 @@ export default function WordList({ data }: { data: Array<Word> }) {
                   }
                 </td>
                 <td>
-                  <a className="small icon reverso mr-1" title="Search word on Reverso" target="_blank" href={`https://context.reverso.net/translation/english-${REVERSO_LANG}/${el.word}`}></a>
-                  <a className={css.word} target="_blank" href={"https://www.oxfordlearnersdictionaries.com/definition/english/" + el.id}>{el.word}</a>
+                  <DictLink className="mr-1" service="reverso" word={el} />
+                  <DictLink type="anchor" service="oxford" word={el} />
                 </td>
                 <td>{el.part} </td>
                 <td>{el.level}</td>

@@ -9,6 +9,7 @@ import { addWords } from "~/app/edit_my_wordlist/my_wordlist";
 
 import { pull } from "lodash";
 import AdjustDropdown from "./adjust_dropdown";
+import DictLink from "@/dictlink";
 
 type AtomizedWordResponse = {
   data: {
@@ -46,10 +47,10 @@ export default function SubtitlesComp() {
     return (<span title={json.time} dangerouslySetInnerHTML={{ __html: text }}></span>);
   }
 
-  function copySentenceToClipboard(word: AtomizedWord) {
-    const json = JSON.parse(word.sentence);
-    let text = json.text.replace(word.word, `<b>${word.word}</b>`);
-    navigator.clipboard.writeText(text);
+  function copySentenceToClipboard(el: HTMLElement) {
+    // const json = JSON.parse(word.sentence);
+    // let text = json.text.replace(word.word, `<b>${word.word}</b>`);
+    navigator.clipboard.writeText(el.innerHTML);
   }
 
   const inDict: AtomizedWord[] = [];
@@ -74,7 +75,7 @@ export default function SubtitlesComp() {
   function printTable(array: AtomizedWord[]) {
     return <>
       Words count: {array.length}
-      <table>
+      <table className="w-full">
         <tbody>
           {array.map(w => (
             <tr key={w.id}>
@@ -84,8 +85,15 @@ export default function SubtitlesComp() {
                 <AdjustDropdown word={w} removeCall={discardWord}></AdjustDropdown>
               </td>
               <td>{w.count}</td>
-              <td>{w.id}</td>
-              <td onClick={e => copySentenceToClipboard(w)} >{formatSentence(w)}</td>
+              <td onClick={e => copySentenceToClipboard(e.target as HTMLElement)} >
+                {w.id}</td>
+              <td onClick={e => copySentenceToClipboard(e.target as HTMLElement)} >{formatSentence(w)}</td>
+              <td className="w-0 whitespace-nowrap">
+                <DictLink className="mr-1" word={w} service="google" />
+                <DictLink className="mr-1" word={w} service="oxford" />
+                <DictLink className="mr-1" word={w} service="reverso" />
+                <DictLink word={w} service="urban" />
+              </td>
             </tr>
           ))}
         </tbody>

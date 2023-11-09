@@ -77,16 +77,28 @@ html {
 }
 
 .icon.reverso {
-  background-image: url("/reverso.png");
+  background-image: url("/icons/reverso.png");
+}
+
+.icon.oxford {
+  background-image: url("/icons/oxford.png");
+}
+
+.icon.urban {
+  background-image: url("/icons/urban_dictionary.png");
+}
+
+.icon.google {
+  background-image: url("/icons/google.png");
 }
 
 .icon.thumbs_up {
-  background-image: url("/thumbs.png");
+  background-image: url("/icons/thumbs.png");
   background-size: 35px auto;
 }
 
 .icon.thumbs_down {
-  background-image: url("/thumbs.png");
+  background-image: url("/icons/thumbs.png");
   background-size: 35px auto;
   background-position: 18px 0;
 }
