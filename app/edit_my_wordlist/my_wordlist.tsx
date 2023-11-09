@@ -106,7 +106,7 @@ export default function MyWordlist() {
   function updateViewWords(words: Record<string, boolean>): Promise<Record<string, boolean>> {
     // setMyWords(words);
     setUpdateTrigger(Math.random());
-    
+
     return Promise.resolve(words);
   }
 
@@ -133,13 +133,13 @@ export default function MyWordlist() {
 
   return (
     <div>
-      <div className="flex">
-        <input autoComplete="off" className="grow mr-2" type="text" name="new_word" value={newWord} onChange={e => setNewWord(e.target.value)} />
-        <button onClick={addNewWord}>Add new word</button>
+      <div className="flex mb-3">
+        <input placeholder="Add new word" autoComplete="off" className="input grow mr-2" type="text" name="new_word" value={newWord} onChange={e => setNewWord(e.target.value)} />
+        <button className="btn" onClick={addNewWord}>Add</button>
       </div>
-      <div>
+      <div className="mb-3">
         <label htmlFor="filter_file">Import from file:</label>
-        <input id="filter_file" type="file" onChange={e => {
+        <input className="file-input" id="filter_file" type="file" onChange={e => {
           const input = e.target;
           const files = input.files;
           if (!files) return;
@@ -161,9 +161,9 @@ export default function MyWordlist() {
           }
           reader.readAsText(file);
         }} />
-        <button onClick={saveMyWordlist}>Export to file</button>
+        <button className="btn" onClick={saveMyWordlist}>Export to file</button>
 
-        <button onClick={e => {
+        <button className="btn" onClick={e => {
           const promptResult = prompt('Are you sure? Type \"DELETE\" to delete all words.');
           if (promptResult == 'DELETE') {
             clearMyWords().then(updateViewWords);
@@ -171,20 +171,31 @@ export default function MyWordlist() {
         }}>Remove all words</button>
       </div>
 
-      <Link href="/wordlist">Explore Oxford's wordlist</Link>
-      <div className="flex">
-        <button className="grow" onClick={e => addWordlists(['a1']).then(updateViewWords)}>Add A1</button>
-        <button className="grow" onClick={e => addWordlists(['a2']).then(updateViewWords)}>Add A2</button>
-        <button className="grow" onClick={e => addWordlists(['b1']).then(updateViewWords)}>Add B1</button>
-        <button className="grow" onClick={e => addWordlists(['b2']).then(updateViewWords)}>Add B2</button>
-        <button className="grow" onClick={e => addWordlists(['c1']).then(updateViewWords)}>Add C1</button>
-      </div>
-      <div className="flex">
-        <button className="grow" onClick={e => removeWordlists(['a1']).then(updateViewWords)}>Remove A1</button>
-        <button className="grow" onClick={e => removeWordlists(['a2']).then(updateViewWords)}>Remove A2</button>
-        <button className="grow" onClick={e => removeWordlists(['b1']).then(updateViewWords)}>Remove B1</button>
-        <button className="grow" onClick={e => removeWordlists(['b2']).then(updateViewWords)}>Remove B2</button>
-        <button className="grow" onClick={e => removeWordlists(['c1']).then(updateViewWords)}>Remove C1</button>
+      <div className="mb-3">
+        <div className="join join-vertical">
+          <button className="btn join-item grow" onClick={e => addWordlists(['a1']).then(updateViewWords)}>Add A1</button>
+          <button className="btn join-item grow" onClick={e => removeWordlists(['a1']).then(updateViewWords)}>Remove A1</button>
+        </div>
+
+        <div className="join join-vertical">
+          <button className="btn join-item grow" onClick={e => addWordlists(['a2']).then(updateViewWords)}>Add A2</button>
+          <button className="btn join-item grow" onClick={e => removeWordlists(['a2']).then(updateViewWords)}>Remove A2</button>
+        </div>
+
+        <div className="join join-vertical">
+          <button className="btn join-item grow" onClick={e => addWordlists(['b1']).then(updateViewWords)}>Add B1</button>
+          <button className="btn join-item grow" onClick={e => removeWordlists(['b1']).then(updateViewWords)}>Remove B1</button>
+        </div>
+
+        <div className="join join-vertical">
+          <button className="btn join-item grow" onClick={e => addWordlists(['b2']).then(updateViewWords)}>Add B2</button>
+          <button className="btn join-item grow" onClick={e => removeWordlists(['b2']).then(updateViewWords)}>Remove B2</button>
+        </div>
+
+        <div className="join join-vertical">
+          <button className="btn join-item grow" onClick={e => addWordlists(['c1']).then(updateViewWords)}>Add C1</button>
+          <button className="btn join-item grow" onClick={e => removeWordlists(['c1']).then(updateViewWords)}>Remove C1</button>
+        </div>
       </div>
 
       Word count: {wordCount}
@@ -194,6 +205,6 @@ export default function MyWordlist() {
           <span className="grow">{word}</span>
         </li>)}
       </ul>
-    </div>
+    </div >
   );
 }

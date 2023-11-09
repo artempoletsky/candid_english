@@ -7,7 +7,6 @@ import { AtomizedWord } from '~/app/api/atomize_text/route';
 import { useState, useEffect } from 'react';
 import { addWords } from "~/app/edit_my_wordlist/my_wordlist";
 
-import { pull } from "lodash";
 import AdjustDropdown from "./adjust_dropdown";
 import DictLink from "@/dictlink";
 
@@ -75,7 +74,7 @@ export default function SubtitlesComp() {
   function printTable(array: AtomizedWord[]) {
     return <>
       Words count: {array.length}
-      <table className="w-full">
+      <table className="w-full mt-5 table">
         <tbody>
           {array.map(w => (
             <tr key={w.id}>
@@ -103,7 +102,7 @@ export default function SubtitlesComp() {
   }
   return (
     <div>
-      <input id="subtitles_file" type="file" onChange={e => {
+      <input id="subtitles_file" className="file-input w-full max-w-xs mr-2" type="file" onChange={e => {
         const input = e.target;
 
         uploadFile(input).then((res: AtomizedWordResponse) => {

@@ -14,6 +14,7 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end: hsl(0, 0%, 85%);
+  --animation-btn: 0s;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -47,9 +48,19 @@ html {
 }
 
 
+
 @layer components {
 
-  button {
+  button:not(.btn) {
+    @apply txt-vol rounded-xl border border-current px-3 py-1;
+    background-color: hsl(var(--main-hue), 45%, 87%);
+  }
+
+  .btn {
+    @apply btn-neutral;
+    min-height: auto;
+  }
+  /* button {
     @apply txt-vol rounded-xl;
   }
 
@@ -63,7 +74,7 @@ html {
     border-radius: 8px;
     box-shadow: 2px 2px 4px hsla(var(--main-hue), 12%, 18%, 0.8),
       inset -1px -1px 3px hsl(var(--main-hue), 10%, 52%);
-  }
+  } */
 }
 
 
@@ -126,12 +137,11 @@ a {
     text-align: center;
     font-weight: bold;
     color: var(--dark-vivid);
-    @apply mb-5;
+    @apply mb-5 mt-3;
   }
 
   h1 {
-    @apply text-5xl;
-    @apply mb-10;
+    @apply text-5xl mb-10;
   }
 
   h2 {

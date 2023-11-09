@@ -1,7 +1,6 @@
 import { AtomizedWord } from "~/app/api/atomize_text/route";
 import axios from "axios";
 import { useState } from "react";
-import css from "./adjust_dropdown.module.css";
 
 const API_PATH = "/api/admin/adjust_lemmatizer";
 
@@ -39,23 +38,23 @@ export default function ({ word, removeCall }: { word: AtomizedWord, removeCall:
   }
 
   return (
-    <div className={css.container}>
-      <button onClick={toggle}>...</button>
+    <details className="dropdown">
+      <summary className="btn h-8" onClick={toggle}>...</summary>
       {dropDownVisible &&
-        <ul className={css.dropdown + " bg-slate-200 p-2 rounded-xl border border-current"}>
+        <ul className={" bg-slate-200 shadow dropdown-content p-2 rounded-xl border border-current z-[1] "}>
           <li>
-            <button className="mr-2" onClick={() => override(wordStr, lemma).then(onSuccess)}>Override</button>
+            <button className="btn mr-2" onClick={() => override(wordStr, lemma).then(onSuccess)}>Override</button>
             {wordStr} with
-            <input type="text" value={lemma} onChange={(e) => setLemma(e.target.value)} />
+            <input className="input" type="text" value={lemma} onChange={(e) => setLemma(e.target.value)} />
           </li>
           <li>
-            <input type="text" value={whiteListCandidate} onChange={(e) => setWhiteListCandidate(e.target.value)} />
-            <button onClick={() => toList(whiteListCandidate, "white").then(onSuccess)}> to whitelist</button></li>
+            <input className="input" type="text" value={whiteListCandidate} onChange={(e) => setWhiteListCandidate(e.target.value)} />
+            <button className="btn" onClick={() => toList(whiteListCandidate, "white").then(onSuccess)}> to whitelist</button></li>
           <li>
-            <input type="text" value={blackListCandidate} onChange={(e) => setBlackListCandidate(e.target.value)} />
-            <button onClick={() => toList(blackListCandidate, "black").then(onSuccess)}> to blacklist</button></li>
+            <input className="input" type="text" value={blackListCandidate} onChange={(e) => setBlackListCandidate(e.target.value)} />
+            <button className="btn" onClick={() => toList(blackListCandidate, "black").then(onSuccess)}> to blacklist</button></li>
         </ul>
       }
-    </div>
+    </details>
   )
 }
