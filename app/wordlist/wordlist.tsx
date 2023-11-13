@@ -5,11 +5,12 @@ import css from "./wordlist.module.css";
 import debounce from "lodash.debounce";
 import { addWords, removeWords } from "~/app/edit_my_wordlist/my_wordlist";
 import { isWordLearned, getMyWords } from "~/lib/words_storage";
-import Link from "next/link"
+
 import DictLink from "@/dictlink";
 import useSWR from "swr";
-import { FixedSizeList as List } from "react-window";
+
 import Table from "@/largetable";
+import Select from "../components/select";
 
 export type Word = {
   id: string,
@@ -43,12 +44,6 @@ const partOptions: { [key: string]: string } = {
   "modal verb": "Modal verb",
   other: "Other"
 };
-
-const levelOptionsArr = Object.keys(levelOptions)
-  .map(key => <option key={key} value={key}>{levelOptions[key]}</option>);
-
-const partOptionsArr = Object.keys(partOptions)
-  .map(key => <option key={key} value={key}>{partOptions[key]}</option>);
 
 const fetcher = (...args: any) => fetch.apply(this, args).then(res => res.json())
 
@@ -128,30 +123,32 @@ export default function WordList({ words }: { words?: Array<Word> }) {
   const wordCount = filteredWords.length;
   return (
     <>
-      <div className="flex">
+      <div className="flex items-center gap-2 mb-2">
         <label htmlFor="level_select">Level: </label>
-        <select id="level_select" value={level} onChange={e => setLevel(e.target.value)}>
-          {levelOptionsArr}
-        </select>
+        <Select
+          className="select"
+          dict={levelOptions}
+          bind={[level, setLevel]}
+          id="level_select"
+        />
         <label htmlFor="part_select">Part of speech: </label>
-        <select id="part_select" value={part} onChange={e => setPart(e.target.value)}>
-          {partOptionsArr}
-        </select>
-        <label htmlFor="search_q">Search: </label>
-        <input id="search_q" autoComplete="off" onChange={debounce(e => setSearchQuery(e.target.value), 300)} />
+        <Select
+          className="select"
+          dict={partOptions}
+          bind={[part, setPart]}
+          id="part_select"
+        />
+        <input placeholder="Search" className="input" id="search_q" autoComplete="off" onChange={debounce(e => setSearchQuery(e.target.value), 300)} />
       </div>
       Word count: {wordCount}
       <div>
-        <label>&nbsp;<input type="checkbox" checked={hideLearnedMode} onChange={e => {
-          const now = Date.now();
-          setHideLearnedMode(e.target.checked);
-          requestAnimationFrame(() => {
-            console.log((Date.now() - now) / 1000);
-          });
-        }} /> Hide learned words</label>
+        <label>
+          <input className="checkbox mb-[-5px]" type="checkbox" checked={hideLearnedMode} onChange={e => {
+            setHideLearnedMode(e.target.checked);
+          }} /> Hide learned words</label>
       </div>
       <Table
-        tableClass={css.table  + " table"}
+        tableClass={css.table + " table"}
         height={800}
         itemCount={wordCount}
         itemSize={53}
