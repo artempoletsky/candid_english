@@ -1,11 +1,12 @@
-import { AtomizedWord } from "~/app/api/atomize_text/route";
+import { AtomizedWord } from "~/app/api/lemmatize_text/route";
 import axios from "axios";
 import { useState } from "react";
+import { API_ADMIN_ADJUST_LEMMATIZER } from "~/lib/paths";
 
-const API_PATH = "/api/admin/adjust_lemmatizer";
+;
 
 function toList(word: string, listType: "black" | "white") {
-  return axios.post(API_PATH, {
+  return axios.post(API_ADMIN_ADJUST_LEMMATIZER, {
     method: "addToList",
     listType,
     word
@@ -13,7 +14,7 @@ function toList(word: string, listType: "black" | "white") {
 }
 
 function override(word: string, lemma: string) {
-  return axios.post(API_PATH, {
+  return axios.post(API_ADMIN_ADJUST_LEMMATIZER, {
     method: "addOverride",
     lemma,
     word

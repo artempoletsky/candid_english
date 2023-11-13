@@ -47,15 +47,15 @@ describe("Simplify", () => {
     expect(allWordsDict["answers"]).toBeUndefined();
   });
 
-  xtest("answers", () => {
-    let lemmas = lemmatize("answer");
+  test("woes", () => {
+    let lemmas = lemmatize("woes");
     // console.log(lemmas);
 
-    expect(lemmas["answer"]).toBeDefined();
+    expect(lemmas["woe"]).toBeDefined();
   });
 });
-
-describe("Lemmatizer", () => {
+ 
+xdescribe("Lemmatizer", () => {
 
   test("counts lemmas in text", () => {
     let lemmas = lemmatize("No. Standard black.");

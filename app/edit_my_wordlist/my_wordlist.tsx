@@ -1,15 +1,16 @@
-'use client';
+"use client";
 
-import { UpdateWordsResponse } from '~/app/api/update_known_words/route';
-import { useState, useEffect } from 'react';
-import css from '../wordlist/wordlist.module.css';
-import Link from 'next/link'
-import { getMyWords, saveMyWords } from '~/lib/words_storage';
+import { FixedSizeList as List } from "react-window";
+import { UpdateWordsResponse } from "~/app/api/update_known_words/route";
+import { useState, useEffect } from "react";
+import css from "../wordlist/wordlist.module.css";
+import Link from "next/link"
+import { getMyWords, saveMyWords } from "~/lib/words_storage";
 
 
 export function updateWordlists(requestBody: any): Promise<Record<string, boolean>> {
-  return fetch('/api/update_known_words', {
-    method: 'POST',
+  return fetch("/api/update_known_words", {
+    method: "POST",
     headers: {
     },
     body: JSON.stringify(requestBody),
@@ -31,11 +32,6 @@ export function updateLocalStorage(response: UpdateWordsResponse): Promise<Recor
   added.forEach(w => {
     words[w] = true;
   });
-
-  // words = words.sort((a: string, b: string) => a.toLowerCase() > b.toLowerCase() ? 0 : -1);
-
-  // store.set('my_words', words);
-  // store.set('last_words_update', updateTimestamp);
   saveMyWords();
 
   return Promise.resolve(words);
@@ -77,7 +73,7 @@ export function saveTextFile(fileName: string, textData: string) {
   let url = window.URL.createObjectURL(blobData);
 
   let a = document.createElement("a");
-  a.setAttribute('style', 'display: none');
+  a.setAttribute("style", "display: none");
   document.body.appendChild(a);
   a.href = url;
   a.download = fileName;
@@ -87,20 +83,21 @@ export function saveTextFile(fileName: string, textData: string) {
 }
 
 export function saveMyWordlist() {
-  saveTextFile('my_wordlist.txt', store.get("my_words").join("\r\n"));
+  saveTextFile("my_wordlist.txt", Object.keys(getMyWords()).sort().join("\r\n"));
 }
 
 
 export default function MyWordlist() {
   // initWordsLocalStorage();
   let [myWords, setMyWords] = useState<Record<string, boolean>>(getMyWords());
-  let [newWord, setNewWord] = useState<string>('');
+  let [newWord, setNewWord] = useState<string>("");
+  let [searchQuery, setSearchQuery] = useState<string>("");
   let [updateTrigger, setUpdateTrigger] = useState(0);
 
 
   useEffect(() => {
     // update some client side state to say it is now safe to render the client-side only component
-    // setMyWords(store.get('my_words'));
+    // setMyWords(store.get("my_words"));
   }, []);
 
   function updateViewWords(words: Record<string, boolean>): Promise<Record<string, boolean>> {
@@ -118,7 +115,7 @@ export default function MyWordlist() {
     addWords([newWord])
       .then(updateViewWords)
       .then(() => {
-        setNewWord('');
+        setNewWord("");
       });
   }
 
@@ -128,15 +125,53 @@ export default function MyWordlist() {
     }).then(updateViewWords)
   }
 
-  const wordsArr = Object.keys(myWords).sort();
+  const wordsArr = Object.keys(myWords).filter(w => {
+    // if (searchQuery != "" && !e.word.match(new RegExp(`^${searchQuery}.*?$`, "i"))) return false;
+    if (searchQuery == "") {
+      return true;
+    }
+    return w.indexOf(searchQuery) != -1;
+  }).sort((w1, w2) => {
+    const s1 = w1.startsWith(searchQuery);
+    const s2 = w2.startsWith(searchQuery);
+    if (s1 == s2) //if both starts with search query sorts normally
+      return w1 > w2 ? 1 : -1;
+
+    //else the word witch starts with search query goes first
+    return s1 < s2 ? 1 : -1;
+  });
   const wordCount = wordsArr.length;
+
+  const Row = ({ style, data, index }: any) => {
+    const word = data[index];
+    return (
+      <div style={style}>
+        <i className="small icon thumbs_down cursor-pointer mr-1" title="Remove" onClick={() => removeWord(word)}></i>
+        <span>{word}</span>
+      </div>
+    )
+  };
 
   return (
     <div>
       <div className="flex mb-3">
-        <input placeholder="Add new word" autoComplete="off" className="input grow mr-2" type="text" name="new_word" value={newWord} onChange={e => setNewWord(e.target.value)} />
+        <input
+          className="input grow mr-5"
+          type="text" name="new_word"
+          placeholder="Search" autoComplete="off"
+          value={searchQuery} onChange={e => setSearchQuery(e.target.value.toLowerCase())}
+        />
+        <input
+          className="input grow mr-2"
+          type="text" name="new_word"
+          placeholder="Add new word" autoComplete="off"
+          value={newWord} onChange={e => setNewWord(e.target.value)}
+        />
         <button className="btn" onClick={addNewWord}>Add</button>
       </div>
+
+
+
       <div className="mb-3">
         <label htmlFor="filter_file">Import from file:</label>
         <input className="file-input" id="filter_file" type="file" onChange={e => {
@@ -147,7 +182,7 @@ export default function MyWordlist() {
           const reader = new FileReader();
           reader.onload = function (e: ProgressEvent<FileReader>) {
             if (e.target) {
-              const text: string = e.target.result + '';
+              const text: string = e.target.result + "";
               const words = text.split("\n")
                 .map(line => line.split(/[\s;,]/)[0].toLowerCase())
                 .filter((w: string) => w.match(/^\p{L}.*/u));
@@ -157,15 +192,15 @@ export default function MyWordlist() {
                 .then(updateViewWords)
               // console.log(words);
             }
-            input.value = '';
+            input.value = "";
           }
           reader.readAsText(file);
         }} />
         <button className="btn" onClick={saveMyWordlist}>Export to file</button>
 
         <button className="btn" onClick={e => {
-          const promptResult = prompt('Are you sure? Type \"DELETE\" to delete all words.');
-          if (promptResult == 'DELETE') {
+          const promptResult = prompt("Are you sure? Type \"DELETE\" to delete all words.");
+          if (promptResult == "DELETE") {
             clearMyWords().then(updateViewWords);
           }
         }}>Remove all words</button>
@@ -173,38 +208,43 @@ export default function MyWordlist() {
 
       <div className="mb-3">
         <div className="join join-vertical">
-          <button className="btn join-item grow" onClick={e => addWordlists(['a1']).then(updateViewWords)}>Add A1</button>
-          <button className="btn join-item grow" onClick={e => removeWordlists(['a1']).then(updateViewWords)}>Remove A1</button>
+          <button className="btn join-item grow" onClick={e => addWordlists(["a1"]).then(updateViewWords)}>Add A1</button>
+          <button className="btn join-item grow" onClick={e => removeWordlists(["a1"]).then(updateViewWords)}>Remove A1</button>
         </div>
 
         <div className="join join-vertical">
-          <button className="btn join-item grow" onClick={e => addWordlists(['a2']).then(updateViewWords)}>Add A2</button>
-          <button className="btn join-item grow" onClick={e => removeWordlists(['a2']).then(updateViewWords)}>Remove A2</button>
+          <button className="btn join-item grow" onClick={e => addWordlists(["a2"]).then(updateViewWords)}>Add A2</button>
+          <button className="btn join-item grow" onClick={e => removeWordlists(["a2"]).then(updateViewWords)}>Remove A2</button>
         </div>
 
         <div className="join join-vertical">
-          <button className="btn join-item grow" onClick={e => addWordlists(['b1']).then(updateViewWords)}>Add B1</button>
-          <button className="btn join-item grow" onClick={e => removeWordlists(['b1']).then(updateViewWords)}>Remove B1</button>
+          <button className="btn join-item grow" onClick={e => addWordlists(["b1"]).then(updateViewWords)}>Add B1</button>
+          <button className="btn join-item grow" onClick={e => removeWordlists(["b1"]).then(updateViewWords)}>Remove B1</button>
         </div>
 
         <div className="join join-vertical">
-          <button className="btn join-item grow" onClick={e => addWordlists(['b2']).then(updateViewWords)}>Add B2</button>
-          <button className="btn join-item grow" onClick={e => removeWordlists(['b2']).then(updateViewWords)}>Remove B2</button>
+          <button className="btn join-item grow" onClick={e => addWordlists(["b2"]).then(updateViewWords)}>Add B2</button>
+          <button className="btn join-item grow" onClick={e => removeWordlists(["b2"]).then(updateViewWords)}>Remove B2</button>
         </div>
 
         <div className="join join-vertical">
-          <button className="btn join-item grow" onClick={e => addWordlists(['c1']).then(updateViewWords)}>Add C1</button>
-          <button className="btn join-item grow" onClick={e => removeWordlists(['c1']).then(updateViewWords)}>Remove C1</button>
+          <button className="btn join-item grow" onClick={e => addWordlists(["c1"]).then(updateViewWords)}>Add C1</button>
+          <button className="btn join-item grow" onClick={e => removeWordlists(["c1"]).then(updateViewWords)}>Remove C1</button>
         </div>
       </div>
 
       Word count: {wordCount}
-      <ul className={css.container} data-update={updateTrigger}>
-        {wordsArr.map(word => <li className="flex" key={word}>
-          <i className="small icon thumbs_down cursor-pointer" title="Remove" onClick={() => removeWord(word)}></i>
-          <span className="grow">{word}</span>
-        </li>)}
-      </ul>
+
+      <List
+        data-update={updateTrigger}
+        height={800}
+        itemCount={wordCount}
+        itemSize={29}
+        itemData={wordsArr}
+        width="100%"
+      >
+        {Row}
+      </List>
     </div >
   );
 }

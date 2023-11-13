@@ -1,20 +1,20 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
-import WordList from './wordlist';
-import Layout from '../components/layout';
+import { Metadata } from "next";
+import Link from "next/link";
+import WordList from "./wordlist";
+import Layout from "../components/layout";
 
 
 export const metadata: Metadata = {
-  title: 'Explore Oxford\'s 5000 wordlist',
-  description: 'Explore Oxford Learner\'s Word List',
+  title: "Explore Oxford's 5000 wordlist",
+  description: "Explore Oxford Learner's Word List",
 }
 
 
 export default async function WordlistPage() {
   return (
     <Layout>
-      <h1 className="foo">Wordlist</h1>
-      <WordList></WordList>
+      <h1 className="foo">{metadata.title as string}</h1>
+      <WordList />
     </Layout>
   );
 }

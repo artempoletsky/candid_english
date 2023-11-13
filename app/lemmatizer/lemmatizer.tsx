@@ -3,12 +3,13 @@
 import { getMyWords } from '~/lib/words_storage';
 import axios from 'axios';
 
-import { AtomizedWord } from '~/app/api/atomize_text/route';
+import { AtomizedWord } from '~/app/api/lemmatize_text/route';
 import { useState, useEffect } from 'react';
 import { addWords } from "~/app/edit_my_wordlist/my_wordlist";
 
 import AdjustDropdown from "./adjust_dropdown";
 import DictLink from "@/dictlink";
+import { API_LEMMATIZE } from '~/lib/paths';
 
 type AtomizedWordResponse = {
   data: {
@@ -26,13 +27,13 @@ function uploadFile(input: HTMLInputElement): Promise<AtomizedWordResponse> {
   data.append('file', input.files[0]);
   // data.append('user', 'hubot');
 
-  const promise = axios.post('/api/atomize_text', data);
+  const promise = axios.post(API_LEMMATIZE, data);
 
   return promise;
 }
 
 
-export default function SubtitlesComp() {
+export default function LemmatizerComponent() {
   let [words, setWords] = useState<AtomizedWord[]>([]);
   let [myWords, setMyWords] = useState<Record<string, boolean>>({});
   useEffect(() => {
@@ -78,13 +79,13 @@ export default function SubtitlesComp() {
         <tbody>
           {array.map(w => (
             <tr key={w.id}>
-              <td className="whitespace-nowrap">
+              <td className="w-0 whitespace-nowrap">
                 <i onClick={e => addWords([w.id]).then(words => setMyWords({ ...words }))} title="Mark as learned" className="icon small thumbs_up cursor-pointer mr-2"></i>
                 <i onClick={e => discardWord(w)} title="Discard" className="icon small thumbs_down m-0 cursor-pointer mr-2"></i>
                 <AdjustDropdown word={w} removeCall={discardWord}></AdjustDropdown>
               </td>
-              <td>{w.count}</td>
-              <td onClick={e => copySentenceToClipboard(e.target as HTMLElement)} >
+              <td className="w-0">{w.count}</td>
+              <td className="w-0" onClick={e => copySentenceToClipboard(e.target as HTMLElement)} >
                 {w.id}</td>
               <td onClick={e => copySentenceToClipboard(e.target as HTMLElement)} >{formatSentence(w)}</td>
               <td className="w-0 whitespace-nowrap">

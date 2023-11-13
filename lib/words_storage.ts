@@ -17,6 +17,9 @@ export function getMyWords(): Record<string, boolean> {
     return myWords;
   }
   let wordsArray: string[] = [];
+  if (typeof window == "undefined") {
+    return {};
+  }
   if (localStorage['my_words']) {
     try {
       wordsArray = JSON.parse(localStorage['my_words']);

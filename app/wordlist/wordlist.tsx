@@ -1,12 +1,15 @@
-'use client';
-import { useState, useEffect } from 'react';
-import css from './wordlist.module.css';
-import debounce from 'lodash.debounce';
-import { addWords, removeWords } from '~/app/edit_my_wordlist/my_wordlist';
-import { isWordLearned, getMyWords } from '~/lib/words_storage';
-import Link from 'next/link'
+"use client";
+
+import { useState, useEffect } from "react";
+import css from "./wordlist.module.css";
+import debounce from "lodash.debounce";
+import { addWords, removeWords } from "~/app/edit_my_wordlist/my_wordlist";
+import { isWordLearned, getMyWords } from "~/lib/words_storage";
+import Link from "next/link"
 import DictLink from "@/dictlink";
 import useSWR from "swr";
+import { FixedSizeList as List } from "react-window";
+import Table from "@/largetable";
 
 export type Word = {
   id: string,
@@ -17,29 +20,28 @@ export type Word = {
 
 
 
-
 const levelOptions: { [key: string]: string } = {
-  any: 'Any',
-  a1: 'A1',
-  a2: 'A2',
-  b1: 'B1',
-  b2: 'B2',
-  c1: 'C1',
+  any: "Any",
+  a1: "A1",
+  a2: "A2",
+  b1: "B1",
+  b2: "B2",
+  c1: "C1",
 };
 
 const partOptions: { [key: string]: string } = {
-  any: 'Any',
-  noun: 'Noun',
-  verb: 'Verb',
-  adjective: 'Adjective',
-  adverb: 'Adverb',
-  preposition: 'Preposition',
-  conjunction: 'Conjunction',
-  determiner: 'Determiner',
-  pronoun: 'Pronoun',
-  number: 'Number',
-  'modal verb': 'Modal verb',
-  other: 'Other'
+  any: "Any",
+  noun: "Noun",
+  verb: "Verb",
+  adjective: "Adjective",
+  adverb: "Adverb",
+  preposition: "Preposition",
+  conjunction: "Conjunction",
+  determiner: "Determiner",
+  pronoun: "Pronoun",
+  number: "Number",
+  "modal verb": "Modal verb",
+  other: "Other"
 };
 
 const levelOptionsArr = Object.keys(levelOptions)
@@ -64,7 +66,7 @@ export default function WordList({ words }: { words?: Array<Word> }) {
   if (dataEmpty) {
     words = [];
   }
-  const { data, error, isLoading } = useSWR('/api/get_oxford_list', fetcher);
+  const { data, error, isLoading } = useSWR("/api/get_oxford_list", fetcher);
 
   if (isLoading) {
     return (<div>loading...</div>);
@@ -93,10 +95,34 @@ export default function WordList({ words }: { words?: Array<Word> }) {
         return false;
       }
     }
-    if (searchQuery != "" && !e.word.match(new RegExp(`^${searchQuery}.*?$`, 'i'))) return false;
+    if (searchQuery != "" && !e.word.match(new RegExp(`^${searchQuery}.*?$`, "i"))) return false;
+    // if (searchQuery != "" && e.word.indexOf(searchQuery) == -1) return false;
     if (excludedWords.includes(e.word)) return false;
     return true;
   };
+
+  const Row = ({ data, index }: any) => {
+    const el: Word = data[index];
+    return (
+      <tr key={el.id}>
+        <td className="w-[56px] align-middle text-center">
+          {!hideLearnedMode ?
+            <input className="checkbox align-middle" type="checkbox" checked={isWordLearned(el.word)} onChange={e => toggleWord(el.word, e.target.checked)} />
+            :
+            <i className="small icon thumbs_up cursor-pointer" title="Mark as learned" onClick={e => toggleWord(el.word, true)}></i>
+          }
+        </td>
+        <td>
+          <DictLink className="mr-1" service="reverso" word={el} />
+          <DictLink type="anchor" service="oxford" word={el} />
+        </td>
+        <td className="w-2/6">{el.part} </td>
+        <td className="w-1/6">{el.level}</td>
+      </tr>
+    )
+  };
+
+
 
   const filteredWords = data.filter(filterFn);
   const wordCount = filteredWords.length;
@@ -124,30 +150,15 @@ export default function WordList({ words }: { words?: Array<Word> }) {
           });
         }} /> Hide learned words</label>
       </div>
-
-      <div className={css.container}>
-        <table className="w-full table">
-          <tbody>
-            {filteredWords.map((el: Word) =>
-              <tr key={el.id}>
-                <td className={css.checkbox_td}>
-                  {!hideLearnedMode ?
-                    <input className="checkbox" type="checkbox" checked={isWordLearned(el.word)} onChange={e => toggleWord(el.word, e.target.checked)} />
-                    :
-                    <i className="small icon thumbs_up cursor-pointer" title="Mark as learned" onClick={e => toggleWord(el.word, true)}></i>
-                  }
-                </td>
-                <td>
-                  <DictLink className="mr-1" service="reverso" word={el} />
-                  <DictLink type="anchor" service="oxford" word={el} />
-                </td>
-                <td>{el.part} </td>
-                <td>{el.level}</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <Table
+        tableClass={css.table  + " table"}
+        height={800}
+        itemCount={wordCount}
+        itemSize={53}
+        itemData={filteredWords}
+        width="100%"
+        row={Row}
+      />
     </>
   );
 }

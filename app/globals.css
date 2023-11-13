@@ -30,10 +30,11 @@ body {
   background: linear-gradient(to top,
       transparent,
       var(--background-end)) hsl(var(--counter-hue), 15%, 73%);
+  min-height: 100%;
 }
 
 html {
-  min-height: 100%;
+  height: 100%;
 }
 
 .page_container {
@@ -60,6 +61,7 @@ html {
     @apply btn-neutral;
     min-height: auto;
   }
+
   /* button {
     @apply txt-vol rounded-xl;
   }
@@ -85,6 +87,7 @@ html {
   height: 35px;
   vertical-align: middle;
   background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .icon.reverso {
@@ -111,7 +114,7 @@ html {
 .icon.thumbs_down {
   background-image: url("/icons/thumbs.png");
   background-size: 35px auto;
-  background-position: 18px 0;
+  background-position: -18px 0;
 }
 
 .icon.small {
@@ -155,15 +158,11 @@ a {
   }
 }
 
+.table {
+  font-size: 1em;
+}
+
 p,
 li {
   @apply mb-1.5;
-}
-
-
-header {
-  background-color: rgba(255, 255, 255, .8);
-  align-items: center;
-  font-size: 1.1rem;
-  @apply flex px-9;
 }

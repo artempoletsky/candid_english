@@ -1,16 +1,3 @@
-.table {
-    width: 100%;
-}
-
-.table td {
-    padding: 5px 10px;
-}
-
-.container {
-    overflow: auto;
-    max-height: 800px;
-}
-
-.checkbox_td {
-    width:0.1%;
+.table :where(td, th) {
+  height: 53px;
 }
