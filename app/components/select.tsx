@@ -1,9 +1,13 @@
+'use client';
+
 import React, { FC, SelectHTMLAttributes } from "react";
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   keys?: string[],
   values?: string[],
+  array?: string[],
   dict?: Record<string, string>,
+  placeholder?: string,
   bind?: [any, Function]
 };
 
@@ -12,6 +16,8 @@ export default function Select({
   values,
   bind,
   dict,
+  array,
+  placeholder,
   ...rest
 }: SelectProps) {
   if (!keys) keys = [];
@@ -25,12 +31,26 @@ export default function Select({
 
   if (bind) {
     rest.onChange = e => bind[1](e.target.value);
-    rest.value = bind[0];
+    rest.defaultValue = bind[0];
+  }
+
+  if (array) {
+    keys = [...array];
+    values = [...array];
+  }
+
+  if (placeholder) {
+    keys.unshift("");
+    values.unshift(placeholder);
   }
 
   return (
-    <select {...rest} >
-      {keys.map((key, index) => <option key={key} value={key}>{values ? values[index] : ""}</option>)}
+    <select {...rest}>
+      {keys.map((key, index) =>
+        !key ?
+          <option hidden key="">{placeholder}</option> :
+          <option hidden={!key} key={key} value={key}>{values ? values[index] : ""}</option>
+      )}
     </select>
   );
 };

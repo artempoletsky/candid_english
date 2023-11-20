@@ -29,13 +29,14 @@ const Inner = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
   function Inner({ children, ...rest }, ref) {
     const { header, footer, top, tableClass } = useContext(VirtualTableContext)
     return (
-      <div {...rest} ref={ref}>
-        <table className={tableClass} style={{ top, position: 'absolute', width: '100%' }}>
-          {header}
-          <tbody>{children}</tbody>
-          {footer}
-        </table>
-      </div>
+      <>
+        <div {...rest} ref={ref}>
+          <table className={tableClass} style={{ top, position: 'absolute', width: '100%' }}>
+            <tbody>{children}</tbody>
+            {footer}
+          </table>
+        </div>
+      </>
     )
   }
 )
@@ -57,9 +58,19 @@ export default function LargeTable({
 }: VirtualTableProps) {
   const listRef = useRef<FixedSizeList | null>()
   const [top, setTop] = useState(0)
+  const headerMarkup = (
+    <div style={{ paddingRight: "18px" }}>
+      <table className={tableClass}>
+        <thead>
+          {header}
+        </thead>
+      </table>
+    </div>
+  );
 
   return (
     <VirtualTableContext.Provider value={{ top, setTop, header, footer, tableClass }}>
+      {header && headerMarkup}
       <FixedSizeList
         {...rest}
         innerElementType={Inner}
