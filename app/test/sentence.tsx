@@ -1,17 +1,21 @@
+import Select from "@/select";
 
-export type TestSentenceData = {
+import React, { FC, HTMLAttributes } from "react";
+
+interface TestSentenceProps extends HTMLAttributes<HTMLDivElement> {
   question: string,
-  options: string[][],
+  options: string[][]
 };
 
-export default function TestSentence({ data }: {
-  data: TestSentenceData
-}) {
-
-  
+const TEMPLATE = "{...}";
+export default function TestSentence({ question, options }: TestSentenceProps) {
   return (
     <div>
-      Mom washed the
+      {question.split(TEMPLATE).map((text, i, arr) => <React.Fragment key={i}>
+        {text}
+        {arr.length - 1 != i && <Select placeholder="Select..." array={options[i++]} />}
+      </React.Fragment>
+      )}
     </div>
   );
 }
