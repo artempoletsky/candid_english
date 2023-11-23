@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { OXFORD_LIST_LIGHT, OXFORD_LEVEL_PATCH } from "~/lib/paths";
 import { createIfNotExists, rfs, wfs } from "~/lib/util";
 
-import { existsSync } from "fs";
 
 type OxfordEntry = {
   id: string
