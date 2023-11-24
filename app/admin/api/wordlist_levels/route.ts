@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { OXFORD_LIST_LIGHT, OXFORD_LEVEL_PATCH } from "~/lib/paths";
+import validate, { ValidationRecord, typeExpectedMessage } from "~/lib/api";
+import { OXFORD_LIST_LIGHT, OXFORD_LEVEL_PATCH, OXFORD_PART_PATCH } from "~/lib/paths";
 import { createIfNotExists, rfs, wfs } from "~/lib/util";
 
 
@@ -21,15 +22,17 @@ type ModifiedOxfordList = Record<string, {
 export async function GET(req: NextRequest) {
 
   createIfNotExists(OXFORD_LEVEL_PATCH, {});
+  createIfNotExists(OXFORD_PART_PATCH, {});
   const listLight: OxfordEntry[] = rfs(OXFORD_LIST_LIGHT);
-  const modified: Record<string, string> = rfs(OXFORD_LEVEL_PATCH);
+  const levelPatch: Record<string, string> = rfs(OXFORD_LEVEL_PATCH);
+  const partPatch: Record<string, string> = rfs(OXFORD_PART_PATCH);
   const result: ModifiedOxfordList = {};
   for (const entry of listLight) {
     const id: string = entry.word.toLowerCase();
     result[id] = {
       word: entry.word,
-      part: entry.part,
-      level: modified[id] || entry.level,
+      level: levelPatch[id] || entry.level,
+      part: partPatch[id] || entry.part,
       originalLevel: entry.level,
     };
   }
@@ -39,7 +42,74 @@ export async function GET(req: NextRequest) {
   });
 }
 
-function changeLevel(ids: string[], levels: string[]) {
+
+type TChangeField = {
+  ids: string[],
+  values: string[],
+  fields: Array<"part" | "level">
+}
+
+const VChangeField: ValidationRecord = {
+  ids: "string[]",
+  values: "string[]",
+  fields: (value: any) => {
+    if (!(value instanceof Array) || value.find(e => !["part", "level"].includes(e))) {
+      return typeExpectedMessage("fields", `Array<"part" | "level">`, value);
+    }
+    return false;
+  }
+}
+
+async function changeField({ ids, values, fields }: TChangeField) {
+  const listLight: OxfordEntry[] = rfs(OXFORD_LIST_LIGHT);
+  const levelPatch: Record<string, string> = rfs(OXFORD_LEVEL_PATCH);
+  const partPatch: Record<string, string> = rfs(OXFORD_PART_PATCH);
+
+  for (const e of listLight) {
+    const id = e.word.toLowerCase();
+    const i = ids.indexOf(id);
+    if (i == -1) continue;
+    const field = fields[i];
+    const value = values[i];
+    const originalValue = (e as any)[field];
+    let patch: Record<string, string> = {};
+
+    if (field == "part") {
+      patch = partPatch;
+    } else if (field == "level") {
+      patch = levelPatch;
+    }
+
+    if (value == originalValue) {
+      delete patch[id];
+      continue;
+    }
+    patch[id] = value;
+  }
+
+  wfs(OXFORD_LEVEL_PATCH, levelPatch, {
+    pretty: true
+  });
+  wfs(OXFORD_PART_PATCH, partPatch, {
+    pretty: true
+  });
+  return {
+    message: "OK"
+  }
+}
+
+
+type TChangeLevel = {
+  ids: string[],
+  levels: string[]
+}
+
+const VChangeLevel: ValidationRecord = {
+  ids: "string[]",
+  levels: "string[]",
+}
+
+async function changeLevel({ ids, levels }: TChangeLevel) {
   const listLight: OxfordEntry[] = rfs(OXFORD_LIST_LIGHT);
   const patch: Record<string, string> = rfs(OXFORD_LEVEL_PATCH);
 
@@ -58,40 +128,24 @@ function changeLevel(ids: string[], levels: string[]) {
   wfs(OXFORD_LEVEL_PATCH, patch, {
     pretty: true
   });
+
+  return {
+    message: "OK"
+  }
 }
 
 export async function PATCH(req: NextRequest) {
   let { method, ...args } = await req.json();
-  if (method == "changeLevel") {
-    if (!args.ids || !args.levels) {
-      return NextResponse.json({
-        message: `Missing arguments, expected: {ids: string[], levels: string[]}`
-      }, {
-        status: 403
-      });
-    }
 
-    try {
-      changeLevel(args.ids, args.levels);
-
-    } catch (error) {
-      return NextResponse.json({
-        message: error + ""
-      }, {
-        status: 500
-      });
-    }
-  } else {
-    return NextResponse.json({
-      message: `Method "${method}" doesn't exist`
-    }, {
-      status: 403
-    });
-  }
-
-  return NextResponse.json({
-    message: "OK"
+  const [a, b] = await validate({
+    method,
+    arguments: args
   }, {
-    status: 200
+    changeField: VChangeField
+  }, {
+    changeField,
+    changeLevel
   });
+
+  return NextResponse.json(a, b);
 }

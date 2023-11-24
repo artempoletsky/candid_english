@@ -65,6 +65,20 @@ const partOptions: Record<string, string> = {
   other: "Other"
 };
 
+const partOptions2: Record<string, string> = {
+  noun: "Noun",
+  verb: "Verb",
+  adjective: "Adjective",
+  adverb: "Adverb",
+  preposition: "Preposition",
+  conjunction: "Conjunction",
+  determiner: "Determiner",
+  pronoun: "Pronoun",
+  number: "Number",
+  "modal verb": "Modal verb",
+  other: "Other"
+};
+
 const fetcher = (...args: any) => fetch.apply(this, args).then(res => res.json())
 const API_WORDLIST_URL = "/admin/api/wordlist_levels";
 
@@ -95,10 +109,29 @@ export default function WordList() {
       body: JSON.stringify({
         method: "changeLevel",
         ids: [word.id],
-        levels: [level]
+        levels: null
       })
     }).then(e => {
       data[word.id].level = level;
+      dispatchVersion();
+      return e;
+    });
+  }
+
+  const patchWord = (word: Word, field: "part" | "level", value: string) => {
+    return fetch(API_WORDLIST_URL, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        method: "changeField",
+        ids: [word.id],
+        values: [value],
+        fields: [field]
+      })
+    }).then(e => {
+      data[word.id][field] = value;
       dispatchVersion();
       return e;
     });
@@ -126,16 +159,24 @@ export default function WordList() {
       <tr key={el.id}>
         <td>
           <DictLink type="anchor" service="oxford" word={el} />
+          <DictLink type="anchor" service="synonym" word={el} className="ml-1 text-xs align-super">syn</DictLink>
         </td>
-        <td className="w-[170px]">{el.part} </td>
+        <td className="w-[170px]">
+          <Select
+            className="select"
+            dict={partOptions2}
+            defaultValue={el.part}
+            id="level_select"
+            onChange={e => patchWord(el, "part", e.target.value)} />
+        </td>
         <td className="w-[80px]">{levelOptions[el.originalLevel]}</td>
         <td className="w-[145px]"><Select
           className="select"
           dict={levelOptions2}
           defaultValue={el.level}
           id="level_select"
-          onChange={e => changeWordLevel(el, e.target.value)}
-        /></td>
+          onChange={e => changeWordLevel(el, e.target.value)} />
+        </td>
       </tr>
     )
   };
