@@ -74,7 +74,7 @@ export default function LemmatizerComponent() {
 
   function printTable(array: AtomizedWord[]) {
     return <>
-      Words count: {array.length}
+      <div className="mt-4">Words count: {array.length}</div>
       <table className="w-full mt-5 table">
         <tbody>
           {array.map(w => (
