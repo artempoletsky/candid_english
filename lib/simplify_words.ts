@@ -2,7 +2,7 @@ import words from 'an-array-of-english-words';
 // import fs from 'fs';
 // import lemmatize from "~/lib/wink_lemmatizer";
 import { rfs, wfs } from './util';
-import { LemmatizerBlacklist, LemmatizerWhitelist, LemmatizerWordlist } from '~/lib/paths';
+import { LEMMATIZER_BLACKLIST, LEMMATIZER_WHITELIST, LEMMATIZER_ALL } from '~/lib/paths';
 
 let BlackList: Record<string, number>;
 let WhiteList: Record<string, number>;
@@ -33,10 +33,10 @@ export default function simplify(): Record<string, number> {
 
   WhiteList = {
     ...rfs("/grab_data/words_dict.json"),
-    ...toDict(rfs(LemmatizerWhitelist))
+    ...toDict(rfs(LEMMATIZER_WHITELIST))
   };
 
-  BlackList = toDict(rfs(LemmatizerBlacklist));
+  BlackList = toDict(rfs(LEMMATIZER_BLACKLIST));
 
   const fullDict = toDict(words);
 
@@ -71,7 +71,7 @@ export default function simplify(): Record<string, number> {
       delete fullDict[word + 'e'];
     }
   }
-  wfs(LemmatizerWordlist, fullDict);
+  wfs(LEMMATIZER_ALL, fullDict);
 
   invalidateDict();
   return fullDict;

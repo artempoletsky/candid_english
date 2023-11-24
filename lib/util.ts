@@ -62,3 +62,29 @@ export function getCollection(name: string) {
 export function closeDBConnection() {
   return client.close();
 };
+
+
+export function dictToArr(dict: Record<string, Object>, idField = "id"): any[] {
+  const result = [];
+  for (const key in dict) {
+    result.push({
+      [idField]: key,
+      ...dict[key]
+    })
+  }
+  return result;
+}
+
+export function arrToDict(array: Object[], idField = "id", removeId = true): Record<string, any> {
+  let result: Record<string, any> = {};
+  for (const item of array) {
+    const id = (item as any)[idField];
+    result[id] = {
+      ...item
+    }
+    if (removeId) {
+      delete result[id][idField];
+    }
+  }
+  return result;
+}

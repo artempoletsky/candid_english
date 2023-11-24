@@ -21,6 +21,8 @@ const files = fs.readdirSync('./__tests__');
 
 // currentFile = 'lemmatizer.test.ts';
 // currentFile = 'admin_adjust_lemmatizer.test.ts';
+// currentFile = 'validator.test.ts';
+
 if (currentFile) {
   customJestConfig.testPathIgnorePatterns = files.filter(f => f != currentFile).map(f => "<rootDir>/__tests__/" + f);
 }

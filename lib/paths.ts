@@ -1,9 +1,9 @@
 
-export const LemmatizerOverrides = "/data/lemmatizer/lemma_overrides.json";
-export const LemmatizerBlacklist = "/data/lemmatizer/blacklist.json";
-export const LemmatizerWhitelist = "/data/lemmatizer/whitelist.json";
-export const LemmatizerWordlist = "/data/lemmatizer/all_words.json";
-export const LemmatizerIrregular = "/data/lemmatizer/irregular_verbs.json";
+export const LEMMATIZER_OVERRIDES = "/data/lemmatizer/lemma_overrides.json";
+export const LEMMATIZER_BLACKLIST = "/data/lemmatizer/blacklist.json";
+export const LEMMATIZER_WHITELIST = "/data/lemmatizer/whitelist.json";
+export const LEMMATIZER_ALL = "/data/lemmatizer/all_words.json";
+export const LEMMATIZER_IRREGULAR = "/data/lemmatizer/irregular_verbs.json";
 export const OXFORD_LIST_LIGHT = "/grab_data/words_light.json";
 export const OXFORD_LEVEL_PATCH = "/data/oxford_level_patch.json";
 export const OXFORD_PART_PATCH = "/data/oxford_part_patch.json";

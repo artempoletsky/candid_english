@@ -2,32 +2,50 @@
 import { NextRequest, NextResponse } from "next/server";
 import simplify from "~/lib/simplify_words";
 import { rfs, wfs } from "~/lib/util";
-import { LemmatizerBlacklist, LemmatizerWhitelist, LemmatizerOverrides } from "~/lib/paths";
+import { LEMMATIZER_BLACKLIST, LEMMATIZER_WHITELIST, LEMMATIZER_OVERRIDES } from "~/lib/paths";
+import validate, { APIObject, ValidationRecord, validateTupleFabric } from "~/lib/api";
 
 const CWD = process.cwd();
 
+type TAddOverride = {
+  word: string,
+  lemma: string
+}
 
-export function addOverride({
+const VAddOverride: ValidationRecord = {
+  word: "string",
+  lemma: "string",
+}
+
+const OKResponse = {
+  message: "OK"
+};
+
+export async function addOverride({
   word,
   lemma
 }: Record<string, string>) {
-  const overrides: Record<string, string> = rfs(LemmatizerOverrides);
+  const overrides: Record<string, string> = rfs(LEMMATIZER_OVERRIDES);
   overrides[word.toLowerCase()] = lemma.toLowerCase();
-  wfs(LemmatizerOverrides, overrides, {
+  wfs(LEMMATIZER_OVERRIDES, overrides, {
     pretty: true
   });
+
+  return OKResponse;
 };
 
+type TAddToList = {
+  word: string,
+  listType: "black" | "white"
+}
 
-export function addToList({
-  word,
-  listType
-}: Record<string, string>) {
-  if (listType != "black" && listType != "white") {
-    throw new Error(`'listType' can be only "black" or "white"`);
-  }
+const VAddToList: ValidationRecord = {
+  word: "string",
+  listType: validateTupleFabric(["black", "white"]),
+}
 
-  const filename = listType == "white" ? LemmatizerWhitelist: LemmatizerBlacklist;
+export async function addToList({ word, listType }: TAddToList) {
+  const filename = listType == "white" ? LEMMATIZER_WHITELIST : LEMMATIZER_BLACKLIST;
 
   const list: string[] = rfs(filename);
   word = word.toLowerCase();
@@ -37,39 +55,30 @@ export function addToList({
   wfs(filename, list, {
     pretty: true
   });
+
+  return OKResponse;
 };
 
-const Methods: Record<string, Function> = {
-  addOverride,
-  addToList
-};
 
 export async function POST(req: NextRequest) {
   // const reqBody = await req.json();
   let { method, ...args } = await req.json();
 
-  if (!Methods[method]) {
-    return NextResponse.json({
-      message: `Method "${method}" doesn't exist`
-    }, {
-      status: 403
-    });
-  }
-  let res;
-  try {
-    res = Methods[method](args) || {
-      message: "OK"
-    };
-  } catch (error) {
-    return NextResponse.json({
-      message: error + ""
-    }, {
-      status: 403
-    });
-  }
+  let [a, b] = await validate(
+    {
+      method,
+      arguments: args
+    },
+    {
+      addToList: VAddToList,
+      addOverride: VAddOverride,
+    },
+    {
+      addOverride,
+      addToList
+    }
+  );
 
   simplify();
-  return NextResponse.json(res, {
-    status: 200
-  });
+  return NextResponse.json(a, b);
 }

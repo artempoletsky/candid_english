@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import validate, { ValidationRecord, typeExpectedMessage } from "~/lib/api";
+import validate, { ValidationRecord, validateArrayTupleFabric } from "~/lib/api";
 import { OXFORD_LIST_LIGHT, OXFORD_LEVEL_PATCH, OXFORD_PART_PATCH } from "~/lib/paths";
 import { createIfNotExists, rfs, wfs } from "~/lib/util";
 
@@ -46,18 +46,13 @@ export async function GET(req: NextRequest) {
 type TChangeField = {
   ids: string[],
   values: string[],
-  fields: Array<"part" | "level">
+  fields: ("part" | "level")[]
 }
 
 const VChangeField: ValidationRecord = {
   ids: "string[]",
   values: "string[]",
-  fields: (value: any) => {
-    if (!(value instanceof Array) || value.find(e => !["part", "level"].includes(e))) {
-      return typeExpectedMessage("fields", `Array<"part" | "level">`, value);
-    }
-    return false;
-  }
+  fields: validateArrayTupleFabric(["part", "level"])
 }
 
 async function changeField({ ids, values, fields }: TChangeField) {

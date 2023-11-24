@@ -1,6 +1,6 @@
 import { describe, test, expect } from "@jest/globals"
-import { LemmatizerOverrides, LemmatizerBlacklist, LemmatizerWhitelist, LemmatizerWordlist } from '~/lib/paths'
-import { addToList, POST } from "~/app/api/admin/adjust_lemmatizer/route";
+import { LEMMATIZER_OVERRIDES, LEMMATIZER_BLACKLIST, LEMMATIZER_WHITELIST, LEMMATIZER_ALL } from '~/lib/paths'
+import { addToList, POST } from "~/app/admin/api/adjust_lemmatizer/route";
 import { NextRequest } from "next/server"
 // import fs from "fs"
 import { wfs, rfs } from "~/lib/util";
@@ -18,24 +18,24 @@ describe('/admin/adjust_lemmatizer', () => {
   }
 
   function getOverrides(): Record<string, string> {
-    return rfs(LemmatizerOverrides);
+    return rfs(LEMMATIZER_OVERRIDES);
   }
 
   function getList(listType: "black" | "white"): string[] {
-    let filename = listType == "black" ? LemmatizerBlacklist : LemmatizerWhitelist;
+    let filename = listType == "black" ? LEMMATIZER_BLACKLIST : LEMMATIZER_WHITELIST;
     return rfs(filename);
   }
 
   function removeOverride(key: string) {
     let overrides = getOverrides();
     delete overrides[key];
-    return wfs(LemmatizerOverrides, overrides, {
+    return wfs(LEMMATIZER_OVERRIDES, overrides, {
       pretty: true
     });
   }
 
   function removeFromList(key: string, listType: "black" | "white") {
-    let filename = listType == "black" ? LemmatizerBlacklist : LemmatizerWhitelist;
+    let filename = listType == "black" ? LEMMATIZER_BLACKLIST : LEMMATIZER_WHITELIST;
     let list = getList(listType);
     list = list.filter(w => w != key);
     return wfs(filename, list, {
@@ -48,11 +48,9 @@ describe('/admin/adjust_lemmatizer', () => {
       method: "doesn't exist"
     }));
 
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(400);
 
-    expect(await response.json()).toEqual({
-      message: `Method "doesn't exist" doesn't exist`
-    });
+    expect((await response.json()).message).toEqual(`API method 'doesn't exist' doesn't exist`);
   });
 
   describe("after this", () => {
@@ -70,13 +68,12 @@ describe('/admin/adjust_lemmatizer', () => {
         lemma: "foo",
       }));
 
+      expect(response.status).toBe(200);
+      expect((await response.json()).message).toEqual("OK");
+
       o = getOverrides();
       expect(o["foobar"]).toEqual("foo");
 
-      expect(response.status).toBe(200);
-      expect(await response.json()).toEqual({
-        message: `OK`
-      });
       let lemma = lemmatize("foobar");
       expect(lemma["foo"]).toBeDefined();
     });
@@ -124,11 +121,9 @@ describe('/admin/adjust_lemmatizer', () => {
       listType: "blakc",
     }));
 
-    expect(response.status).toBe(403);
+    expect(response.status).toBe(400);
 
-    expect(await response.json()).toEqual({
-      message: `Error: 'listType' can be only "black" or "white"`
-    });
+    expect((await response.json()).invalidFields.listType.message).toEqual("expected to be '('black' | 'white')' got 'string: blakc'");
   });
 
   describe("after this", () => {
@@ -139,7 +134,7 @@ describe('/admin/adjust_lemmatizer', () => {
       let black = getList("black");
       expect(black.includes("wolve")).toBe(false);
 
-      let dict = rfs(LemmatizerWordlist);
+      let dict = rfs(LEMMATIZER_ALL);
       expect(dict.wolve).toBeTruthy();
 
       let lemma = lemmatize("wolves");

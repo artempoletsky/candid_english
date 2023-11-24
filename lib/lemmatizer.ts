@@ -28,9 +28,9 @@ const Suffixes = {
   "ly": "",
 };
 
-import { wfs, rfs, createIfNotExists } from "./util";
-import { LemmatizerWordlist, LemmatizerIrregular, LemmatizerOverrides } from "./paths";
-createIfNotExists(LemmatizerWordlist, {});
+import { rfs, createIfNotExists } from "./util";
+import { LEMMATIZER_ALL, LEMMATIZER_IRREGULAR, LEMMATIZER_OVERRIDES } from "./paths";
+createIfNotExists(LEMMATIZER_ALL, {});
 
 let WordsDict: Record<string, number>;
 let Overrides: Record<string, string>;
@@ -38,9 +38,9 @@ let Irregular: Record<string, string>;
 const CWD = process.cwd();
 export function invalidateDict() {
   // delete require.cache[Object.keys(require.cache).find(k => k.endsWith('all_words.json')) as string];
-  WordsDict = rfs(LemmatizerWordlist);
-  Overrides = rfs(LemmatizerOverrides);
-  Irregular = rfs(LemmatizerIrregular);
+  WordsDict = rfs(LEMMATIZER_ALL);
+  Overrides = rfs(LEMMATIZER_OVERRIDES);
+  Irregular = rfs(LEMMATIZER_IRREGULAR);
 }
 invalidateDict();
 
@@ -73,9 +73,8 @@ export function lemmatizeWord(word: string, dict: Record<string, any>, options?:
     return word;
   }
 
-  //jinxes boxes
-  //misses tosses
-  if ((suffix == "ers" || suffix == "ers'")) {
+  //drivers
+  if ((suffix == "ers") || (suffix == "ers'")) {
     if (dict[lemma + 'er']) {
       return lemma + 'er';
     }
@@ -86,7 +85,7 @@ export function lemmatizeWord(word: string, dict: Record<string, any>, options?:
   } else if (suffix == "in'") {
     suffix = "ing";
   }
-  
+
   //jinxes boxes
   //misses tosses
   if ((suffix == "s") && (lemma.endsWith('xe') || lemma.endsWith('sse'))) {
