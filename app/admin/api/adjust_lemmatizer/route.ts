@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import simplify from "~/lib/simplify_words";
 import { rfs, wfs } from "~/lib/util";
 import { LEMMATIZER_BLACKLIST, LEMMATIZER_WHITELIST, LEMMATIZER_OVERRIDES } from "~/lib/paths";
-import validate, { APIObject, ValidationRecord, validateTupleFabric } from "~/lib/api";
+import validate, { APIObject, ValidationRecord, validateUnionFabric } from "~/lib/api";
 
 const CWD = process.cwd();
 
@@ -34,14 +34,16 @@ export async function addOverride({
   return OKResponse;
 };
 
+const LIST_TYPES = ["black", "white"] as const;
+
 type TAddToList = {
   word: string,
-  listType: "black" | "white"
+  listType: typeof LIST_TYPES[number]
 }
 
 const VAddToList: ValidationRecord = {
   word: "string",
-  listType: validateTupleFabric(["black", "white"]),
+  listType: validateUnionFabric(LIST_TYPES),
 }
 
 export async function addToList({ word, listType }: TAddToList) {
@@ -67,7 +69,7 @@ export async function POST(req: NextRequest) {
   let [a, b] = await validate(
     {
       method,
-      arguments: args
+      args
     },
     {
       addToList: VAddToList,

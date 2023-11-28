@@ -100,24 +100,6 @@ export default function WordList() {
     return (<div>Loading has failed</div>);
   }
 
-  const changeWordLevel = (word: Word, level: string) => {
-    return fetch(API_WORDLIST_URL, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        method: "changeLevel",
-        ids: [word.id],
-        levels: null
-      })
-    }).then(e => {
-      data[word.id].level = level;
-      dispatchVersion();
-      return e;
-    });
-  }
-
   const patchWord = (word: Word, field: "part" | "level", value: string) => {
     return fetch(API_WORDLIST_URL, {
       method: "PATCH",
@@ -175,7 +157,7 @@ export default function WordList() {
           dict={levelOptions2}
           defaultValue={el.level}
           id="level_select"
-          onChange={e => changeWordLevel(el, e.target.value)} />
+          onChange={e => patchWord(el, "level", e.target.value)} />
         </td>
       </tr>
     )

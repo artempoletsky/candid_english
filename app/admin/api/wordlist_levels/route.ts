@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import validate, { ValidationRecord, validateArrayTupleFabric } from "~/lib/api";
+import validate, { ValidationRecord, commonArraysEqualLength, validateArrayUnionFabric } from "~/lib/api";
 import { OXFORD_LIST_LIGHT, OXFORD_LEVEL_PATCH, OXFORD_PART_PATCH } from "~/lib/paths";
 import { createIfNotExists, rfs, wfs } from "~/lib/util";
 
@@ -29,6 +29,9 @@ export async function GET(req: NextRequest) {
   const result: ModifiedOxfordList = {};
   for (const entry of listLight) {
     const id: string = entry.word.toLowerCase();
+    if (result[id] && result[id].originalLevel < entry.level) {
+      continue;
+    }
     result[id] = {
       word: entry.word,
       level: levelPatch[id] || entry.level,
@@ -43,16 +46,18 @@ export async function GET(req: NextRequest) {
 }
 
 
+const EDITABLE_FIELDS = ["part", "level"] as const;
+
 type TChangeField = {
   ids: string[],
   values: string[],
-  fields: ("part" | "level")[]
+  fields: (typeof EDITABLE_FIELDS[number])[]
 }
 
 const VChangeField: ValidationRecord = {
   ids: "string[]",
   values: "string[]",
-  fields: validateArrayTupleFabric(["part", "level"])
+  fields: validateArrayUnionFabric(EDITABLE_FIELDS)
 }
 
 async function changeField({ ids, values, fields }: TChangeField) {
@@ -93,54 +98,24 @@ async function changeField({ ids, values, fields }: TChangeField) {
   }
 }
 
-
-type TChangeLevel = {
-  ids: string[],
-  levels: string[]
-}
-
-const VChangeLevel: ValidationRecord = {
-  ids: "string[]",
-  levels: "string[]",
-}
-
-async function changeLevel({ ids, levels }: TChangeLevel) {
-  const listLight: OxfordEntry[] = rfs(OXFORD_LIST_LIGHT);
-  const patch: Record<string, string> = rfs(OXFORD_LEVEL_PATCH);
-
-  for (const e of listLight) {
-    const id = e.word.toLowerCase();
-    const i = ids.indexOf(id);
-    if (i == -1) continue;
-    const level = levels[i];
-    if (level == e.level) {
-      delete patch[id];
-      continue;
-    }
-    patch[id] = level;
-  }
-
-  wfs(OXFORD_LEVEL_PATCH, patch, {
-    pretty: true
-  });
-
-  return {
-    message: "OK"
-  }
-}
-
 export async function PATCH(req: NextRequest) {
   let { method, ...args } = await req.json();
 
-  const [a, b] = await validate({
-    method,
-    arguments: args
-  }, {
-    changeField: VChangeField
-  }, {
-    changeField,
-    changeLevel
-  });
+  const [a, b] = await validate(
+    {
+      method,
+      args,
+    },
+    {
+      changeField: VChangeField,
+      arrayEqual: commonArraysEqualLength({
+        changeField: Object.keys(VChangeField)
+      })
+    },
+    {
+      changeField,
+    }
+  );
 
   return NextResponse.json(a, b);
 }
