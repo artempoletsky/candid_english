@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import validate, { ValidationRecord, commonArraysEqualLength, validateArrayUnionFabric } from "~/lib/api";
+import validate, { ValidationRule, commonArraysEqualLength, validateArrayUnionFabric } from "~/lib/api";
 import { OXFORD_LIST_LIGHT, OXFORD_LEVEL_PATCH, OXFORD_PART_PATCH } from "~/lib/paths";
 import { createIfNotExists, rfs, wfs } from "~/lib/util";
 
@@ -51,14 +51,18 @@ const EDITABLE_FIELDS = ["part", "level"] as const;
 type TChangeField = {
   ids: string[],
   values: string[],
-  fields: (typeof EDITABLE_FIELDS[number])[]
+  fields: typeof EDITABLE_FIELDS[number][]
 }
 
-const VChangeField: ValidationRecord = {
-  ids: "string[]",
-  values: "string[]",
-  fields: validateArrayUnionFabric(EDITABLE_FIELDS)
-}
+const VChangeField: ValidationRule = [
+  {
+    ids: "string[]",
+    values: "string[]",
+    fields: validateArrayUnionFabric(EDITABLE_FIELDS)
+  },
+  commonArraysEqualLength(["ids", "values", "fields"])
+]
+
 
 async function changeField({ ids, values, fields }: TChangeField) {
   const listLight: OxfordEntry[] = rfs(OXFORD_LIST_LIGHT);
@@ -107,10 +111,7 @@ export async function PATCH(req: NextRequest) {
       args,
     },
     {
-      changeField: VChangeField,
-      arrayEqual: commonArraysEqualLength({
-        changeField: Object.keys(VChangeField)
-      })
+      changeField: VChangeField
     },
     {
       changeField,

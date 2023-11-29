@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import simplify from "~/lib/simplify_words";
 import { rfs, wfs } from "~/lib/util";
 import { LEMMATIZER_BLACKLIST, LEMMATIZER_WHITELIST, LEMMATIZER_OVERRIDES } from "~/lib/paths";
-import validate, { APIObject, ValidationRecord, validateUnionFabric } from "~/lib/api";
+import validate, { ValidationRule, validateUnionFabric } from "~/lib/api";
 
 const CWD = process.cwd();
 
@@ -12,7 +12,7 @@ type TAddOverride = {
   lemma: string
 }
 
-const VAddOverride: ValidationRecord = {
+const VAddOverride: ValidationRule = {
   word: "string",
   lemma: "string",
 }
@@ -41,7 +41,7 @@ type TAddToList = {
   listType: typeof LIST_TYPES[number]
 }
 
-const VAddToList: ValidationRecord = {
+const VAddToList: ValidationRule = {
   word: "string",
   listType: validateUnionFabric(LIST_TYPES),
 }
