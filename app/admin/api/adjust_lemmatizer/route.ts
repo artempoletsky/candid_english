@@ -21,10 +21,8 @@ const OKResponse = {
   message: "OK"
 };
 
-export async function addOverride({
-  word,
-  lemma
-}: Record<string, string>) {
+export async function addOverride({ word, lemma }: TAddOverride) {
+
   const overrides: Record<string, string> = rfs(LEMMATIZER_OVERRIDES);
   overrides[word.toLowerCase()] = lemma.toLowerCase();
   wfs(LEMMATIZER_OVERRIDES, overrides, {

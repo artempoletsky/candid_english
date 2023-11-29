@@ -17,11 +17,11 @@ type ArrayType = "number[]" | "boolean[]" | "string[]" | "stringEmpty[]" | "any[
 
 type ValidationType = PrimitiveType | ArrayType | "object" | "email" | "optionalEmail";
 
-type ValidationRecord = Record<string, Validator | ValidationType>;
+type ValidationRecord = Record<string, Validator | ValidationType | (Validator | ValidationType)[]>;
 
 export type ValidationRule = ValidationRecord | (ValidationRecord | Validator)[]
 
-export type APIValidationObject = Record<string, ValidationRule>
+export type APIValidationObject = Record<string, any>
 
 export type InvalidResult = [ValiationErrorResponce, {
   status: number
@@ -120,15 +120,47 @@ export const arrayValidatorFabric = (type: string = "", validator?: Validator): 
 }
 
 
-export const objectValidator: Validator = async ({ value, }) => {
-  return typeof value == "object" || typeExpectedReason("object", value);
+function validify(entry: any): Validator {
+  if (typeof entry == "function") {
+    return entry;
+  } else if (typeof entry == "string") {
+    return RulesObject[entry];
+  } else if (entry instanceof Array) {
+    return chainValidators.apply(undefined, entry.map(validify));
+  } else if (typeof entry == "object") {
+    return objectValidatorFactory(entry);
+  }
+  throw new Error("entry can be a Validator, a string, an array of Validators or a plain object");
+}
+
+export const objectValidatorFactory = (rulesObject: Record<string, any>): Validator => {
+  const validators: Validator[] = [];
+  for (const field in rulesObject) {
+    const validator = validify(rulesObject[field]);
+    validators.push(
+      ((field: string, validator: Validator) =>
+        async ({ value, args, method }) => {
+          if (typeof value[field] === "undefined") {
+            return `Object is missing field '${field}'`;
+          }
+          return await validator({ value: value[field], args, method })
+        }
+
+      )(field, validator)
+    );
+    // validators[field] = 
+    // const result = await validator()
+    // validators.push())
+  }
+  return chainValidators.apply(undefined, validators);
 }
 
 const stringValidator = primitiveValidatorFabric("string");
 
-export function chainValidators(...validators: Validator[]): Validator {
+export function chainValidators(...validators: any[]): Validator {
   return async (request) => {
-    for (const validator of validators) {
+    for (const v of validators) {
+      const validator = validify(v);
       const error = await validator(request);
       if (error !== true) {
         return error;
@@ -140,22 +172,22 @@ export function chainValidators(...validators: Validator[]): Validator {
 
 export const nonEmptystringValidator: Validator = chainValidators(
   stringValidator,
-  async ({ value }) => value !== "" || {
+  (async ({ value }) => value !== "" || {
     message: "should not be empty",
     userMessage: UserMessages.required
-  }
+  }) as Validator
 );
 
 export const emailValidator: Validator = chainValidators(
   nonEmptystringValidator,
-  async ({ value }) => {
+  (async ({ value }) => {
     return !!value.match(
       /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     ) || {
       message: "email is invalid",
       userMessage: "email is invalid",
     }
-  }
+  }) as Validator
 );
 
 export const optionalEmailValidator: Validator = async ({ value, method, args }) => {
@@ -163,7 +195,7 @@ export const optionalEmailValidator: Validator = async ({ value, method, args })
   return await emailValidator({ value, method, args });
 };
 
-const RulesObject: Record<ValidationType, Validator> = {
+const RulesObject: Record<string, Validator> = {
   number: primitiveValidatorFabric("number"),
   stringEmpty: stringValidator,
   boolean: primitiveValidatorFabric("boolean"),
@@ -172,7 +204,6 @@ const RulesObject: Record<ValidationType, Validator> = {
   "boolean[]": arrayValidatorFabric("boolean[]", primitiveValidatorFabric("boolean")),
   "any[]": arrayValidatorFabric("any[]", async () => true),
   any: async () => true,
-  object: objectValidator,
   string: nonEmptystringValidator,
   "string[]": arrayValidatorFabric("string[]", nonEmptystringValidator),
   email: emailValidator,
@@ -196,6 +227,13 @@ function makeReason(reason: string | InvalidFieldReason): InvalidFieldReason {
   return reason;
 }
 
+function arraify<T>(value: T | T[]): T[] {
+  if (value instanceof Array) {
+    return value;
+  }
+  return [value];
+}
+
 function validate(req: APIRequest, rules: APIValidationObject): Promise<InvalidResult | false>;
 
 function validate(req: APIRequest, rules: APIValidationObject, api: APIObject): Promise<ValidResult | InvalidResult>
@@ -206,12 +244,9 @@ async function validate(req: APIRequest, rules: APIValidationObject, api?: APIOb
     return invalidResponce(`API method '${method}' doesn't exist`);
   }
 
-  const methodRules: (ValidationRecord | Validator)[] =
-    (rules[method] instanceof Array) ?
-      rules[method] as (ValidationRecord | Validator)[] :
-      [rules[method] as (ValidationRecord | Validator)];
+  const methodRules = arraify(rules[method]);
 
-  let fieldRules: Record<string, Validator | ValidationType> = {};
+  let fieldRules: Record<string, any[]> = {};
   const invalidFields: Record<string, {
     message: string,
     userMessage: string
@@ -225,22 +260,21 @@ async function validate(req: APIRequest, rules: APIValidationObject, api?: APIOb
     } else {
 
       fieldRules = rule;
+
       for (const fieldName in fieldRules) {
-        const rule: (Validator | ValidationType) = fieldRules[fieldName];
+        const validator = validify(fieldRules[fieldName]);
         const value = args[fieldName];
 
         if (invalidFields[fieldName]) continue;
 
         if (typeof value == "undefined") {
-          const t = typeof rule == "string" ? rule : "";
+
           invalidFields[fieldName] = {
-            message: `missing; ` + (t ? `expected: '${rule}'` : ""),
+            message: `missing`,
             userMessage: UserMessages.required
           }
           continue;
         }
-
-        const validator: Validator = typeof rule == "function" ? rule : RulesObject[rule];
 
         let validationErrorReason = await validator({ value, method, args });
 

@@ -60,7 +60,7 @@ describe("Validator", () => {
     expect(res.message).toBe(`Bad request`);
 
     expect(res.invalidFields.name).toBeDefined();
-    expect(res.invalidFields.name.message).toBe(`missing; expected: 'string'`);
+    expect(res.invalidFields.name.message).toBe(`missing`);
     expect(res.invalidFields.name.userMessage).toBe(`required field`);
   });
 
@@ -217,10 +217,7 @@ describe("Validator", () => {
     const rules: APIValidationObject = {
       testMethod: [
         {
-          testField: "number"
-        },
-        {
-          testField: mock1
+          testField: ["number", mock1]
         },
         {
           testField: mock2
@@ -331,6 +328,60 @@ describe("Validator", () => {
     expect(invalidResult2[0].invalidFields.arg2).not.toBeDefined();
     expect(invalidResult2[0].invalidFields.arg1.message).toBe("should not be empty");
     expect(invalidResult2[0].invalidFields.arg1.userMessage).toBe("required field");
+
+  });
+
+  test("supports nested objects", async () => {
+    const rules: APIValidationObject = {
+      methodName: {
+        level1: {
+          level2: {
+            level3: "string"
+          }
+        }
+      }
+    }
+
+    const validResult = await validate({
+      method: "methodName",
+      args: {
+        level1: {
+          level2: {
+            level3: "foo"
+          }
+        }
+      }
+    }, rules);
+
+    expect(validResult).toBe(false);
+
+    const invalidResult1 = await validate({
+      method: "methodName",
+      args: {
+        level1: {
+          level2: {
+            level3: 0
+          }
+        }
+      }
+    }, rules);
+
+    expect(invalidResult1).not.toBe(false);
+    if (!invalidResult1) return;
+    expect(invalidResult1[0].invalidFields.level1.message).toBe("expected to be 'string' got number: '0'");
+
+
+    const invalidResult2 = await validate({
+      method: "methodName",
+      args: {
+        level1: {
+        }
+      }
+    }, rules);
+
+    expect(invalidResult2).not.toBe(false);
+    if (!invalidResult2) return;
+    expect(invalidResult2[0].invalidFields.level1.message).toBe("Object is missing field 'level2'");
 
   });
 });
