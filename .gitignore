@@ -39,3 +39,4 @@ next-env.d.ts
 
 /dist/*
 /data/lemmatizer/all_words.json
+/data/session/

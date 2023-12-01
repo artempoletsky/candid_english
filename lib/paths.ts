@@ -13,3 +13,6 @@ export const API_LEMMATIZE = "/api/lemmatize_text";
 
 export const MONGO_CONNECTION_STRING = "mongodb://127.0.0.1:27017";
 export const MONGO_DBNAME = "CandidEnglish";
+
+export const COOKIE_SESSION_KEY = "CandidEnglish";
+export const SESSION_DIR = "/data/session/";
