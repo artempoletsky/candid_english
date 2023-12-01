@@ -10,7 +10,8 @@ import DictLink from "@/dictlink";
 import useSWR from "swr";
 
 import Table from "@/largetable";
-import Select from "../components/select";
+import Select from "@/select";
+import Checkbox from "@/checkbox";
 
 export type Word = {
   id: string,
@@ -142,10 +143,11 @@ export default function WordList({ words }: { words?: Array<Word> }) {
       </div>
       Word count: {wordCount}
       <div>
-        <label>
-          <input className="checkbox mb-[-5px]" type="checkbox" checked={hideLearnedMode} onChange={e => {
-            setHideLearnedMode(e.target.checked);
-          }} /> Hide learned words</label>
+        <Checkbox
+          className="checkbox mb-[-5px]"
+          label="Hide learned words"
+          bind={[hideLearnedMode, setHideLearnedMode]}
+        />
       </div>
       <Table
         tableClass={css.table + " table"}
