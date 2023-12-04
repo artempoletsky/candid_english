@@ -1,42 +1,24 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import utils from './lib/middleware_utils';
+import { COOKIE_SESSION_KEY } from './lib/paths';
 
 function isAdmin() {
   return true;
 }
 
-function parseSetCookie(cookieString: string): Record<string, string> {
-  let res: Record<string, string> = {};
-  let arr = cookieString.split(";").map(e => e.trim().split("="))[0];
-  res[arr[0]] = arr[1];
-  return res;
-}
-
-function parseCookie(cookieString: string): Record<string, string> {
-
-  if (cookieString === "")
-    return {};
-
-  let pairs = cookieString.split(";");
-
-  let splittedPairs = pairs.map(cookie => cookie.split("="));
-
-
-  const cookieObj = splittedPairs.reduce(function (obj: Record<string, string>, cookie) {
-
-    obj[decodeURIComponent(cookie[0].trim())]
-      = decodeURIComponent(cookie[1].trim());
-
-    return obj;
-  }, {})
-
-  return cookieObj;
-}
-
-
-function serializeCookies(obj: Record<string, string>): string {
-  return Object.keys(obj).map(key => `${key}=${obj[key]}`).join("; ");
-}
+//stores valid session IDs
+const SESSION_CACHE: Record<string, number> = {};
+const SESSION_CACHE_LIFESPAN = 5 * 60 * 1000;
+setInterval(() => {
+  let now = Date.now();
+  for (const key in SESSION_CACHE) {
+    if (now + SESSION_CACHE_LIFESPAN > SESSION_CACHE[key]) {
+      delete SESSION_CACHE[key];
+      // console.log(key + " removed from cache");
+    }
+  }
+}, SESSION_CACHE_LIFESPAN)
 
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -47,23 +29,30 @@ export async function middleware(request: NextRequest) {
     return;
   }
 
-  const sessionRes: Response = await fetch(request.nextUrl.origin + "/session", {
-    headers: {
-      cookie: request.headers.get("cookie") || ""
-    }
-  });
-  const newCookies = sessionRes.headers.getSetCookie();
+  const requestCookiesStr = request.headers.get("Cookie") || "";
 
+  const cookies = utils.parseCookie(requestCookiesStr);
   const requestHeaders = new Headers(request.headers);
 
-  const cookies = parseCookie(requestHeaders.get("Cookie") || "");
+  let sessid = cookies[COOKIE_SESSION_KEY];
+  let newCookies: string[] = [];
+  if (!SESSION_CACHE[sessid]) {
+    const sessionRes: Response = await fetch(request.nextUrl.origin + "/session", {
+      headers: {
+        cookie: requestCookiesStr
+      }
+    });
 
-  for (const cookie of newCookies) {
-    const p = parseSetCookie(cookie);
-    Object.assign(cookies, p);
+    newCookies = sessionRes.headers.getSetCookie();
+    for (const cookie of newCookies) {
+      const p = utils.parseSetCookie(cookie);
+      Object.assign(cookies, p);
+    }
+    requestHeaders.set("Cookie", utils.serializeCookies(cookies));
+    SESSION_CACHE[cookies[COOKIE_SESSION_KEY]] = Date.now();
+  } else {
+    // console.log(sessid + " cached");
   }
-
-  requestHeaders.set("Cookie", serializeCookies(cookies));
 
   const res = NextResponse.next({
     request: {
