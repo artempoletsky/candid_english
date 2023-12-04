@@ -12,15 +12,14 @@ type OxfordEntry = {
 };
 
 
-type ModifiedOxfordList = Record<string, {
+export type ModifiedOxfordList = Record<string, {
   word: string
   part: string
   level: string
   originalLevel: string
 }>;
 
-export async function GET(req: NextRequest) {
-
+export function getList(): ModifiedOxfordList {
   createIfNotExists(OXFORD_LEVEL_PATCH, {});
   createIfNotExists(OXFORD_PART_PATCH, {});
   const listLight: OxfordEntry[] = rfs(OXFORD_LIST_LIGHT);
@@ -39,8 +38,12 @@ export async function GET(req: NextRequest) {
       originalLevel: entry.level,
     };
   }
+  return result;
+}
 
-  return NextResponse.json(result, {
+export async function GET(req: NextRequest) {
+  
+  return NextResponse.json(getList(), {
     status: 200
   });
 }
