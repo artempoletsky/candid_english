@@ -321,7 +321,7 @@ async function validate(req: APIRequest, rules: APIValidationObject, api?: APIOb
   } catch (error) {
     return [
       {
-        message: `Method has failed with error: '${error}'`
+        message: `Method '${method}' has failed with error: '${error}'`
       },
       {
         status: 500

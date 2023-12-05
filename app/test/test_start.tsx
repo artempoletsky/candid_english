@@ -1,11 +1,10 @@
 import Select from "@/select";
-import { getSession } from "../session/route";
-import type { TestSession } from "./page";
-import { formDataToDict } from "~/lib/util";
-import { cookies } from "next/headers";
-import { COOKIE_SESSION_KEY } from "~/lib/paths";
-import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { FormEvent } from "react";
+import { formDataToDict, getAPIMethod } from "~/lib/client_utils";
+import { API_ENGLISH_TEST } from "~/lib/paths";
+import type { TestSession, TestSessionLight } from "./test";
+import type { FnBeginTest, TBeginTest } from "./api/route";
+import { SessionUpdateCb } from "./page";
 
 const Levels: Record<string, string> = {
   a0: "A0",
@@ -23,24 +22,21 @@ function injectOptions(injeced: Record<string, string>): Record<string, string> 
     ...Levels,
   }
 }
-export default function TestStart() {
-  async function submitForm(formData: FormData) {
-    'use server'
-    const SESSION = getSession();
-    
-    let activeEnglishTest: TestSession = SESSION.activeEnglishTest;
-    activeEnglishTest.otherRatings = formDataToDict(formData)
-    activeEnglishTest.started = true;
 
-    // console.log(activeEnglishTest);
-    
-    SESSION.activeEnglishTest = activeEnglishTest;
 
-    revalidatePath('/test', "layout");
+type TestStartProps = {
+  onStart: SessionUpdateCb
+}
 
+const beginTest: FnBeginTest = getAPIMethod(API_ENGLISH_TEST, "begin");
+export default function TestStart({ onStart }: TestStartProps) {
+  function submitForm(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = formDataToDict(new FormData(e.target as HTMLFormElement));
+    beginTest(formData as TBeginTest).then(onStart);
   }
   return (
-    <form action={submitForm} method="POST">
+    <form onSubmit={submitForm} method="POST" encType="multipart/form-data">
       <p className="mt-5">How do you rate your level of English?</p>
       <Select className="select" name="own_rating" dict={injectOptions({
         x: "I don't know"
@@ -53,7 +49,7 @@ export default function TestStart() {
       <Select className="select" name="certificate" dict={injectOptions({
         x: "I didn't take one"
       })} />
-      <div className="mt-5 flex justify-center"><button type="submit" className="btn">Begin test</button></div>
+      <div className="mt-5 flex justify-center"><button name="submit" type="submit" className="btn">Begin test</button></div>
     </form>
   );
 }

@@ -1,43 +1,39 @@
+"use client"
 import Layout from '@/layout'
-import Sentence from "./sentence";
 
-import { getSession } from '../session/route';
+
+
 import TestStart from './test_start';
 import TestProgress from './test_progress';
 
-// export const dynamic = 'force-dynamic'
+import TestResult from './test_result';
+import useSWR from 'swr';
+import { useState, useEffect } from "react";
+import { fetcher, getAPIData, getAPIMethod } from '~/lib/client_utils';
+import { API_ENGLISH_TEST } from '~/lib/paths';
+import { TestSession, TestSessionLight } from './test';
+import { FnTryAgain } from './api/route';
 
+export type SessionUpdateCb = (session: TestSessionLight | TestSession) => any;
+const tryAgain: FnTryAgain = getAPIMethod(API_ENGLISH_TEST, "tryAgain");
+const loadSession = getAPIData(API_ENGLISH_TEST);
 
-
-export type TestSession = {
-  currentLevel: number // 0-7 A0-C2
-  questionsRemained: number
-  started: boolean
-  otherRatings: Record<string, string>
-}
-
-export const initialTestSession: TestSession = {
-  currentLevel: 7,
-  questionsRemained: 5,
-  started: false,
-  otherRatings: {}
-};
-
-
-export default async function Test() {
-  const SESSION = getSession();
-  let testSession = SESSION.activeEnglishTest;
-  if (!testSession) {
-    SESSION.activeEnglishTest = testSession = initialTestSession;
-  }
+export default function Test() {
+  let [testSession, setTestSession] = useState<TestSession | TestSessionLight>();
   
-  
-  
+  useEffect(()=> {
+    loadSession().then(setTestSession);
+  }, []);
+
+  if (!testSession) return "loading";
+
   return (
     <Layout>
       <h1>Test your level of English</h1>
-      {!testSession.started && <TestStart />}
-      {testSession.started && <TestProgress />}
+      <div>Level: {testSession.currentLevel}; Correct answers count: {testSession.correctAnswersCount}</div>
+      {!testSession.active && <TestStart onStart={setTestSession} />}
+      {testSession.currentQuestion && <TestProgress onAnswer={setTestSession} testSession={testSession as TestSessionLight} />}
+      {testSession.active && !testSession.currentQuestion && <TestResult onTryAgain={() => tryAgain({}).then(setTestSession)} testSession={testSession as TestSession} />}
     </Layout>
   );
 }

@@ -48,7 +48,7 @@ export default function Select({
     <select {...rest}>
       {keys.map((key, index) =>
         !key ?
-          <option hidden key="">{placeholder}</option> :
+          <option hidden key="" value="">{placeholder}</option> :
           <option hidden={!key} key={key} value={key}>{values ? values[index] : ""}</option>
       )}
     </select>

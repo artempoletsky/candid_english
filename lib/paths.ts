@@ -11,6 +11,9 @@ export const OXFORD_BY_LEVEL = "/grab_data/words_level.json";
 export const API_ADMIN_ADJUST_LEMMATIZER = "/admin/api/adjust_lemmatizer";
 export const API_LEMMATIZE = "/api/lemmatize_text";
 
+export const API_ENGLISH_TEST = "/test/api";
+
+
 export const MONGO_CONNECTION_STRING = "mongodb://127.0.0.1:27017";
 export const MONGO_DBNAME = "CandidEnglish";
 
