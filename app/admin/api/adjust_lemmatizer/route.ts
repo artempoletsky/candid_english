@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import simplify from "~/lib/simplify_words";
 import { rfs, wfs } from "~/lib/util";
 import { LEMMATIZER_BLACKLIST, LEMMATIZER_WHITELIST, LEMMATIZER_OVERRIDES } from "~/lib/paths";
-import validate, { ValidationRule, validateUnionFabric } from "~/lib/api";
+import validate, { ValidationRule, validateUnionFabric } from "~/lib/rpc";
 
 const CWD = process.cwd();
 

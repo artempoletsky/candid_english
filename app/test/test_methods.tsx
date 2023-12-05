@@ -1,11 +1,12 @@
 import { revalidatePath } from "next/cache"
 import { getSession } from "~/app/session/route"
+import { LanguageLevel } from "~/lib/language_levels"
 
 
 export type Question = {
   template: string
   correctAnswers: string[]
-  difficulty: number
+  difficulty: LanguageLevel
   options: string[][]
 }
 
@@ -20,7 +21,7 @@ export type AnswerRecord = {
 export type TestSession = {
   penaltyQuestions: number
   correctAnswersCount: number
-  currentLevel: number // 0-7 A0-C2
+  currentLevel: LanguageLevel
   active: boolean
   otherRatings: Record<string, string>
   currentQuestion: Question | undefined
@@ -33,7 +34,7 @@ export type TestSessionLight = Omit<TestSession, "answers" | "currentQuestion"> 
 
 export const InitialTestSession: TestSession = {
   penaltyQuestions: 0,
-  currentLevel: 6,
+  currentLevel: "c2",
   correctAnswersCount: 0,
   active: false,
   currentQuestion: undefined,
@@ -42,11 +43,11 @@ export const InitialTestSession: TestSession = {
 };
 
 
-export function getQuestionForLevel(level: number): Question {
+export function getQuestionForLevel(level: LanguageLevel): Question {
   return {
     template: "Who let the {...} out? {...} are you OK?",
     options: [["dogs", "cats"], ["Annie", "Jimmy"]],
-    difficulty: 6,
+    difficulty: "c2",
     correctAnswers: ["dogs", "Annie"]
   };
 }
@@ -69,6 +70,7 @@ export function makeAnswerRecord(answers: string[], question: Question): AnswerR
     userAnswers: answers
   }
 }
+
 export function createIfNotExists(): TestSession {
   const SESSION = getSession();
   if (!SESSION.activeEnglishTest) {
@@ -78,15 +80,3 @@ export function createIfNotExists(): TestSession {
   return SESSION.activeEnglishTest;
 }
 
-export function getTestSession(): TestSession {
-  const SESSION = getSession();
-  return SESSION.activeEnglishTest;
-}
-
-export function reset(revalidate: boolean = true) {
-  const SESSION = getSession();
-  SESSION.activeEnglishTest = InitialTestSession;
-
-  if (revalidate)
-    revalidatePath("/test");
-}

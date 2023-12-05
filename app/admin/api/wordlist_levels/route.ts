@@ -1,29 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
-import validate, { ValidationRule, commonArraysEqualLength, validateArrayUnionFabric } from "~/lib/api";
+import validate, { ValidationRule, commonArraysEqualLength, validateArrayUnionFabric } from "~/lib/rpc";
 import { OXFORD_LIST_LIGHT, OXFORD_LEVEL_PATCH, OXFORD_PART_PATCH } from "~/lib/paths";
 import { createIfNotExists, rfs, wfs } from "~/lib/util";
+import { LanguageLevel } from "~/lib/language_levels";
 
 
 type OxfordEntry = {
   id: string
   word: string
   part: string
-  level: string
+  level: LanguageLevel
 };
 
 
 export type ModifiedOxfordList = Record<string, {
   word: string
   part: string
-  level: string
-  originalLevel: string
+  level: LanguageLevel
+  originalLevel: LanguageLevel
 }>;
 
 export function getList(): ModifiedOxfordList {
   createIfNotExists(OXFORD_LEVEL_PATCH, {});
   createIfNotExists(OXFORD_PART_PATCH, {});
   const listLight: OxfordEntry[] = rfs(OXFORD_LIST_LIGHT);
-  const levelPatch: Record<string, string> = rfs(OXFORD_LEVEL_PATCH);
+  const levelPatch: Record<string, LanguageLevel> = rfs(OXFORD_LEVEL_PATCH);
   const partPatch: Record<string, string> = rfs(OXFORD_PART_PATCH);
   const result: ModifiedOxfordList = {};
   for (const entry of listLight) {

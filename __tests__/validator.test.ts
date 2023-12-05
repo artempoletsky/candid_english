@@ -1,5 +1,5 @@
 import { describe, expect, test, beforeAll } from "@jest/globals";
-import validate, { APIValidationObject, InvalidResult, Validator, commonArraysEqualLength } from "~/lib/api";
+import validate, { APIValidationObject, InvalidResult, ValidationRule, Validator, commonArraysEqualLength } from "~/lib/rpc";
 
 
 const xdescribe = (...args: any) => { };
@@ -383,5 +383,38 @@ describe("Validator", () => {
     if (!invalidResult2) return;
     expect(invalidResult2[0].invalidFields.level1.message).toBe("Object is missing field 'level2'");
 
+  });
+
+  test("payload object", async () => { //validators can pass data to the method via payload object
+
+    const secret: number = Math.random();
+    const rule1: ValidationRule = [{
+      argument: ["string", async ({ payload, value }) => {
+        payload.stringLength = value.length;
+        return true;
+      }]
+    }, async ({ payload }) => {
+      payload.secret = secret;
+      return true;
+    }
+    ];
+
+    const api = {
+      methodName: jest.fn(async (args, payload) => { })
+    };
+
+    const [res, status]  = await validate({
+      method: "methodName",
+      args: {
+        argument: "1234"
+      }
+    }, {
+      methodName: rule1
+    }, api);
+
+    expect(status.status).toBe(200);
+    expect(api.methodName).toBeCalledTimes(1);
+    expect(api.methodName.mock.calls[0][1].stringLength).toBe(4);
+    expect(api.methodName.mock.calls[0][1].secret).toBe(secret);
   });
 });

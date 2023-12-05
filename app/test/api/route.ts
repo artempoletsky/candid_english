@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { formDataToDict } from "~/lib/client_utils";
-import { InitialTestSession, TestSession, createIfNotExists, getQuestionForLevel, lightenSession, makeAnswerRecord } from "../test";
-import validate, { ValidationRule } from "~/lib/api";
+import { InitialTestSession, TestSession, createIfNotExists, getQuestionForLevel, lightenSession, makeAnswerRecord } from "../test_methods";
+import validate, { ValidationRule, Validator } from "~/lib/rpc";
 import { getSession } from "~/app/session/route";
+import { dec } from "~/lib/language_levels";
 
 
 export type TBeginTest = {
@@ -23,7 +23,7 @@ async function begin(dict: TBeginTest) {
   activeEnglishTest.otherRatings = dict;
   activeEnglishTest.active = true;
 
-  activeEnglishTest.currentQuestion = getQuestionForLevel(6);
+  activeEnglishTest.currentQuestion = getQuestionForLevel("c2");
 
   SESSION.activeEnglishTest = activeEnglishTest;
 
@@ -38,21 +38,28 @@ export type TGiveAnswer = {
   dontKnow: boolean
   answers: string[]
 }
-const VGiveAnswer: ValidationRule = {
+
+const VGiveAnswer: ValidationRule = [{
   dontKnow: "boolean",
   answers: "string[]",
-}
+}, async ({ payload }) => {
+  const SESSION = getSession();
+
+  if (!SESSION.activeEnglishTest?.currentQuestion) {
+    return "Current question is undefined";
+  }
+  payload.session = SESSION;
+  return true;
+}]
 
 
 const ANSWERS_TO_COMPLETE = 5;
 
-export async function giveAnswer({ dontKnow, answers }: TGiveAnswer) {
-  const SESSION = getSession();
-  const testSession: TestSession = SESSION.activeEnglishTest
+export async function giveAnswer({ dontKnow, answers }: TGiveAnswer, payload: any) {
 
-  if (!testSession.currentQuestion) {
-    throw new Error("Current question is undefined");
-  }
+  const testSession: TestSession = payload.session.activeEnglishTest
+  if (!testSession.currentQuestion) throw new Error("imposible");
+
   const aRec = makeAnswerRecord(answers, testSession.currentQuestion);
   testSession.answers.push(aRec);
   testSession.currentQuestion = getQuestionForLevel(testSession.currentLevel);
@@ -69,14 +76,14 @@ export async function giveAnswer({ dontKnow, answers }: TGiveAnswer) {
     }
   }
   if (dontKnow || !aRec.isCorrect) {
-    testSession.currentLevel--;
+    testSession.currentLevel = dec(testSession.currentLevel);
     //fail the exam
-    if (testSession.currentLevel == 0) {
+    if (testSession.currentLevel == "a0") {
       testSession.currentQuestion = undefined;
     }
   }
 
-  SESSION.activeEnglishTest = testSession;
+  payload.session.activeEnglishTest = testSession;
 
   if (testSession.currentQuestion) {
     return lightenSession(testSession);
@@ -84,8 +91,8 @@ export async function giveAnswer({ dontKnow, answers }: TGiveAnswer) {
     return testSession;
   }
 }
-
-export type FnGiveAnswer = typeof giveAnswer;
+type t = Parameters<typeof giveAnswer>[0];
+export type FnGiveAnswer = (args: TGiveAnswer) => ReturnType<typeof giveAnswer>;
 
 export async function GET() {
   // beginTest(dict);

@@ -12,39 +12,17 @@ import useSWR from "swr";
 import Table from "@/largetable";
 import Select from "@/select";
 import Checkbox from "@/checkbox";
+import { LevelOptionsAny, PartOptionsAny } from "~/lib/select_options";
+import { LanguageLevel } from "~/lib/language_levels";
+
 
 export type Word = {
   id: string,
   word: string,
-  level: string,
+  level: LanguageLevel,
   part: string
 };
 
-
-
-const levelOptions: { [key: string]: string } = {
-  any: "Any",
-  a1: "A1",
-  a2: "A2",
-  b1: "B1",
-  b2: "B2",
-  c1: "C1",
-};
-
-const partOptions: { [key: string]: string } = {
-  any: "Any",
-  noun: "Noun",
-  verb: "Verb",
-  adjective: "Adjective",
-  adverb: "Adverb",
-  preposition: "Preposition",
-  conjunction: "Conjunction",
-  determiner: "Determiner",
-  pronoun: "Pronoun",
-  number: "Number",
-  "modal verb": "Modal verb",
-  other: "Other"
-};
 
 const fetcher = (...args: any) => fetch.apply(this, args).then(res => res.json())
 
@@ -53,7 +31,7 @@ export default function WordList({ words }: { words?: Array<Word> }) {
   let [hideLearnedMode, setHideLearnedMode] = useState(true);
 
 
-  let [level, setLevel] = useState("any");
+  let [level, setLevel] = useState<LanguageLevel | "any">("any");
   let [part, setPart] = useState("any");
   let [searchQuery, setSearchQuery] = useState("");
   let [excludedWords, setExcludedWords] = useState<Array<String>>([]);
@@ -85,7 +63,7 @@ export default function WordList({ words }: { words?: Array<Word> }) {
     if (level != "any" && level != e.level) return false;
     if (part != "any" && part != e.part) {
       if (part == "other") {
-        return !partOptions[e.part];
+        return !PartOptionsAny[e.part];
       }
       else {
         return false;
@@ -128,14 +106,14 @@ export default function WordList({ words }: { words?: Array<Word> }) {
         <label htmlFor="level_select">Level: </label>
         <Select
           className="select"
-          dict={levelOptions}
+          dict={LevelOptionsAny}
           bind={[level, setLevel]}
           id="level_select"
         />
         <label htmlFor="part_select">Part of speech: </label>
         <Select
           className="select"
-          dict={partOptions}
+          dict={PartOptionsAny}
           bind={[part, setPart]}
           id="part_select"
         />

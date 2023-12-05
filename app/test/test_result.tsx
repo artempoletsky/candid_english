@@ -1,5 +1,5 @@
 
-import { TestSession } from "./test";
+import { TestSession } from "./test_methods";
 import { FormEvent } from "react";
 
 type TestResultProps = {

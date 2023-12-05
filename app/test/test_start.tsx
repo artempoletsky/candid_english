@@ -1,20 +1,13 @@
 import Select from "@/select";
 import { FormEvent } from "react";
-import { formDataToDict, getAPIMethod } from "~/lib/client_utils";
+import { getAPIMethod } from "~/lib/rpc_client";
+import { formDataToDict } from "~/lib/utils_client";
 import { API_ENGLISH_TEST } from "~/lib/paths";
-import type { TestSession, TestSessionLight } from "./test";
 import type { FnBeginTest, TBeginTest } from "./api/route";
 import { SessionUpdateCb } from "./page";
+import { asDict, range } from "~/lib/language_levels";
 
-const Levels: Record<string, string> = {
-  a0: "A0",
-  a1: "A1",
-  a2: "A2",
-  b1: "B1",
-  b2: "B2",
-  c1: "C1",
-  c2: "C2",
-}
+const Levels = asDict(range());
 
 function injectOptions(injeced: Record<string, string>): Record<string, string> {
   return {

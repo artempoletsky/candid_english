@@ -5,9 +5,10 @@ export type APIRequest = {
 }
 export type Validator = (args:
   {
-    value: any,
-    method: string,
-    args: any,
+    value: any
+    method: string
+    args: any
+    payload: Record<string, any>
   }
 ) => Promise<InvalidFieldReason | string | true>;
 
@@ -44,6 +45,8 @@ export type ValiationErrorResponce = {
   invalidFields: Record<string, InvalidFieldReason>
 };
 
+
+const noop = () => { };
 
 function invalidResponce(message: string): InvalidResult {
   return [
@@ -90,7 +93,7 @@ const primitiveValidatorFabric = (type: PrimitiveType): Validator => {
 
 export const arrayValidatorFabric = (type: string = "", validator?: Validator): Validator => {
 
-  return async ({ value, method, args }) => {
+  return async ({ value, method, args, payload }) => {
     if (!(value instanceof Array)) {
       return typeExpectedReason(type, value);
     }
@@ -103,6 +106,7 @@ export const arrayValidatorFabric = (type: string = "", validator?: Validator): 
         value: value[i],
         method,
         args,
+        payload
       });
 
 
@@ -139,11 +143,11 @@ export const objectValidatorFactory = (rulesObject: Record<string, any>): Valida
     const validator = validify(rulesObject[field]);
     validators.push(
       ((field: string, validator: Validator) =>
-        async ({ value, args, method }) => {
+        async ({ value, args, method, payload }) => {
           if (typeof value[field] === "undefined") {
             return `Object is missing field '${field}'`;
           }
-          return await validator({ value: value[field], args, method })
+          return await validator({ value: value[field], args, method, payload })
         }
 
       )(field, validator)
@@ -190,9 +194,9 @@ export const emailValidator: Validator = chainValidators(
   }) as Validator
 );
 
-export const optionalEmailValidator: Validator = async ({ value, method, args }) => {
+export const optionalEmailValidator: Validator = async ({ value, method, args, payload }) => {
   if (value === "") return true;
-  return await emailValidator({ value, method, args });
+  return await emailValidator({ value, method, args, payload });
 };
 
 const RulesObject: Record<string, Validator> = {
@@ -252,6 +256,7 @@ async function validate(req: APIRequest, rules: APIValidationObject, api?: APIOb
     userMessage: string
   }> = {};
 
+  let payload: Record<string, any> = {};
   const commonValidators: Validator[] = [];
 
   for (const rule of methodRules) {
@@ -276,7 +281,7 @@ async function validate(req: APIRequest, rules: APIValidationObject, api?: APIOb
           continue;
         }
 
-        let validationErrorReason = await validator({ value, method, args });
+        let validationErrorReason = await validator({ value, method, args, payload });
 
         if (validationErrorReason !== true) {
           invalidFields[fieldName] = makeReason(validationErrorReason);
@@ -297,8 +302,11 @@ async function validate(req: APIRequest, rules: APIValidationObject, api?: APIOb
     ];
   }
 
+
+
   for (const validator of commonValidators) {
-    let validationErrorReason = await validator({ value: null, method, args });
+
+    let validationErrorReason = await validator({ value: null, method, args, payload });
     if (validationErrorReason !== true) {
       return [
         {
@@ -317,7 +325,7 @@ async function validate(req: APIRequest, rules: APIValidationObject, api?: APIOb
 
   let result;
   try {
-    result = await api[method](args);
+    result = await api[method](args, payload);
   } catch (error) {
     return [
       {

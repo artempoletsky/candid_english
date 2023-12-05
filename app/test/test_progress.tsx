@@ -1,8 +1,9 @@
 
 import TestSentence from "./sentence";
-import { formDataToDict, getAPIMethod } from "~/lib/client_utils";
+import { formDataToDict } from "~/lib/utils_client";
+import { getAPIMethod } from "~/lib/rpc_client";
 import { MouseEvent, useRef } from "react";
-import type { TestSessionLight } from "./test";
+import type { TestSessionLight } from "./test_methods";
 import { FnGiveAnswer } from "./api/route";
 import { API_ENGLISH_TEST } from "~/lib/paths";
 import { SessionUpdateCb } from "./page";
@@ -35,7 +36,7 @@ export default function TestProgress({ testSession, onAnswer }: TestProgressProp
         dontKnow,
         answers: answersArray
       }).then(onAnswer);
-      
+
     }
 
 

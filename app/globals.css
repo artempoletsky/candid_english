@@ -35,6 +35,7 @@ body {
 
 html {
   height: 100%;
+  overflow-y: scroll;
 }
 
 .page_container {

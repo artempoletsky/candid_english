@@ -123,7 +123,7 @@ describe('/admin/adjust_lemmatizer', () => {
 
     expect(response.status).toBe(400);
 
-    expect((await response.json()).invalidFields.listType.message).toEqual("expected to be '('black' | 'white')' got 'string: blakc'");
+    expect((await response.json()).invalidFields.listType.message).toEqual("expected to be '('black' | 'white')' got string: 'blakc'");
   });
 
   describe("after this", () => {

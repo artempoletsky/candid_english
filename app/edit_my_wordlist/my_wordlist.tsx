@@ -3,9 +3,8 @@
 import { FixedSizeList as List } from "react-window";
 import { UpdateWordsResponse } from "~/app/api/update_known_words/route";
 import { useState, useEffect } from "react";
-import css from "../wordlist/wordlist.module.css";
-import Link from "next/link"
 import { getMyWords, saveMyWords } from "~/lib/words_storage";
+import { DictRange, userView } from "~/lib/language_levels";
 
 
 export function updateWordlists(requestBody: any): Promise<Record<string, boolean>> {
@@ -89,15 +88,14 @@ export function saveMyWordlist() {
 
 export default function MyWordlist() {
   // initWordsLocalStorage();
-  let [myWords, setMyWords] = useState<Record<string, boolean>>(getMyWords());
+  let [myWords, setMyWords] = useState<Record<string, boolean>>({});
   let [newWord, setNewWord] = useState<string>("");
   let [searchQuery, setSearchQuery] = useState<string>("");
   let [updateTrigger, setUpdateTrigger] = useState(0);
 
 
   useEffect(() => {
-    // update some client side state to say it is now safe to render the client-side only component
-    // setMyWords(store.get("my_words"));
+    setMyWords(getMyWords());
   }, []);
 
   function updateViewWords(words: Record<string, boolean>): Promise<Record<string, boolean>> {
@@ -207,30 +205,11 @@ export default function MyWordlist() {
       </div>
 
       <div className="mb-3">
-        <div className="join join-vertical">
-          <button className="btn join-item grow" onClick={e => addWordlists(["a1"]).then(updateViewWords)}>Add A1</button>
-          <button className="btn join-item grow" onClick={e => removeWordlists(["a1"]).then(updateViewWords)}>Remove A1</button>
+        {DictRange.map(level => <div key={level} className="join join-vertical">
+          <button className="btn join-item grow" onClick={e => addWordlists([level]).then(updateViewWords)}>Add {userView(level)}</button>
+          <button className="btn join-item grow" onClick={e => removeWordlists([level]).then(updateViewWords)}>Remove {userView(level)}</button>
         </div>
-
-        <div className="join join-vertical">
-          <button className="btn join-item grow" onClick={e => addWordlists(["a2"]).then(updateViewWords)}>Add A2</button>
-          <button className="btn join-item grow" onClick={e => removeWordlists(["a2"]).then(updateViewWords)}>Remove A2</button>
-        </div>
-
-        <div className="join join-vertical">
-          <button className="btn join-item grow" onClick={e => addWordlists(["b1"]).then(updateViewWords)}>Add B1</button>
-          <button className="btn join-item grow" onClick={e => removeWordlists(["b1"]).then(updateViewWords)}>Remove B1</button>
-        </div>
-
-        <div className="join join-vertical">
-          <button className="btn join-item grow" onClick={e => addWordlists(["b2"]).then(updateViewWords)}>Add B2</button>
-          <button className="btn join-item grow" onClick={e => removeWordlists(["b2"]).then(updateViewWords)}>Remove B2</button>
-        </div>
-
-        <div className="join join-vertical">
-          <button className="btn join-item grow" onClick={e => addWordlists(["c1"]).then(updateViewWords)}>Add C1</button>
-          <button className="btn join-item grow" onClick={e => removeWordlists(["c1"]).then(updateViewWords)}>Remove C1</button>
-        </div>
+        )}
       </div>
 
       Word count: {wordCount}
