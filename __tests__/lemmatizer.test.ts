@@ -47,7 +47,7 @@ describe("Simplify", () => {
     expect(allWordsDict["answers"]).toBeUndefined();
   });
 
-  xtest("woes", () => {
+  xtest("lying dying expelled", () => {
     let lemmas = lemmatize("woes");
     console.log(lemmas);
 

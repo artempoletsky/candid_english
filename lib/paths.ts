@@ -16,6 +16,8 @@ export const API_ENGLISH_TEST = "/test/api";
 
 export const MONGO_CONNECTION_STRING = "mongodb://127.0.0.1:27017";
 export const MONGO_DBNAME = "CandidEnglish";
+export const DBCOL_QUESTIONS = "questions";
+export const DBCOL_SYNONYMS = "ReversoSynonyms";
 
 export const COOKIE_SESSION_KEY = "CandidEnglish";
 export const SESSION_DIR = "/data/session/";

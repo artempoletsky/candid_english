@@ -44,6 +44,7 @@ export const InitialTestSession: TestSession = {
 
 
 export function getQuestionForLevel(level: LanguageLevel): Question {
+  
   return {
     template: "Who let the {...} out? {...} are you OK?",
     options: [["dogs", "cats"], ["Annie", "Jimmy"]],

@@ -5,20 +5,21 @@ import TestProgress from './test_progress';
 
 import TestResult from './test_result';
 import { useState, useEffect } from "react";
-import { getAPIData, getAPIMethod } from '~/lib/rpc_client';
+import { getAPIMethod } from '@artempoletsky/easyrpc/client';
 import { API_ENGLISH_TEST } from '~/lib/paths';
 import { TestSession, TestSessionLight } from './test_methods';
-import { FnTryAgain } from './api/route';
+import { FnTryAgain, FnCreateSession } from './api/route';
 
 export type SessionUpdateCb = (session: TestSessionLight | TestSession) => any;
 const tryAgain: FnTryAgain = getAPIMethod(API_ENGLISH_TEST, "tryAgain");
-const loadSession = getAPIData(API_ENGLISH_TEST);
+const createSession: FnCreateSession = getAPIMethod(API_ENGLISH_TEST, "createSession");
+
 
 export default function TestPageComponent() {
   let [testSession, setTestSession] = useState<TestSession | TestSessionLight>();
 
   useEffect(() => {
-    loadSession().then(setTestSession);
+    createSession().then(setTestSession);
   }, []);
 
   if (!testSession) return "loading...";
@@ -28,7 +29,7 @@ export default function TestPageComponent() {
       <div>Level: {testSession.currentLevel}; Correct answers count: {testSession.correctAnswersCount}</div>
       {!testSession.active && <TestStart onStart={setTestSession} />}
       {testSession.currentQuestion && <TestProgress onAnswer={setTestSession} testSession={testSession as TestSessionLight} />}
-      {testSession.active && !testSession.currentQuestion && <TestResult onTryAgain={() => tryAgain({}).then(setTestSession)} testSession={testSession as TestSession} />}
+      {testSession.active && !testSession.currentQuestion && <TestResult onTryAgain={() => tryAgain().then(setTestSession)} testSession={testSession as TestSession} />}
     </>
   );
 }

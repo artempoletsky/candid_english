@@ -1485,5 +1485,8 @@
   "humorous": "b1",
   "humour": "a2",
   "wise": "a2",
-  "shot": "a2"
+  "shot": "a2",
+  "tag": "b1",
+  "explicit": "b2",
+  "explicitly": "b2"
 }

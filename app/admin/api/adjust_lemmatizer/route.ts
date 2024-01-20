@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import simplify from "~/lib/simplify_words";
 import { rfs, wfs } from "~/lib/util";
 import { LEMMATIZER_BLACKLIST, LEMMATIZER_WHITELIST, LEMMATIZER_OVERRIDES } from "~/lib/paths";
-import validate, { ValidationRule, validateUnionFabric } from "~/lib/rpc";
+import validate, { ValidationRule, validateUnionFabric } from "@artempoletsky/easyrpc";
 
 const CWD = process.cwd();
 
@@ -12,7 +12,7 @@ type TAddOverride = {
   lemma: string
 }
 
-const VAddOverride: ValidationRule = {
+const VAddOverride: ValidationRule<TAddOverride> = {
   word: "string",
   lemma: "string",
 }
@@ -32,6 +32,8 @@ export async function addOverride({ word, lemma }: TAddOverride) {
   return OKResponse;
 };
 
+export type MAddOverride = typeof addOverride;
+
 const LIST_TYPES = ["black", "white"] as const;
 
 type TAddToList = {
@@ -39,7 +41,7 @@ type TAddToList = {
   listType: typeof LIST_TYPES[number]
 }
 
-const VAddToList: ValidationRule = {
+const VAddToList: ValidationRule<TAddToList> = {
   word: "string",
   listType: validateUnionFabric(LIST_TYPES),
 }

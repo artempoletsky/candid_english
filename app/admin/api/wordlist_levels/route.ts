@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import validate, { ValidationRule, commonArraysEqualLength, validateArrayUnionFabric } from "~/lib/rpc";
+import { ValidationRule, commonArraysEqualLength, validateArrayUnionFabric, NextPOST } from "@artempoletsky/easyrpc";
 import { OXFORD_LIST_LIGHT, OXFORD_LEVEL_PATCH, OXFORD_PART_PATCH } from "~/lib/paths";
 import { createIfNotExists, rfs, wfs } from "~/lib/util";
 import { LanguageLevel } from "~/lib/language_levels";
+
 
 
 type OxfordEntry = {
@@ -43,7 +44,7 @@ export function getList(): ModifiedOxfordList {
 }
 
 export async function GET(req: NextRequest) {
-  
+
   return NextResponse.json(getList(), {
     status: 200
   });
@@ -52,13 +53,13 @@ export async function GET(req: NextRequest) {
 
 const EDITABLE_FIELDS = ["part", "level"] as const;
 
-type TChangeField = {
+type ArgChangeField = {
   ids: string[],
   values: string[],
   fields: typeof EDITABLE_FIELDS[number][]
 }
 
-const VChangeField: ValidationRule = [
+const VChangeField: ValidationRule<ArgChangeField> = [
   {
     ids: "string[]",
     values: "string[]",
@@ -68,7 +69,7 @@ const VChangeField: ValidationRule = [
 ]
 
 
-async function changeField({ ids, values, fields }: TChangeField) {
+async function changeField({ ids, values, fields }: ArgChangeField) {
   const listLight: OxfordEntry[] = rfs(OXFORD_LIST_LIGHT);
   const levelPatch: Record<string, string> = rfs(OXFORD_LEVEL_PATCH);
   const partPatch: Record<string, string> = rfs(OXFORD_PART_PATCH);
@@ -106,21 +107,9 @@ async function changeField({ ids, values, fields }: TChangeField) {
   }
 }
 
-export async function PATCH(req: NextRequest) {
-  let { method, ...args } = await req.json();
 
-  const [a, b] = await validate(
-    {
-      method,
-      args,
-    },
-    {
-      changeField: VChangeField
-    },
-    {
-      changeField,
-    }
-  );
-
-  return NextResponse.json(a, b);
-}
+export const POST = NextPOST(NextResponse, {
+  changeField: VChangeField
+}, {
+  changeField,
+});

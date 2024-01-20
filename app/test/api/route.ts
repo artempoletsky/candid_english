@@ -1,22 +1,23 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { InitialTestSession, TestSession, createIfNotExists, getQuestionForLevel, lightenSession, makeAnswerRecord } from "../test_methods";
-import validate, { ValidationRule, Validator } from "~/lib/rpc";
+import { ValidationRule } from "@artempoletsky/easyrpc";
 import { getSession } from "~/app/session/route";
 import { dec } from "~/lib/language_levels";
+import { NextPOST } from "@artempoletsky/easyrpc";
 
 
-export type TBeginTest = {
+export type ABeginTest = {
   own_rating: string
   online: string
   certificate: string
 }
-const VBeginTest: ValidationRule = {
+const VBeginTest: ValidationRule<ABeginTest> = {
   own_rating: "string",
   online: "string",
   certificate: "string",
 }
 
-async function begin(dict: TBeginTest) {
+async function beginTest(dict: ABeginTest) {
   const SESSION = getSession();
 
   let activeEnglishTest: TestSession = SESSION.activeEnglishTest;
@@ -30,16 +31,16 @@ async function begin(dict: TBeginTest) {
   return lightenSession(activeEnglishTest);
 }
 
-export type FnBeginTest = typeof begin;
+export type FnBeginTest = typeof beginTest;
 
 /////////
 
-export type TGiveAnswer = {
+export type AGiveAnswer = {
   dontKnow: boolean
   answers: string[]
 }
 
-const VGiveAnswer: ValidationRule = [{
+const VGiveAnswer: ValidationRule<AGiveAnswer> = [{
   dontKnow: "boolean",
   answers: "string[]",
 }, async ({ payload }) => {
@@ -55,7 +56,7 @@ const VGiveAnswer: ValidationRule = [{
 
 const ANSWERS_TO_COMPLETE = 5;
 
-export async function giveAnswer({ dontKnow, answers }: TGiveAnswer, payload: any) {
+export async function giveAnswer({ dontKnow, answers }: AGiveAnswer, payload: any) {
 
   const testSession: TestSession = payload.session.activeEnglishTest
   if (!testSession.currentQuestion) throw new Error("imposible");
@@ -91,23 +92,12 @@ export async function giveAnswer({ dontKnow, answers }: TGiveAnswer, payload: an
     return testSession;
   }
 }
-type t = Parameters<typeof giveAnswer>[0];
-export type FnGiveAnswer = (args: TGiveAnswer) => ReturnType<typeof giveAnswer>;
 
-export async function GET() {
-  // beginTest(dict);
-  const session: TestSession = createIfNotExists();
+export type FnGiveAnswer = (args: AGiveAnswer) => ReturnType<typeof giveAnswer>;
 
-  return NextResponse.json(lightenSession(session), {
-    status: 200
-  });
-}
 /////
-export type TTryAgain = {}
 
-const VTryAgain: ValidationRule = {}
-
-async function tryAgain({ }: TTryAgain) {
+async function tryAgain() {
   const SESSION = getSession();
   SESSION.activeEnglishTest = InitialTestSession;
   return lightenSession(SESSION.activeEnglishTest);
@@ -115,20 +105,21 @@ async function tryAgain({ }: TTryAgain) {
 
 export type FnTryAgain = typeof tryAgain;
 
-export async function POST(req: NextRequest) {
-  let { method, ...args } = await req.json();
-  let [a, b] = await validate({
-    method,
-    args
-  }, {
-    begin: VBeginTest,
-    giveAnswer: VGiveAnswer,
-    tryAgain: VTryAgain,
-  }, {
-    begin,
-    giveAnswer,
-    tryAgain,
-  });
-
-  return NextResponse.json(a, b);
+async function createSession() {
+  return lightenSession(createIfNotExists());
 }
+
+export type FnCreateSession = typeof createSession;
+
+
+export const POST = NextPOST(NextResponse, {
+  createSession: {},
+  beginTest: VBeginTest,
+  giveAnswer: VGiveAnswer,
+  tryAgain: {},
+}, {
+  createSession,
+  beginTest,
+  giveAnswer,
+  tryAgain,
+});

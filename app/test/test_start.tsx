@@ -1,11 +1,11 @@
 import Select from "@/select";
 import { FormEvent } from "react";
-import { getAPIMethod } from "~/lib/rpc_client";
+import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { formDataToDict } from "~/lib/utils_client";
 import { API_ENGLISH_TEST } from "~/lib/paths";
-import type { FnBeginTest, TBeginTest } from "./api/route";
-import { SessionUpdateCb } from "./page";
+import type { FnBeginTest, ABeginTest } from "./api/route";
 import { asDict, range } from "~/lib/language_levels";
+import { SessionUpdateCb } from "./test_page_component";
 
 const Levels = asDict(range());
 
@@ -21,12 +21,12 @@ type TestStartProps = {
   onStart: SessionUpdateCb
 }
 
-const beginTest: FnBeginTest = getAPIMethod(API_ENGLISH_TEST, "begin");
+const beginTest: FnBeginTest = getAPIMethod(API_ENGLISH_TEST, "beginTest");
 export default function TestStart({ onStart }: TestStartProps) {
   function submitForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = formDataToDict(new FormData(e.target as HTMLFormElement));
-    beginTest(formData as TBeginTest).then(onStart);
+    beginTest(formData as ABeginTest).then(onStart);
   }
   return (
     <form onSubmit={submitForm} method="POST" encType="multipart/form-data">
