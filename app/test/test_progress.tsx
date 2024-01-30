@@ -44,12 +44,13 @@ export default function TestProgress({ testSession, onAnswer }: TestProgressProp
     // giveAnswer(answersArray, dontKnow);
   }
   // console.log(testSession.currentQuestion.template);
-  // console.log(testSession.currentQuestion.options);
+  // console.log(testSession.currentQuestion);
 
   // testSession.currentQuestion
   return (
     <form ref={form} method="POST" encType="multipart/form-data">
       {/* <TestSentence question="Who let the {...} out? {...} are you OK?" options={[["dogs", "cats"], ["Annie", "Jimmy"]]} /> */}
+      <p>Please select the most aproptiate options:</p>
       <TestSentence question={testSession.currentQuestion.template} options={testSession.currentQuestion.options} />
       <div className="mt-5 flex justify-center">
         <button onClick={submitForm(false)} type="submit" name="submit" className="btn mr-2" value="submit">Submit</button>

@@ -136,6 +136,15 @@ export function lemmatizeWord(word: string, dict: Record<string, any>, options?:
     }
   }
 
+  //ly -> lie
+  //dy -> die
+  if (lemma.endsWith("y")) {
+    let l = lemma.slice(0, -1);
+    if (dict[l + 'ie']) {
+      return l + 'ie';
+    }
+  }
+
   //hop -> hope
   if (dict[lemma + 'e']) {
     return lemma + 'e';
@@ -171,7 +180,7 @@ export default function lemmatize(text: string): Record<string, LemmatizeResult>
     if (sentence == "") {
       continue;
     }
-    const words = sentence.split(/[\s\,\;\:\"\-]/).filter(word => {
+    const words = sentence.split(/[\s\,\;\:\"\-\(\)]/).filter(word => {
       if (word.match(/[0-9]/g)) {
         return false;
       }

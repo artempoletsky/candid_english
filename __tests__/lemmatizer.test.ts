@@ -47,14 +47,14 @@ describe("Simplify", () => {
     expect(allWordsDict["answers"]).toBeUndefined();
   });
 
-  xtest("lying dying expelled", () => {
-    let lemmas = lemmatize("woes");
-    console.log(lemmas);
+  xtest("(sniffs)", () => {
+    let lemmas = lemmatize("(sniffs)");
+    // console.log(lemmas);
 
-    expect(lemmas["woe"]).toBeDefined();
+    expect(lemmas["sniff"]).toBeDefined();
   });
 });
- 
+
 describe("Lemmatizer", () => {
 
   test("counts lemmas in text", () => {
@@ -272,5 +272,17 @@ describe("Lemmatizer", () => {
   test("woes", () => {
     let lemmas = lemmatize("woes");
     expect(lemmas["woe"]).toBeDefined();
+  });
+
+  test("dying dyeing", () => {
+    let lemmas = lemmatize("dying dyeing lying");
+    expect(lemmas["dye"]).toBeDefined();
+    expect(lemmas["die"]).toBeDefined();
+    expect(lemmas["lie"]).toBeDefined();
+  });
+
+  test("(sniffs)", () => {
+    let lemmas = lemmatize("(sniffs)");
+    expect(lemmas["sniff"]).toBeDefined();
   });
 });

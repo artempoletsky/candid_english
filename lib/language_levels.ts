@@ -23,7 +23,7 @@ export function range(min: LanguageLevel = "a0", max: LanguageLevel = "c2"): Lan
   return result;
 }
 
-export const DictRange = range("a1", "c1");
+export const DictRange: ["a1", "a2", "b1", "b2", "c1"] = range("a1", "c1") as any;
 
 export function userView(level: LanguageLevel): string {
   return level.toUpperCase();

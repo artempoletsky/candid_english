@@ -24,7 +24,7 @@ async function beginTest(dict: ABeginTest) {
   activeEnglishTest.otherRatings = dict;
   activeEnglishTest.active = true;
 
-  activeEnglishTest.currentQuestion = getQuestionForLevel("c2");
+  activeEnglishTest.currentQuestion = await getQuestionForLevel("c2");
 
   SESSION.activeEnglishTest = activeEnglishTest;
 
@@ -63,7 +63,8 @@ export async function giveAnswer({ dontKnow, answers }: AGiveAnswer, payload: an
 
   const aRec = makeAnswerRecord(answers, testSession.currentQuestion);
   testSession.answers.push(aRec);
-  testSession.currentQuestion = getQuestionForLevel(testSession.currentLevel);
+  const exclude = testSession.answers.map(a => a.question.word);
+
 
   if (dontKnow) {
     answers = answers.map(a => "");
@@ -83,6 +84,11 @@ export async function giveAnswer({ dontKnow, answers }: AGiveAnswer, payload: an
       testSession.currentQuestion = undefined;
     }
   }
+  
+  if (testSession.currentQuestion !== undefined) {
+    testSession.currentQuestion = await getQuestionForLevel(testSession.currentLevel, exclude);
+  }
+
 
   payload.session.activeEnglishTest = testSession;
 

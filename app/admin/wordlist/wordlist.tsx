@@ -3,7 +3,6 @@
 import { useState, useEffect, useReducer } from "react";
 import css from "~/app/wordlist/wordlist.module.css";
 import debounce from "lodash.debounce";
-import { addWords, removeWords } from "~/app/edit_my_wordlist/my_wordlist";
 
 import DictLink from "@/dictlink";
 import useSWR from "swr";
@@ -12,6 +11,9 @@ import Table from "@/largetable";
 import Select from "@/select";
 import { LanguageLevel } from "~/lib/language_levels";
 import { LevelOptions, LevelOptionsAny, PartOptions, PartOptionsAny } from "~/lib/select_options";
+import { FChangeField } from "./api/route";
+import { getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { TestWord } from "~/db";
 
 export type Word = {
   id: string
@@ -33,8 +35,13 @@ const LevelOptionsAnyExclude: Record<string, string> = Object.assign({
 }, LevelOptions);
 
 
-const fetcher = (...args: any) => fetch.apply(this, args).then(res => res.json())
-const API_WORDLIST_URL = "/admin/api/wordlist_levels";
+
+const API_WORDLIST_URL = "/admin/wordlist/api";
+
+const changeField = getAPIMethod<FChangeField>(API_WORDLIST_URL, "changeField");
+
+const getTestWords = getAPIMethod(API_WORDLIST_URL, "getTestWords");
+const fetcher = (...args: any) => getTestWords();
 
 export default function WordList() {
 
@@ -44,38 +51,30 @@ export default function WordList() {
   let [searchQuery, setSearchQuery] = useState("");
   let [version, dispatchVersion] = useReducer(version => version + 1, 0);
 
-  const { data, error, isLoading, mutate } = useSWR(API_WORDLIST_URL, fetcher);
+  const { data, error, isLoading, mutate } = useSWR<TestWord[]>("getTestWords", () => getTestWords());
 
   if (isLoading) {
     return (<div>loading...</div>);
   }
 
-  if (error) {
+  if (error || !data) {
+    console.log(error);
     return (<div>Loading has failed</div>);
   }
 
-  const patchWord = (word: Word, field: "part" | "level", value: string) => {
-    return fetch(API_WORDLIST_URL, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        method: "changeField",
-        ids: [word.id],
-        values: [value],
-        fields: [field]
-      })
-    }).then(e => {
-      data[word.id][field] = value;
+  const patchWord = async (word: TestWord, field: "part" | "level", value: string) => {
+
+    return changeField({ [word.id]: { [field]: value } }).then(e => {
+      // data[word.id][field] = value;
+      word[field] = value as any;
       dispatchVersion();
       return e;
     });
   }
 
-  const filterFn = (e: Word) => {
+  const filterFn = (e: TestWord) => {
     if (level != "any" && level != e.level) return false;
-    if (originalLevel != "any" && originalLevel != e.originalLevel) return false;
+    if (originalLevel != "any" && originalLevel != e.oxfordLevel) return false;
     if (part != "any" && part != e.part) {
       if (part == "other") {
         return !PartOptionsAny[e.part];
@@ -90,7 +89,7 @@ export default function WordList() {
   };
 
   const Row = ({ data, index }: any) => {
-    const el: Word = data[index];
+    const el: TestWord = data[index];
     return (
       <tr key={el.id}>
         <td>
@@ -105,7 +104,7 @@ export default function WordList() {
             id="level_select"
             onChange={e => patchWord(el, "part", e.target.value)} />
         </td>
-        <td className="w-[80px]">{LevelOptions[el.originalLevel]}</td>
+        <td className="w-[80px]">{LevelOptions[el.oxfordLevel]}</td>
         <td className="w-[145px]"><Select
           className="select"
           dict={LevelOptionsExclude}
@@ -126,12 +125,7 @@ export default function WordList() {
     </tr>);
 
 
-  const filteredWords = Object.keys(data).map(id => {
-    return {
-      id,
-      ...data[id]
-    } as Word
-  }).filter(filterFn);
+  const filteredWords = data.filter(filterFn);
 
   const wordCount = filteredWords.length;
   return (

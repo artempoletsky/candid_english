@@ -1,9 +1,10 @@
 [
   {
-    "answers": [
+    "word": "ballot papers",
+    "correctAnswers": [
       "ballot"
     ],
-    "question": "The opposition proposed to deface the {...} papers",
+    "template": "The opposition proposed to deface the {...} papers",
     "options": [
       [
         "voting",
@@ -13,10 +14,11 @@
     ]
   },
   {
-    "answers": [
+    "word": "$word_order",
+    "correctAnswers": [
       "plastic"
     ],
-    "question": "a red {...} car",
+    "template": "a red {...} car",
     "options": [
       [
         "fast",
@@ -26,10 +28,11 @@
     ]
   },
   {
-    "answers": [
+    "word": "get back at",
+    "correctAnswers": [
       "avenge"
     ],
-    "question": "<strong>To get back at</strong> means to {...}",
+    "template": "<strong>To get back at</strong> means to {...}",
     "options": [
       [
         "return",
@@ -39,10 +42,11 @@
     ]
   },
   {
-    "answers": [
+    "word": "get at",
+    "correctAnswers": [
       "at"
     ],
-    "question": "To critize is to get {...}",
+    "template": "To critize is to get {...}",
     "options": [
       [
         "by",
@@ -52,10 +56,11 @@
     ]
   },
   {
-    "answers": [
+    "word": "$perfect1",
+    "correctAnswers": [
       "have you known"
     ],
-    "question": "How long {} him?",
+    "template": "How long {...} him?",
     "options": [
       [
         "you have knowing",
@@ -65,10 +70,11 @@
     ]
   },
   {
-    "answers": [
+    "word": "to get down",
+    "correctAnswers": [
       "lose"
     ],
-    "question": "To get down <strong>doesn't mean</strong> to {}",
+    "template": "To get down <strong>doesn't mean</strong> to {...}",
     "options": [
       [
         "dance",
@@ -78,10 +84,11 @@
     ]
   },
   {
-    "answers": [
+    "word": "a means to an end",
+    "correctAnswers": [
       "a means to an end"
     ],
-    "question": "It's nothing personal, but it was {...}",
+    "template": "It's nothing personal, but it was {...}",
     "options": [
       [
         "the mean to an end",
@@ -91,10 +98,11 @@
     ]
   },
   {
-    "answers": [
+    "word": "clout",
+    "correctAnswers": [
       "hit"
     ],
-    "question": "A synonym for \"clout\" is {...}",
+    "template": "A synonym for \"clout\" is {...}",
     "options": [
       [
         "bar",
@@ -104,10 +112,11 @@
     ]
   },
   {
-    "answers": [
+    "word": "asthma attack",
+    "correctAnswers": [
       "attack"
     ],
-    "question": "an asthma {...}",
+    "template": "an asthma {...}",
     "options": [
       [
         "fit",
@@ -117,10 +126,11 @@
     ]
   },
   {
-    "answers": [
+    "word": "hearse",
+    "correctAnswers": [
       "a vehicle used for carrying the coffin"
     ],
-    "question": "A hearse is {...}",
+    "template": "A hearse is {...}",
     "options": [
       [
         "a type of a sail",

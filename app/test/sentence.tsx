@@ -12,10 +12,10 @@ export default function TestSentence({ question, options }: TestSentenceProps) {
   return (
     <div>
       {question.split(TEMPLATE).map((text, i, arr) =>
-      <React.Fragment key={"foo_" + i}>
-        {text}
-        {arr.length - 1 != i && <Select name={i.toString()} placeholder="Select..." array={options[i++]} />}
-      </React.Fragment>
+        <React.Fragment key={"foo_" + i}>
+          <span dangerouslySetInnerHTML={{ __html: text }}></span>
+          {arr.length - 1 != i && <Select className="select" name={i.toString()} placeholder="Select..." array={options[i]} />}
+        </React.Fragment>
       )}
     </div>
   );

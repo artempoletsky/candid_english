@@ -11,7 +11,7 @@
     "grab": "node grab/grab.mjs && node grab/parse.mjs"
   },
   "dependencies": {
-    "@artempoletsky/easyrpc": "file:../easyrpc",
+    "@artempoletsky/easyrpc": "^1.0.2",
     "@artempoletsky/kurgandb": "file:../mydb",
     "@types/lodash.debounce": "^4.0.7",
     "@types/node": "20.6.2",
@@ -27,7 +27,7 @@
     "lodash.debounce": "^4.0.8",
     "md5": "^2.3.0",
     "mongodb": "^6.2.0",
-    "next": "^13.5.4",
+    "next": "^14.1.0",
     "postcss": "^8.4.33",
     "react": "18.2.0",
     "react-dom": "18.2.0",
