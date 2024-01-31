@@ -31,17 +31,13 @@ body {
       transparent,
       var(--background-end)) hsl(var(--counter-hue), 15%, 73%);
   min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 html {
   height: 100%;
   overflow-y: scroll;
-}
-
-.page_container {
-  @apply px-9;
-  max-width: 950px;
-  margin: 0 auto;
 }
 
 .txt-vol {

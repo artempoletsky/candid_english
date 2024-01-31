@@ -180,7 +180,7 @@ export default function lemmatize(text: string): Record<string, LemmatizeResult>
     if (sentence == "") {
       continue;
     }
-    const words = sentence.split(/[\s\,\;\:\"\-\(\)]/).filter(word => {
+    const words = sentence.split(/[\s\,\;\:\"\-\(\)\[\]]/).filter(word => {
       if (word.match(/[0-9]/g)) {
         return false;
       }

@@ -2,15 +2,17 @@ import Header from './header';
 import Footer from './footer';
 
 export default function Layout({
-    children,
+  children,
 }: {
-    children: React.ReactNode
+  children: React.ReactNode
 }) {
-    return (
-        <>
-            <Header></Header>
-            <div className='page_container'>{children}</div>
-            <Footer></Footer>
-        </>
-    )
+  return (
+    <>
+      <Header></Header>
+      <div className="grow">
+        <div className="px-9 mx-auto max-w-[950px]">{children}</div>
+      </div>
+      <Footer></Footer>
+    </>
+  )
 }

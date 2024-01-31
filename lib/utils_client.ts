@@ -1,7 +1,5 @@
 "use client"
 
-export const fetcher = (...args: any) => fetch.apply(null, args).then(res => res.json());
-
 type FormDataToDictOptions = {
   removeActionField?: boolean,
   keysToRemove?: string[],
