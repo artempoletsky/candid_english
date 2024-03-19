@@ -1,88 +1,80 @@
-import { Predicate, standAloneQuery, remoteQuery } from "@artempoletsky/kurgandb"
-
-import { Table } from "@artempoletsky/kurgandb/globals";
-import { LanguageLevel } from "./lib/language_levels";
-import { PlainObject } from "@artempoletsky/kurgandb/globals";
+import { Predicate, queryUniversal } from "@artempoletsky/kurgandb";
+import type { PlainObject, Table } from "@artempoletsky/kurgandb/globals";
+import type * as types from "./globals";
 
 
 export type Tables = {
-  test_records: Table<TestRecord, number>
-  users: Table<User, string>
-  arrays: Table<VariedArrays, string>
-  test_words: Table<TestWord, string>
-  test_questions: Table<TestQuestion, string>
-  synonyms: Table<SynonymsData, string>
-  lemmatizer_propositions: Table<LemmatizerProposition, number>
-  user_rights: Table<UserRights, string>
-}
+  users: Table<
+    types.UserFull,
+    string,
+    types.UsersMeta,
+    types.UserFull,
+    types.UserLight,
+    types.User
+  >;
+  arrays: Table<
+    types.Array,
+    string,
+    types.ArraysMeta,
+    types.Array,
+    types.ArrayLight
+  >;
+  test_words: Table<
+    types.TestWord,
+    string,
+    types.TestWordsMeta
+  >;
+  synonyms: Table<
+    types.Synonym,
+    string,
+    types.SynonymsMeta
+  >;
+  test_questions: Table<
+    types.TestQuestion,
+    string,
+    types.TestQuestionsMeta
+  >;
+  frequency5000: Table<
+    types.Frequency5000,
+    string,
+    types.Frequency5000sMeta
+  >;
+  lemmatizer_propositions: Table<
+    types.LemmatizerProposition,
+    number,
+    types.LemmatizerPropositionsMeta,
+    types.LemmatizerPropositionInsert
+  >;
+  user_rights: Table<
+    types.UserRight,
+    string,
+    types.UserRightsMeta
+  >;
+  comments: Table<
+    types.Comment,
+    number,
+    types.CommentsMeta,
+    types.CommentInsert
+  >;
+  posts: Table<
+    types.Post,
+    number,
+    types.PostsMeta,
+    types.PostInsert,
+    types.PostLight
+  >;
+};
+
 
 export async function query<Payload extends PlainObject, ReturnType>(predicate: Predicate<Tables, Payload, ReturnType>, payload?: Payload) {
-  return standAloneQuery<Payload, ReturnType, Tables>(predicate, payload);
+  return queryUniversal<Payload, ReturnType, Tables>(predicate, payload);
 }
 
-export function noPayloadQueryMethod<ReturnType>(predicate: Predicate<Tables, {}, ReturnType>) {
-  return async function () {
-    return await query(predicate);
+
+export function methodFactory<Payload extends PlainObject, PredicateReturnType, ReturnType = PredicateReturnType>(predicate: Predicate<Tables, Payload, PredicateReturnType>, then?: (dbResult: PredicateReturnType) => ReturnType) {
+  return async function (payload?: Payload) {
+    const dbResult = await query(predicate, payload);
+    if (!then) return dbResult;
+    return then(dbResult);
   }
-}
-
-export type TestRecord = {
-  test: string
-}
-
-export type User = {
-  fullName: string
-  username: string
-  email: string
-  knownWords: string[]
-  blacklist: string[]
-}
-
-export type VariedArrays = {
-  name: string
-  data: any[]
-}
-
-export type TestWord = {
-  id: string
-  word: string
-  part: string
-  level: LanguageLevel | "x"
-  oxfordLevel: LanguageLevel
-}
-
-export type TestQuestion = {
-  word: string
-  template: string
-  correctAnswers: number[]
-  difficulty: LanguageLevel
-  options: string[][]
-}
-
-type RelatedWords = {
-  relevant: string[],
-  other: string[],
-  antonyms: string[],
-}
-
-export type SynonymsData = {
-  word: string,
-  data: Record<"verb" | "noun" | "adjective" | "other", RelatedWords>
-}
-
-export type LemmatizerProposition = {
-  id: number
-  word: string
-  oldLemma: string
-  proposition: string
-  sentence: string
-  reviewed: boolean
-  username: string
-  session_id: string
-}
-
-export type UserRights = {
-  id: string
-  isAdmin: boolean
-  isModerator: boolean
 }
