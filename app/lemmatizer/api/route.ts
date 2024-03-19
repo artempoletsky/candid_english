@@ -1,7 +1,7 @@
 import { NextPOST } from "@artempoletsky/easyrpc";
 import { NextResponse } from "next/server";
 import { getSession } from "~/app/session/route";
-import { LemmatizerProposition, query } from "~/db";
+import { query } from "~/db";
 import z from "zod";
 
 const ZProposeAdjustment = z.object({
@@ -17,10 +17,7 @@ async function proposeAdjustment(args: AProposeAdjustment) {
   const sess = getSession();
 
   const id: number = await query(({ lemmatizer_propositions }, payload) => {
-    const id = lemmatizer_propositions.insert({
-      ...payload,
-      id: 0,
-    });
+    const id = lemmatizer_propositions.insert(payload);
     return id;
   }, {
     ...args,

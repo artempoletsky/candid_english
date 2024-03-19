@@ -1,4 +1,5 @@
-import { TestSession } from "../test/test_methods"
+
+import { TestSession } from "../test/api/route"
 
 export type Session = {
   id: string
