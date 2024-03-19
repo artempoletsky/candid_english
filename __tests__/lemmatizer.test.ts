@@ -30,6 +30,7 @@ describe("Simplify", () => {
     expect(allWordsDict["toss"]).toBeDefined();
     expect(allWordsDict["brave"]).toBeDefined();
     expect(allWordsDict["answer"]).toBeDefined();
+    expect(allWordsDict["cancel"]).toBeDefined();
 
 
     expect(allWordsDict["bodies"]).toBeUndefined();
@@ -45,6 +46,7 @@ describe("Simplify", () => {
     expect(allWordsDict["tosses"]).toBeUndefined();
     expect(allWordsDict["bravely"]).toBeUndefined();
     expect(allWordsDict["answers"]).toBeUndefined();
+    expect(allWordsDict["cancelling"]).toBeUndefined();
   });
 
   xtest("(sniffs)", () => {

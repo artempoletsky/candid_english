@@ -1,0 +1,48 @@
+/* @tailwind utilities; */
+
+/* @layer utilities { */
+
+  button:not(.btn) {
+    @apply txt-vol rounded-xl border border-current px-3 py-1;
+    background-color: hsl(var(--main-hue), 45%, 87%);
+  }
+
+  .select {
+    min-height: auto;
+    height: 36px;
+    line-height: 34px;
+  }
+
+  .btn {
+    @apply btn-neutral;
+    min-height: auto;
+    height: 36px;
+  }
+
+  .input,
+  .file-input {
+    height: 36px;
+  }
+
+
+  /* button {
+      @apply txt-vol rounded-xl;
+    }
+    
+    button {
+      border: 1px solid var(--dark);
+      background-color: hsl(var(--main-hue), 45%, 87%);
+      background-image: linear-gradient(to top,
+          transparent, white);
+      color: var(--dark);
+      padding: .3rem 1rem;
+      border-radius: 8px;
+      box-shadow: 2px 2px 4px hsla(var(--main-hue), 12%, 18%, 0.8),
+        inset -1px -1px 3px hsl(var(--main-hue), 10%, 52%);
+    } */
+/* } */
+
+
+.table {
+  font-size: 1em;
+}

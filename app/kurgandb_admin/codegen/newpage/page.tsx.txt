@@ -1,0 +1,21 @@
+
+import $$COMP$$ from "./$$COMP$$";
+import { Metadata } from 'next';
+import { getPageData } from "./api/methods";
+
+
+export const metadata: Metadata = {
+  title: "",
+};
+
+type Props = {};
+export default async function (props: Props) {
+  const dbVersion = await getPageData();
+  metadata.title = dbVersion;
+  return (
+    <div className="h-screen text-center items-center pt-[40vh]">
+      <div className="mb-3">{dbVersion}</div>
+      <$$COMP$$></$$COMP$$>
+    </div>
+  );
+}

@@ -9,7 +9,15 @@ function isAdmin() {
 
 //stores valid session IDs
 const SESSION_CACHE: Record<string, number> = {};
-const SESSION_CACHE_LIFESPAN = 5 * 60 * 1000;
+export const SESSION_CACHE_LIFESPAN = 5 * 60 * 1000;
+
+export type MiddlewareSession = {
+  id: string
+  isAdmin: boolean
+  middlewareCacheExpires: number
+}
+
+
 setInterval(() => {
   let now = Date.now();
   for (const key in SESSION_CACHE) {

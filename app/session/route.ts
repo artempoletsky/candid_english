@@ -10,27 +10,23 @@ import { debounce } from "lodash";
 import { createIfNotExists, rfs, wfs } from "~/lib/util";
 import { cookies, headers } from 'next/headers'
 import { NextResponse } from "next/server";
+import { Session } from "./session";
+import { MiddlewareSession, SESSION_CACHE_LIFESPAN } from "~/middleware";
 
-// createIfNotExists()
-export async function isGuest() {
-  return true;
-}
-
-export async function isAdmin() {
-  return true;
-}
 
 function getSessionFileName(token: string) {
   return SESSION_DIR + token + ".json";
 }
 
-export function getSession(): Record<string, any> {
-  const sessid = getCookieToken();
-  
+function getSessionById(sessid: string): Session {
   if (!sessid) {
     throw new Error("Session ID must not be empty");
   }
-  return getFileProxy(getSessionFileName(sessid));
+  return getFileProxy(getSessionFileName(sessid)) as Session;
+}
+
+export function getSession(): Session {
+  return getSessionById(getCookieToken());
 }
 
 function getCookieToken(): string {
@@ -55,30 +51,40 @@ function createNewSession(req: NextRequest): string {
   const secret = md5("" + Date.now() + Math.random());
   const sessid = generateSessionID(req, secret);
 
+  const sessData: Session = {
+    id: sessid,
+    username: "",
+    isAdmin: false,
+  };
+
   wfs(getSessionFileName(sessid), {
     secret,
-    data: {}
+    data: sessData
   });
   return sessid;
 }
 
 
 function generateSessionID(req: NextRequest, secret: string): string {
+  let hdrs = headers();
   let ua = userAgent({
-    headers: req.headers
+    headers: hdrs
   });
+
+  // console.log(hdrs);
 
   return md5(req.ip + ua.ua + secret);
 }
 
+
 function getFileProxy(filename: string): Record<string, any> {
   let sessionFile: Record<string, any> = rfs(filename);
-  // let debouncedWrite = debounce(() => {
-  //   wfs(filename, sessionFile);
-  // }, 100);
-  const debouncedWrite = ()=> {
+  let debouncedWrite = debounce(() => {
     wfs(filename, sessionFile);
-  };
+  }, 100);
+  // const debouncedWrite = ()=> {
+  //   wfs(filename, sessionFile);
+  // };
 
   if (!sessionFile.data) {
     sessionFile.data = {};
@@ -97,10 +103,19 @@ function getFileProxy(filename: string): Record<string, any> {
 
 
 export async function GET(req: NextRequest) {
-  let res = NextResponse.json({});
+  const sessid = createNewSession(req);
+  const session = getSessionById(sessid);
+  const result: MiddlewareSession = {
+    id: sessid,
+    isAdmin: session.isAdmin,
+    middlewareCacheExpires: Date.now() + SESSION_CACHE_LIFESPAN,
+  };
+  // console.log("session/GET");
 
+
+  let res = NextResponse.json(result);
   if (!isValidSession(req)) {
-    res.cookies.set(COOKIE_SESSION_KEY, createNewSession(req));
+    res.cookies.set(COOKIE_SESSION_KEY, sessid);
   }
 
   return res;

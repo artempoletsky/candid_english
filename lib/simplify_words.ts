@@ -2,11 +2,7 @@ import words from 'an-array-of-english-words';
 // import fs from 'fs';
 // import lemmatize from "~/lib/wink_lemmatizer";
 import { rfs, wfs } from './util';
-import { LEMMATIZER_BLACKLIST, LEMMATIZER_WHITELIST, LEMMATIZER_ALL } from '~/lib/paths';
-
-let BlackList: Record<string, number>;
-let WhiteList: Record<string, number>;
-
+import { LEMMATIZER_BLACKLIST, LEMMATIZER_WHITELIST, LEMMATIZER_ALL, LEMMATIZER_OVERRIDES } from '~/lib/paths';
 
 import { lemmatizeWord, invalidateDict } from "~/lib/lemmatizer";
 
@@ -31,12 +27,14 @@ export default function simplify(): Record<string, number> {
   //   return true;
   // }));
 
-  WhiteList = {
+  const WhiteList: Record<string, number> = {
     ...rfs("/grab_data/words_dict.json"),
     ...toDict(rfs(LEMMATIZER_WHITELIST))
   };
 
-  BlackList = toDict(rfs(LEMMATIZER_BLACKLIST));
+  const BlackList: Record<string, number> = toDict(rfs(LEMMATIZER_BLACKLIST));
+
+  const Overrides: Record<string, string> = rfs(LEMMATIZER_OVERRIDES);
 
   const fullDict = toDict(words);
 
@@ -45,7 +43,7 @@ export default function simplify(): Record<string, number> {
   }
 
   for (const word in fullDict) {
-    if (BlackList[word]) {
+    if (BlackList[word] || Overrides[word]) {
       delete fullDict[word];
       continue;
     }

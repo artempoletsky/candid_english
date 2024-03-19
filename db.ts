@@ -1,23 +1,26 @@
-import { Predicate, standAloneQuery } from "@artempoletsky/kurgandb"
-import { PlainObject } from "../mydb/build/src/utils";
-import { Table } from "@artempoletsky/kurgandb/table";
+import { Predicate, standAloneQuery, remoteQuery } from "@artempoletsky/kurgandb"
+
+import { Table } from "@artempoletsky/kurgandb/globals";
 import { LanguageLevel } from "./lib/language_levels";
+import { PlainObject } from "@artempoletsky/kurgandb/globals";
 
 
 export type Tables = {
-  test_records: Table<number, TestRecord>
-  users: Table<string, User>
-  arrays: Table<string, VariedArrays>
-  test_words: Table<string, TestWord>
-  test_questions: Table<string, TestQuestion>
-  synonyms: Table<string, SynonymsData>
+  test_records: Table<TestRecord, number>
+  users: Table<User, string>
+  arrays: Table<VariedArrays, string>
+  test_words: Table<TestWord, string>
+  test_questions: Table<TestQuestion, string>
+  synonyms: Table<SynonymsData, string>
+  lemmatizer_propositions: Table<LemmatizerProposition, number>
+  user_rights: Table<UserRights, string>
 }
 
-export async function query<Payload extends PlainObject>(predicate: Predicate<Tables, Payload>, payload?: Payload) {
-  return standAloneQuery<Tables, Payload>(predicate, payload);
+export async function query<Payload extends PlainObject, ReturnType>(predicate: Predicate<Tables, Payload, ReturnType>, payload?: Payload) {
+  return standAloneQuery<Payload, ReturnType, Tables>(predicate, payload);
 }
 
-export function noPayloadQueryMethod(predicate: Predicate<Tables, {}>) {
+export function noPayloadQueryMethod<ReturnType>(predicate: Predicate<Tables, {}, ReturnType>) {
   return async function () {
     return await query(predicate);
   }
@@ -51,7 +54,7 @@ export type TestWord = {
 export type TestQuestion = {
   word: string
   template: string
-  correctAnswers: string[]
+  correctAnswers: number[]
   difficulty: LanguageLevel
   options: string[][]
 }
@@ -65,4 +68,21 @@ type RelatedWords = {
 export type SynonymsData = {
   word: string,
   data: Record<"verb" | "noun" | "adjective" | "other", RelatedWords>
+}
+
+export type LemmatizerProposition = {
+  id: number
+  word: string
+  oldLemma: string
+  proposition: string
+  sentence: string
+  reviewed: boolean
+  username: string
+  session_id: string
+}
+
+export type UserRights = {
+  id: string
+  isAdmin: boolean
+  isModerator: boolean
 }

@@ -85,3 +85,5 @@ export function getCollection(name: string) {
 export function closeDBConnection() {
   return client.close();
 };
+
+export type PlainObject = Record<string, any>

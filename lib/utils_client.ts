@@ -24,3 +24,11 @@ export function formDataToDict(formData: FormData,
   });
   return result;
 }
+
+export function blinkBoolean(setter: (b: boolean) => void, timeout = 1000) {
+  setter(true);
+  setTimeout(() => {
+    setter(false);
+  }, timeout);
+}
+
