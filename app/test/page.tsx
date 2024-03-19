@@ -1,17 +1,18 @@
 import Layout from '@/layout'
 
-import TestPageComponent from './test_page_component';
+import PageTest from './PageTest';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: "Test your level of English",
 };
 
-export default function Test() {
+export default function page() {
+
   return (
     <Layout>
       <h1>{metadata.title as string}</h1>
-      <TestPageComponent />
+      <PageTest />
     </Layout>
   );
 }

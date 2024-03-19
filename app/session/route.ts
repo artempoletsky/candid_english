@@ -31,6 +31,8 @@ export function getSession(): Session {
 
 function getCookieToken(): string {
   const cookie = cookies().get(COOKIE_SESSION_KEY);
+  console.log(cookies());
+  
   return cookie?.value || "";
 }
 

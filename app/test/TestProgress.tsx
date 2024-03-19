@@ -1,20 +1,20 @@
 
-import TestSentence from "./sentence";
+import TestSentence from "./TestSentence";
 import { formDataToDict } from "~/lib/utils_client";
 import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { MouseEvent, useRef } from "react";
-import type { TestSessionLight } from "./test_methods";
-import { FnGiveAnswer } from "./api/route";
+
+import { FGiveAnswer, TestSessionLight } from "./api/route";
 import { API_ENGLISH_TEST } from "~/lib/paths";
-import { SessionUpdateCb } from "./test_page_component";
+import { SessionUpdateCb } from "./PageTest";
 
 
 type TestProgressProps = {
-  testSession: TestSessionLight
-  onAnswer: SessionUpdateCb
+  testSession: TestSessionLight;
+  onAnswer: SessionUpdateCb;
 }
 
-const giveAnswer = getAPIMethod<FnGiveAnswer>(API_ENGLISH_TEST, "giveAnswer");
+const giveAnswer = getAPIMethod<FGiveAnswer>(API_ENGLISH_TEST, "giveAnswer");
 export default function TestProgress({ testSession, onAnswer }: TestProgressProps) {
   const form = useRef<HTMLFormElement>(null);
 

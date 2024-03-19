@@ -1,11 +1,11 @@
 
 import { userView } from "~/lib/language_levels";
-import { TestSession } from "./test_methods";
 import { FormEvent } from "react";
+import { TestSession } from "./api/route";
 
 type TestResultProps = {
-  testSession: TestSession
-  onTryAgain: Function
+  testSession: TestSession;
+  onTryAgain: () => void;
 }
 
 export default function TestResult({ testSession, onTryAgain }: TestResultProps) {

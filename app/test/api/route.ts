@@ -1,26 +1,127 @@
 import { NextResponse } from "next/server";
-import { InitialTestSession, TestSession, createIfNotExists, getQuestionForLevel, lightenSession, makeAnswerRecord } from "../test_methods";
-import { ValidationRule } from "@artempoletsky/easyrpc";
+import { ResponseError } from "@artempoletsky/easyrpc";
 import { getSession } from "~/app/session/route";
-import { dec } from "~/lib/language_levels";
+import { dec, zLanguageLevel } from "~/lib/language_levels";
 import { NextPOST } from "@artempoletsky/easyrpc";
+import z from "zod";
 
 
-export type ABeginTest = {
-  own_rating: string
-  online: string
-  certificate: string
+
+import { revalidatePath } from "next/cache"
+import { TestQuestion, query } from "~/db"
+import { LanguageLevel } from "~/lib/language_levels"
+
+
+export type QuestionLight = Omit<TestQuestion, "correctAnswers" | "word">
+
+export type AnswerRecord = {
+  question: TestQuestion
+  userAnswers: string[]
+  isCorrect: boolean
 }
-const VBeginTest: ValidationRule<ABeginTest> = {
-  own_rating: "string",
-  online: "string",
-  certificate: "string",
+
+export type TestSession = {
+  penaltyQuestions: number
+  correctAnswersCount: number
+  currentLevel: LanguageLevel
+  active: boolean
+  otherRatings: Record<string, string>
+  currentQuestion: TestQuestion | undefined
+  answers: AnswerRecord[]
 }
+
+export type TestSessionLight = Omit<TestSession, "answers" | "currentQuestion"> & {
+  currentQuestion: QuestionLight
+}
+
+export const InitialTestSession: TestSession = {
+  penaltyQuestions: 0,
+  currentLevel: "c2",
+  correctAnswersCount: 0,
+  active: false,
+  currentQuestion: undefined,
+  otherRatings: {},
+  answers: [],
+};
+
+
+async function getQuestionForLevel(level: LanguageLevel, exclude: string[] = []): Promise<TestQuestion> {
+  type Payload = {
+    difficulty: LanguageLevel
+    exclude: string[]
+  };
+
+  return await query(({ test_questions }, payload, { _ }) => {
+    let ids = test_questions.indexIds("difficulty", payload.difficulty);
+    ids = ids.filter(id => !payload.exclude.includes(id));
+    if (!ids.length) throw new Error("Ids are empty");
+
+    let id = _.sample(ids) as string;
+    return test_questions.at(id);
+  }, {
+    difficulty: level,
+    exclude,
+  });
+
+  // return {
+  //   word: "foo",
+  //   template: "Who let the {...} out? {...} are you OK?",
+  //   options: [["dogs", "cats"], ["Annie", "Jimmy"]],
+  //   difficulty: "c2",
+  //   correctAnswers: ["dogs", "Annie"]
+  // };
+}
+
+function lightenSession(session: TestSession): TestSessionLight {
+  const q: Partial<TestQuestion> | undefined = session.currentQuestion ? { ...session.currentQuestion } : undefined;
+  if (q) {
+    delete q.correctAnswers;
+    delete q.word;
+  }
+
+  const result: any = { ...session };
+  delete result.answers;
+  result.currentQuestion = q;
+  return result as TestSessionLight;
+}
+
+function makeAnswerRecord(answers: string[], question: TestQuestion): AnswerRecord {
+  let isCorrect = true;
+  for (let i = 0; i < answers.length; i++) {
+    const iOf = question.options[i].indexOf(answers[i]);
+    if (iOf != question.correctAnswers[i]) {
+      isCorrect = false;
+      break;
+    }
+  }
+
+  return {
+    question,
+    isCorrect,
+    userAnswers: answers
+  }
+}
+
+
+
+const ZEmpty = z.object({});
+const zStringNotEmpty = z.string().min(1, "Required");
+
+
+const ZBeginTest = z.object({
+  own_rating: zLanguageLevel,
+  online: zLanguageLevel,
+  certificate: zLanguageLevel,
+});
+
+export type ABeginTest = z.infer<typeof ZBeginTest>;
 
 async function beginTest(dict: ABeginTest) {
   const SESSION = getSession();
 
-  let activeEnglishTest: TestSession = SESSION.activeEnglishTest;
+
+  let activeEnglishTest = SESSION.activeEnglishTest;
+  if (!activeEnglishTest) throw new ResponseError("Test session is invalid");
   activeEnglishTest.otherRatings = dict;
   activeEnglishTest.active = true;
 
@@ -31,35 +132,24 @@ async function beginTest(dict: ABeginTest) {
   return lightenSession(activeEnglishTest);
 }
 
-export type FnBeginTest = typeof beginTest;
+export type FBeginTest = typeof beginTest;
 
 /////////
 
-export type AGiveAnswer = {
-  dontKnow: boolean
-  answers: string[]
-}
+const ZGiveAnswer = z.object({
+  dontKnow: z.boolean(),
+  answers: z.array(zStringNotEmpty),
+});
 
-const VGiveAnswer: ValidationRule<AGiveAnswer> = [{
-  dontKnow: "boolean",
-  answers: "string[]",
-}, async ({ payload }) => {
-  const SESSION = getSession();
-
-  if (!SESSION.activeEnglishTest?.currentQuestion) {
-    return "Current question is undefined";
-  }
-  payload.session = SESSION;
-  return true;
-}]
+export type AGiveAnswer = z.infer<typeof ZGiveAnswer>;
 
 
 const ANSWERS_TO_COMPLETE = 5;
 
-export async function giveAnswer({ dontKnow, answers }: AGiveAnswer, payload: any) {
-
-  const testSession: TestSession = payload.session.activeEnglishTest
-  if (!testSession.currentQuestion) throw new Error("imposible");
+export async function giveAnswer({ dontKnow, answers }: AGiveAnswer) {
+  const session = getSession();
+  const testSession: TestSession | undefined = session.activeEnglishTest
+  if (!testSession || !testSession.currentQuestion) throw new ResponseError("Test session is invalid");
 
   const aRec = makeAnswerRecord(answers, testSession.currentQuestion);
   testSession.answers.push(aRec);
@@ -84,13 +174,13 @@ export async function giveAnswer({ dontKnow, answers }: AGiveAnswer, payload: an
       testSession.currentQuestion = undefined;
     }
   }
-  
+
   if (testSession.currentQuestion !== undefined) {
     testSession.currentQuestion = await getQuestionForLevel(testSession.currentLevel, exclude);
   }
 
 
-  payload.session.activeEnglishTest = testSession;
+  session.activeEnglishTest = testSession;
 
   if (testSession.currentQuestion) {
     return lightenSession(testSession);
@@ -99,7 +189,7 @@ export async function giveAnswer({ dontKnow, answers }: AGiveAnswer, payload: an
   }
 }
 
-export type FnGiveAnswer = (args: AGiveAnswer) => ReturnType<typeof giveAnswer>;
+export type FGiveAnswer = (args: AGiveAnswer) => ReturnType<typeof giveAnswer>;
 
 /////
 
@@ -109,20 +199,25 @@ async function tryAgain() {
   return lightenSession(SESSION.activeEnglishTest);
 }
 
-export type FnTryAgain = typeof tryAgain;
+export type FTryAgain = typeof tryAgain;
 
 async function createSession() {
-  return lightenSession(createIfNotExists());
+  const SESSION = getSession();
+  if (!SESSION.activeEnglishTest) {
+    SESSION.activeEnglishTest = InitialTestSession;
+  }
+
+  return lightenSession(SESSION.activeEnglishTest);
 }
 
-export type FnCreateSession = typeof createSession;
+export type FCreateSession = typeof createSession;
 
 
 export const POST = NextPOST(NextResponse, {
-  createSession: {},
-  beginTest: VBeginTest,
-  giveAnswer: VGiveAnswer,
-  tryAgain: {},
+  createSession: ZEmpty,
+  beginTest: ZBeginTest,
+  giveAnswer: ZGiveAnswer,
+  tryAgain: ZEmpty,
 }, {
   createSession,
   beginTest,

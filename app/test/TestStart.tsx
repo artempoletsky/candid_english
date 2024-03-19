@@ -3,9 +3,10 @@ import { FormEvent } from "react";
 import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { formDataToDict } from "~/lib/utils_client";
 import { API_ENGLISH_TEST } from "~/lib/paths";
-import type { FnBeginTest, ABeginTest } from "./api/route";
+import type { FBeginTest, ABeginTest } from "./api/route";
 import { asDict, range } from "~/lib/language_levels";
-import { SessionUpdateCb } from "./test_page_component";
+import { SessionUpdateCb } from "./PageTest";
+import { Button } from "@mantine/core";
 
 const Levels = asDict(range());
 
@@ -21,7 +22,7 @@ type TestStartProps = {
   onStart: SessionUpdateCb
 }
 
-const beginTest: FnBeginTest = getAPIMethod(API_ENGLISH_TEST, "beginTest");
+const beginTest: FBeginTest = getAPIMethod(API_ENGLISH_TEST, "beginTest");
 export default function TestStart({ onStart }: TestStartProps) {
   function submitForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -42,7 +43,7 @@ export default function TestStart({ onStart }: TestStartProps) {
       <Select className="select" name="certificate" dict={injectOptions({
         x: "I didn't take one"
       })} />
-      <div className="mt-5 flex justify-center"><button name="submit" type="submit" className="btn">Begin test</button></div>
+      <div className="mt-5 flex justify-center"><Button name="submit" type="submit" className="btn">Begin test</Button></div>
     </form>
   );
 }

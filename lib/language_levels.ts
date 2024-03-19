@@ -1,3 +1,4 @@
+import z from "zod";
 
 export const Levels = ["a0", 'a1', "a2", 'b1', "b2", 'c1', "c2"] as const;
 export type LanguageLevel = typeof Levels[number];
@@ -37,3 +38,7 @@ export function dec(level: LanguageLevel): LanguageLevel {
   return Levels[asNumber(level) - 1];
 }
 
+
+export const zLanguageLevel = z.enum(Levels);
+
+export const zLanguageLevelDict = z.enum(DictRange);
