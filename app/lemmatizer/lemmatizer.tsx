@@ -1,16 +1,15 @@
-'use client';
+"use client";
 
-import { getMyWords } from '~/lib/words_storage';
-import axios from 'axios';
+import { getMyWords } from "~/lib/words_storage";
 
-import { AtomizedWord } from '~/app/api/lemmatize_text/route';
-import { useState, useEffect, useRef } from 'react';
+import { AtomizedWord } from "~/app/api/lemmatize_text/route";
+import { useState, useEffect, useRef } from "react";
 import { addWords } from "~/app/edit_my_wordlist/my_wordlist";
 
 import AdjustLemmatizerDropdown from "./AdjustLemmatizerDropdown";
 import DictLink from "@/dictlink";
-import { API_LEMMATIZE } from '~/lib/paths';
-import { Checkbox, FileInput, Table } from '@mantine/core';
+import { API_LEMMATIZE } from "~/lib/paths";
+import { Checkbox, FileInput, Table } from "@mantine/core";
 
 type AtomizedWordResponse = {
   words: AtomizedWord[]
@@ -22,7 +21,7 @@ function uploadFile(file: File): Promise<AtomizedWordResponse> {
 
   var data = new FormData();
   data.append("file", file);
-  // data.append('user', 'hubot');
+  // data.append("user", "hubot");
 
   return fetch(API_LEMMATIZE, {
     method: "POST",

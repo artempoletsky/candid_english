@@ -1,5 +1,5 @@
 
-import $$COMP$$ from "./$$COMP$$";
+import PageRegister from "./PageRegister";
 import { Metadata } from "next";
 import { getPageData } from "./api/methods";
 import Layout from "@/layout";
@@ -15,7 +15,7 @@ export default async function (props: Props) {
   return (
     <Layout>
       <h1>{metadata.title as string}</h1>
-      <$$COMP$$></$$COMP$$>
+      <PageRegister></PageRegister>
     </Layout>
   );
 }

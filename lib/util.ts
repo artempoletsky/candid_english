@@ -53,37 +53,5 @@ export function arrToDict(array: Object[], idField = "id", removeId = true): Rec
   return result;
 }
 
-import { MongoClient, ServerApiVersion, Db } from "mongodb";
-import { MONGO_CONNECTION_STRING, MONGO_DBNAME } from "./paths";
-
-
-
-let client: MongoClient;
-let myDB: Db;
-
-export async function dbConnect() {
-  client = new MongoClient(MONGO_CONNECTION_STRING, {
-    serverApi: {
-      version: ServerApiVersion.v1,
-      strict: true,
-      deprecationErrors: true,
-    }
-  }
-  );
-  let connected = client.connect();
-  await connected;
-  myDB = client.db(MONGO_DBNAME);
-  return myDB;
-};
-
-
-export function getCollection(name: string) {
-  return myDB.collection(name);
-};
-
-
-export function closeDBConnection() {
-  return client.close();
-};
 
 export type PlainObject = Record<string, any>

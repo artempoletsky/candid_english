@@ -1,8 +1,8 @@
-import words from 'an-array-of-english-words';
-// import fs from 'fs';
+import words from "an-array-of-english-words";
+// import fs from "fs";
 // import lemmatize from "~/lib/wink_lemmatizer";
-import { rfs, wfs } from './util';
-import { LEMMATIZER_BLACKLIST, LEMMATIZER_WHITELIST, LEMMATIZER_ALL, LEMMATIZER_OVERRIDES } from '~/lib/paths';
+import { rfs, wfs } from "./util";
+import { LEMMATIZER_BLACKLIST, LEMMATIZER_WHITELIST, LEMMATIZER_ALL, LEMMATIZER_OVERRIDES } from "~/lib/paths";
 
 import { lemmatizeWord, invalidateDict } from "~/lib/lemmatizer";
 
@@ -62,11 +62,11 @@ export default function simplify(): Record<string, number> {
   }
 
   for (const word in fullDict) {
-    if (WhiteList[word + 'e']) {
+    if (WhiteList[word + "e"]) {
       continue;
     }
-    if (fullDict[word + 'e']) {
-      delete fullDict[word + 'e'];
+    if (fullDict[word + "e"]) {
+      delete fullDict[word + "e"];
     }
   }
   wfs(LEMMATIZER_ALL, fullDict);

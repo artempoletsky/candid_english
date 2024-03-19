@@ -1,7 +1,7 @@
-import Layout from '@/layout'
+import Layout from "@/layout"
 
-import PageTest from './PageTest';
-import { Metadata } from 'next';
+import PageTest from "./PageTest";
+import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Test your level of English",

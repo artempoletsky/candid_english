@@ -1,5 +1,4 @@
 import { AtomizedWord } from "~/app/api/lemmatize_text/route";
-import axios from "axios";
 import { useState } from "react";
 import { API_ADMIN_ADJUST_LEMMATIZER } from "~/lib/paths";
 import { ActionIcon, Button, Menu, TextInput } from "@mantine/core";

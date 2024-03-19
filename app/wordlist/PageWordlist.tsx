@@ -7,7 +7,6 @@ import { addWords, removeWords } from "~/app/edit_my_wordlist/my_wordlist";
 import { isWordLearned, getMyWords } from "~/lib/words_storage";
 
 import DictLink from "@/dictlink";
-import useSWR from "swr";
 
 import Table from "@/largetable";
 import Select from "@/select";
@@ -24,9 +23,7 @@ export type Word = {
 };
 
 
-const fetcher = (...args: any) => fetch.apply(this, args).then(res => res.json())
-
-export default function WordList({ words }: { words?: Array<Word> }) {
+export default function WordList({ words }: { words: Word[] }) {
   let [myWords, setSetMyWordsView] = useState<Record<string, boolean>>({ ...getMyWords() });
   let [hideLearnedMode, setHideLearnedMode] = useState(true);
 
@@ -40,16 +37,7 @@ export default function WordList({ words }: { words?: Array<Word> }) {
   if (dataEmpty) {
     words = [];
   }
-  const { data, error, isLoading } = useSWR("/api/get_oxford_list", fetcher);
-
-  if (isLoading) {
-    return (<div>loading...</div>);
-  }
-
-  if (error) {
-    return (<div>Loading has failed</div>);
-  }
-
+  
   function toggleWord(word: string, isKnown: boolean) {
     const fn = isKnown ? addWords : removeWords;
     fn([word]).then(words => setSetMyWordsView({ ...words }));
@@ -98,7 +86,7 @@ export default function WordList({ words }: { words?: Array<Word> }) {
 
 
 
-  const filteredWords = data.filter(filterFn);
+  const filteredWords = words.filter(filterFn);
   const wordCount = filteredWords.length;
   return (
     <>
