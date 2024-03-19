@@ -7,6 +7,7 @@ import { MouseEvent, useRef } from "react";
 import { FGiveAnswer, TestSessionLight } from "./api/route";
 import { API_ENGLISH_TEST } from "~/lib/paths";
 import { SessionUpdateCb } from "./PageTest";
+import { Button } from "@mantine/core";
 
 
 type TestProgressProps = {
@@ -53,8 +54,8 @@ export default function TestProgress({ testSession, onAnswer }: TestProgressProp
       <p>Please select the most aproptiate options:</p>
       <TestSentence question={testSession.currentQuestion.template} options={testSession.currentQuestion.options} />
       <div className="mt-5 flex justify-center">
-        <button onClick={submitForm(false)} type="submit" name="submit" className="btn mr-2" value="submit">Submit</button>
-        <button onClick={submitForm(true)} type="submit" name="submit" className="btn" value="x">I don't know</button>
+        <Button onClick={submitForm(false)} type="submit" name="submit" className="btn mr-2" value="submit">Submit</Button>
+        <Button onClick={submitForm(true)} type="submit" name="submit" className="btn" value="x">I don't know</Button>
       </div>
     </form>
   );

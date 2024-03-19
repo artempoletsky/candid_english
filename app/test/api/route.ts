@@ -1,15 +1,16 @@
 import { NextResponse } from "next/server";
 import { ResponseError } from "@artempoletsky/easyrpc";
 import { getSession } from "~/app/session/route";
-import { dec, zLanguageLevel } from "~/lib/language_levels";
+import { Levels, dec, zLanguageLevel } from "~/lib/language_levels";
 import { NextPOST } from "@artempoletsky/easyrpc";
 import z from "zod";
 
 
 
 import { revalidatePath } from "next/cache"
-import { TestQuestion, query } from "~/db"
+import { query } from "~/db"
 import { LanguageLevel } from "~/lib/language_levels"
+import { TestQuestion } from "~/globals";
 
 
 export type QuestionLight = Omit<TestQuestion, "correctAnswers" | "word">
@@ -107,11 +108,11 @@ function makeAnswerRecord(answers: string[], question: TestQuestion): AnswerReco
 const ZEmpty = z.object({});
 const zStringNotEmpty = z.string().min(1, "Required");
 
-
+const zLanguageLevelExclude = z.enum(["x", ...Levels]);
 const ZBeginTest = z.object({
-  own_rating: zLanguageLevel,
-  online: zLanguageLevel,
-  certificate: zLanguageLevel,
+  own_rating: zLanguageLevelExclude,
+  online: zLanguageLevelExclude,
+  certificate: zLanguageLevelExclude,
 });
 
 export type ABeginTest = z.infer<typeof ZBeginTest>;
