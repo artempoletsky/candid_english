@@ -1,51 +1,46 @@
-import { NextPOST, ValidationRule, Validator } from "@artempoletsky/easyrpc";
+import { NextPOST } from "@artempoletsky/easyrpc";
 import { NextResponse } from "next/server";
-import { getTestWords } from "~/app/admin/wordlist/api/route";
-import { DictRange, Levels } from "~/lib/language_levels";
-import _ from "lodash";
-import { query } from "~/db";
+import { DictRange } from "~/lib/language_levels";
+import z from "zod";
+import { methodFactory, query } from "~/db";
 
-const AvailableLevels = ["a1", "a2", "b1", "b2", "c1", "all"] as const;
-type AGetFiveWords = {
-  level: typeof AvailableLevels[number];
-};
+const AvailableLevels = [...DictRange, "all"] as const;
 
-const isLevelValid: Validator = async ({ value }) => {
-  return AvailableLevels.includes(value) || `${value} is not a valid level`;
-}
+const ZFiveWords = z.object({
+  level: z.enum(AvailableLevels),
+});
 
-const VGetFiveWords: ValidationRule<AGetFiveWords> = {
-  level: ["string", isLevelValid]
-};
+export type AGetFiveWords = z.infer<typeof ZFiveWords>;
 
-async function getFiveWords({ level }: AGetFiveWords): Promise<string[]> {
-  let words: string[];
+const getFiveWords = methodFactory<AGetFiveWords, string[]>(({ test_words }, { level }, { _ }) => {
+  const levels = ["a1", "a2", "b1", "b2", "c1"] as const;
+
+  let ids: string[];
   if (level == "all") {
-    const res = await getTestWords();
-    let by_level: Record<string, string[]> = {};
-
-    for (const word of res) {
-      const level = word.level;
-      if (!by_level[level]) {
-        by_level[level] = [];
-      }
-      by_level[level].push(word.word);
-    }
-
-    words = DictRange.map(level => <string>_.sample(by_level[level]));
-    return words;
+    ids = levels.map(level => {
+      return _.sample(test_words.indexIds("level", level)) as string;
+    });
+  } else {
+    ids = _.sampleSize(test_words.indexIds("level", level), 5);
   }
-
-  return await query(({ test_words }, { payload, _ }) => {
-    const allLevel = test_words.where("level", payload.level).select(doc => doc.word);
-    return _.sampleSize(allLevel, 5);
-  }, { level });
-}
+  return test_words.where("id", ...ids).select(r => r.word);
+});
 
 export type FGetFiveWords = typeof getFiveWords;
 
+
+async function getFiveWordsPage(payload: AGetFiveWords) {
+  return {
+    words: await getFiveWords(payload),
+  }
+}
+
+export type FGetFiveWordsPage = typeof getFiveWordsPage;
+
 export const POST = NextPOST(NextResponse, {
-  getFiveWords: VGetFiveWords
+  getFiveWords: ZFiveWords,
+  getFiveWordsPage: ZFiveWords,
 }, {
-  getFiveWords
+  getFiveWords,
+  getFiveWordsPage,
 });
