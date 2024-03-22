@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import WordList from "./wordlist";
-import Layout from "@/layout";
+import Layout from "~/app/components/PageLayout";
 
 
 

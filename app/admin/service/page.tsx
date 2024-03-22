@@ -2,7 +2,7 @@
 
 import { useRef } from "react"
 import { getAPIMethod } from "@artempoletsky/easyrpc/client";
-import Layout from "~/app/components/layout";
+import Layout from "~/app/components/PageLayout";
 import { Button, Textarea } from "@mantine/core";
 
 const API_ROUTE = "/admin/service/api";

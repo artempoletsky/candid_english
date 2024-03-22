@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import Layout from "@/layout";
+import Layout from "~/app/components/PageLayout";
 
 
 

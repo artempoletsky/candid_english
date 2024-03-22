@@ -1,7 +1,7 @@
 
 import { BlogPage, getAllPostIds, getPostData } from '~/lib/posts';
 import Link from 'next/link';
-import Layout from '@/layout';
+import Layout from '~/app/components/PageLayout';
 
 export const dynamicParams = false;
 

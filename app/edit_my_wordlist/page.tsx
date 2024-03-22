@@ -1,4 +1,4 @@
-import Layout from "@/layout";
+import Layout from "~/app/components/PageLayout";
 import MyWordlist from "./my_wordlist";
 import type { Metadata } from 'next'
 

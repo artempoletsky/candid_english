@@ -11,7 +11,6 @@ import { Loader } from "@mantine/core";
 export class Mutator<RT>  {
   setter: ((res: RT) => void) | undefined
   trigger(res: RT) {
-    console.log(res);
     if (this.setter) this.setter(res);
   }
 }

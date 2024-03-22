@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import styles from './custom.module.css';
 import { getSortedPostsData } from '~/lib/posts';
-import Layout from '@/layout';
+import Layout from '~/app/components/PageLayout';
 
 
 export const metadata: Metadata = {

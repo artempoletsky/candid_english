@@ -1,21 +1,22 @@
 
-import PageRegister from "./PageRegister";
+import PageRegistration from "./PageRegistration";
 import { Metadata } from "next";
-import { getPageData } from "./api/methods";
 import Layout from "~/app/components/PageLayout";
-
+import { SITE_NAME } from "~/globals";
 export const metadata: Metadata = {
   title: "",
 };
+export const dynamic = "force-dynamic";
 
 type Props = {};
 export default async function (props: Props) {
-  const dbVersion = await getPageData();
-  metadata.title = dbVersion;
+
+  
+  metadata.title = `Create a new ${SITE_NAME} account`;
   return (
     <Layout>
       <h1>{metadata.title as string}</h1>
-      <PageRegister></PageRegister>
+      <PageRegistration  />
     </Layout>
   );
 }

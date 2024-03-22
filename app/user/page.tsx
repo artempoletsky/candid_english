@@ -1,5 +1,5 @@
 
-import $$COMP$$ from "./$$COMP$$";
+import PageUser from "./PageUser";
 import { Metadata } from "next";
 import { FGetPage } from "./api/methods";
 import PageLayout from "@/PageLayout";
@@ -11,12 +11,12 @@ export const metadata: Metadata = {
 
 type Props = {};
 export default async function (props: Props) {
-  const method = "$$PATH$$/api/?getPage" as unknown as FGetPage;
+  const method = "user/api/?getPage" as unknown as FGetPage;
   return (
     <PageLayout>
       <h1>{metadata.title as string}</h1>
       <ComponentLoader
-        Component={$$COMP$$}
+        Component={PageUser}
         method={method}
         args={{}}
       />

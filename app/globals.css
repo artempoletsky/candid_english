@@ -117,7 +117,7 @@ a {
   }
 
   h1 {
-    @apply text-5xl mb-10;
+    @apply text-2xl mb-10;
   }
 
   h2 {

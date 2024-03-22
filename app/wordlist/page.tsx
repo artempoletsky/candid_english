@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import PageWordlist from "./PageWordlist";
-import Layout from "@/layout";
+import Layout from "~/app/components/PageLayout";
 import ComponentLoader from "@/ComponentLoader";
 import type { FGetOxfordList } from "./api/route";
 

@@ -1,4 +1,5 @@
 import z from "zod";
+import { TestSession } from "./app/test/api/route";
 
 export const ZUser = z.object({
   email: z.string(),
@@ -7,6 +8,7 @@ export const ZUser = z.object({
   fullName: z.string(),
   knownWords: z.any(),
   knownWordsVersion: z.date(),
+  image: z.string(),
 });
 
 export type UserFull = z.infer<typeof ZUser>;
@@ -152,3 +154,18 @@ export type PostsMeta = {};
 
 
 
+export const SITE_NAME = "Intermediate Drill";
+
+
+export type AuthData = {
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+}
+export type Session = {
+  id: string
+  isAdmin: boolean
+  activeEnglishTest?: TestSession
+  user?: UserLight,
+  authUser?: AuthData,
+}

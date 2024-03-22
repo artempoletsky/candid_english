@@ -1,4 +1,4 @@
-import Layout from "@/layout";
+import Layout from "~/app/components/PageLayout";
 import Page5Words from "./Page5Words";
 import ComponentLoader from "@/ComponentLoader";
 import { FGetFiveWords, FGetFiveWordsPage } from "./api/route";
