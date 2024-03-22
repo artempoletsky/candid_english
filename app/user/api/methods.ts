@@ -1,17 +1,8 @@
 import { ResponseError } from "@artempoletsky/easyrpc";
-import type { ASayHello, ARegister } from "./schemas";
+import type { ARegister } from "./schemas";
 import { methodFactory, query } from "~/db";
 import { getSession } from "~/app/session/session";
 
-
-export async function sayHello({ name }: ASayHello) {
-  if (name == "")
-    throw new ResponseError("Name is empty!");
-
-  return `Hello, ${name}!`;
-}
-export type FSayHello = typeof sayHello;
-////////////////////////////////////////////////////
 
 
 export const register = methodFactory(({ users }, { username, password }: ARegister, { $ }) => {
@@ -27,15 +18,6 @@ export const register = methodFactory(({ users }, { username, password }: ARegis
   return user;
 });
 export type FRegister = typeof register;
-////////////////////////////////////////////////////
-
-
-
-export const getPageData = methodFactory(({ }, { }, { db }) => {
-  return db.versionString;
-});
-
-export type FGetPageData = () => ReturnType<typeof getPageData>;
 ////////////////////////////////////////////////////
 
 

@@ -11,7 +11,7 @@ if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) throw new Error("Google ENV cred
 const handler = NextAuth({
   callbacks: {
     redirect(params) {
-      return "/user"
+      return params.baseUrl + "/user";
     },
   },
   events: {
@@ -52,7 +52,7 @@ const handler = NextAuth({
             }
             return undefined;
           }
-          return users.where("email", username).where("password", $.encodePassword(password)).select($.full)[0];
+          return users.where("email", username).where("password", $.encodePassword(password)).limit(1).select(u => u.$light())[0];
         }, credentials as { username: string, password: string });
         if (!user) return null;
         return {

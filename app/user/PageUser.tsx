@@ -1,36 +1,45 @@
 "use client";
 
 import { fetchCatch, getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
-import type { FSayHello } from "./api/methods";
-import { useState } from "react";
-import { Session, UserFull } from "~/globals";
+import { useContext, useEffect, useState } from "react";
+import { Session } from "~/globals";
 import PageGuest from "./PageGuest";
-import { signOut } from "next-auth/react";
-import { Button } from "@mantine/core";
+import { UserContext } from "../components/context";
+import { FGetPage } from "./api/methods";
 
-const sayHello = getAPIMethod<FSayHello>("/user/api", "sayHello");
-
+const getPage = getAPIMethod<FGetPage>("/user/api/", "getPage");
 
 type Props = {
   // user: UserFull;
 };
 
-export default function TestComponent({ user, authUser, isAdmin }: Session) {
+export default function TestComponent({ user: userInitial, authUser, isAdmin }: Session) {
+
 
   const [setErrorResponse, mainErrorMessage, errorResponse] = useErrorResponse();
-  if (!user) return <PageGuest />;
+  // console.log(userContext);
 
-  const image = user.image || authUser?.image || "";
-  function onSignOut() {
-    signOut().then(console.log);
-  }
+  const { user, setUser } = useContext(UserContext);
+
+  useEffect(() => {
+    setUser(userInitial || null);
+    localStorage.removeItem("user");
+    if (user) localStorage.setItem("user", JSON.stringify(user));
+  }, []);
+
+  const onSignIn = fetchCatch(getPage)
+    .catch(setErrorResponse)
+    .then(({ user }) => {
+      setUser(user || null);
+    }).action();
+
+  if (!user) return <PageGuest onSignIn={onSignIn} />;
+
   return (
     <div className="">
       <p className="">Hello {user.fullName || user.username}!</p>
       {isAdmin && <p className="">You are admin</p>}
-      {image && <img src={image} />}
       <div className="text-red-600 min-h-[24px]">{mainErrorMessage}</div>
-      <Button onClick={onSignOut}>Logout</Button>
     </div >
   );
 }

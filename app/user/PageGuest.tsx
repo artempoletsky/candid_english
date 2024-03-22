@@ -2,30 +2,45 @@
 
 import { useErrorResponse, useVars } from "@artempoletsky/easyrpc/client";
 import { Button, TextInput } from "@mantine/core";
+import { useForm, zodResolver } from "@mantine/form";
 import { getProviders, signIn } from "next-auth/react";
 import { useEffect } from "react";
+import z from "zod";
 
-export default function PageGuest() {
+const zCredentials = z.object({
+  username: z.string().min(5, "At least 5 symbols").max(35),
+  password: z.string().min(5, "At least 5 symbols"),
+});
+
+type ACredentials = z.infer<typeof zCredentials>;
+
+type Props = { onSignIn: () => void }
+export default function PageGuest({ onSignIn }: Props) {
   // useEffect(() => {
   //   getProviders().then(console.log);
   //   // console.log("Providers", providers)
   // }, [])
-  const [setErrorResponse, mainErrorMessage] = useErrorResponse()
+  const form = useForm<ACredentials>({
+    initialValues: {
+      username: "",
+      password: "",
+    },
+    validate: zodResolver(zCredentials),
+  })
+  const [setErrorResponse, mainErrorMessage] = useErrorResponse(form)
   function google() {
     signIn("google", {
       redirect: false,
     }).then(console.log);
   }
 
-  function cred() {
+  function cred(credentials: ACredentials) {
     setErrorResponse();
     signIn("credentials", {
       ...credentials,
       redirect: false,
       callbackUrl: "/user",
     }).then((res) => {
-      console.log(res);
-      
       if (!res) {
         setErrorResponse({
           message: "Something wrong happened...",
@@ -41,30 +56,43 @@ export default function PageGuest() {
         setErrorResponse({
           message: "Wrong username or password {...}",
           invalidFields: {},
-          args: [res.error],
+          args: [],
           preferredErrorDisplay: "form",
           statusCode: res.status,
         });
+        return;
       }
+      onSignIn();
     });
   }
-  const [credentials, h] = useVars({
-    username: "username",
-    password: "password",
-  });
+  // const [credentials, h] = useVars({
+  //   username: "username",
+  //   password: "password",
+  // });
 
   return <div>
-    Hello Guest!
-    <div className="">
-      <TextInput {...h.props("username")} />
-    </div>
-    <div className="">
-      <TextInput {...h.props("password")} type="password" />
-    </div>
-    <div className="">
-      <Button onClick={cred}>Cred</Button>
-    </div>
-    <p className="min-h-[25px] text-red-500">{mainErrorMessage}</p>
+    <form className="w-[350px]" autoComplete="on" action="/api/auth/signin" onSubmit={form.onSubmit(cred)}>
+      <div className="">
+        <TextInput
+          {...form.getInputProps("username")}
+          label="Username or password"
+          autoComplete="on"
+        />
+      </div>
+      <div className="">
+        <TextInput
+          {...form.getInputProps("password")}
+          label="Password"
+          type="password"
+          autoComplete="on"
+        />
+      </div>
+      <div className="mt-3">
+        <Button type="submit">Sign in</Button>
+      </div>
+      <p className="min-h-[25px] text-red-500">{mainErrorMessage}</p>
+    </form>
+
     <Button onClick={google}>Google</Button>
   </div>
 }

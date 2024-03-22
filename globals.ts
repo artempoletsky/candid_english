@@ -15,6 +15,8 @@ export type UserFull = z.infer<typeof ZUser>;
 
 export type UserLight = Omit<UserFull, "knownWords">;
 
+export type UserSelf = Omit<UserLight, "password">;
+
 export type User = Omit<UserFull, "password" | "knownWords" | "knownWordsVersion">;
 
 export type UsersMeta = {};

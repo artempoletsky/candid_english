@@ -19,7 +19,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ColorSchemeScript />
         <script src="https://accounts.google.com/gsi/client" async></script>
       </head>
-      <body className={inter.className}><MantineProvider>{children}</MantineProvider></body>
+      <body className={inter.className}>
+        <MantineProvider>{children}</MantineProvider>
+      </body>
     </html>
   )
 }
