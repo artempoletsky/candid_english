@@ -14,7 +14,9 @@ export type AGetUnreviewedLemmatizerPropositions = z.infer<typeof ZGetPage>;
 
 async function getUnreviewedLemmatizerPropositions(payload: AGetUnreviewedLemmatizerPropositions) {
   return await query(({ lemmatizer_propositions }, { page }) => {
-    return lemmatizer_propositions.filter(p => !p.reviewed).paginate(page, 20).select();
+    return {
+      unreviewed: lemmatizer_propositions.filter(p => !p.reviewed).paginate(page, 20).select(),
+    }
   }, payload);
 }
 

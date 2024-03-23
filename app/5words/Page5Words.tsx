@@ -1,7 +1,8 @@
 "use client";
 import DictLink from "@/dictlink";
 
-import { fetchCatch, getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { fetchCatch } from "@artempoletsky/easyrpc/react";
 import type { FGetFiveWords } from "./api/route";
 import { useEffect, useState } from "react";
 import { Button } from "@mantine/core";

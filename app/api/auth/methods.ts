@@ -1,5 +1,7 @@
 import { cookies, headers } from "next/headers";
 import { getSession } from "~/app/session/session";
+import { methodFactory } from "~/db";
+import { AuthData, UserLight } from "~/globals";
 // import { getCsrfToken } from "next-auth/react";
 
 async function getCsrfToken() {
@@ -117,3 +119,44 @@ export async function login({ password, username }: ALogin) {
   return result.status == 200;
 }
 export type FLogin = typeof login;
+
+
+
+type RGetUserDataByAuth = {
+  isAdmin: boolean;
+  user: UserLight;
+}
+export const getUserDataByAuth = methodFactory<AuthData, RGetUserDataByAuth>(({ users, user_rights }, auth, { $ }) => {
+  const email = auth.email;
+  if (!email) throw new Error("Email must be valid");
+
+
+  let user: UserLight | undefined = users.where("email", email).select(rec => rec.$light())[0];
+  let isAdmin = false;
+  if (!user) {
+    let username = (email.match(/^([^@]+)@.*$/) as string[])[1] || "";
+    if (users.has(username)) {
+      username = users.getFreeId();
+    }
+    users.insert({
+      emailConfirmed: true,
+      knownWordsVersion: new Date(0),
+      password: "",
+      knownWords: [],
+      username,
+      email,
+      image: auth.image || "",
+      fullName: auth.name || "",
+    });
+    user = users.at(username, rec => rec.$light());
+  }
+
+  if (user_rights.has(user.username)) {
+    isAdmin = user_rights.at(user.username).isAdmin;
+  }
+  return {
+    user,
+    isAdmin,
+  }
+});
+

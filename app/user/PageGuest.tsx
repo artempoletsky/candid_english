@@ -1,6 +1,6 @@
 "use client";
 
-import { useErrorResponse, useVars } from "@artempoletsky/easyrpc/client";
+import { useVars, useErrorResponse } from "@artempoletsky/easyrpc/react";
 import { Button, TextInput } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { getProviders, signIn } from "next-auth/react";

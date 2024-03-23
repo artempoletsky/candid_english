@@ -1,9 +1,10 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
-import { getSession, getUserDataByAuth } from "~/app/session/session";
+import { getSession } from "~/app/session/session";
 import { query } from "~/db";
 import { UserFull, UserLight } from "~/globals";
+import { getUserDataByAuth } from "../methods";
 
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env;
 if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) throw new Error("Google ENV credentials is invalid!");

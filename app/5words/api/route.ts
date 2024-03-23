@@ -37,7 +37,7 @@ async function getFiveWordsPage(payload: AGetFiveWords) {
 
 export type FGetFiveWordsPage = typeof getFiveWordsPage;
 
-export const POST = NextPOST(NextResponse, {
+export const POST = NextPOST({
   getFiveWords: ZFiveWords,
   getFiveWordsPage: ZFiveWords,
 }, {

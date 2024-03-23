@@ -1,36 +1,34 @@
-import { getAPIMethod, useErrorResponse, JSONErrorResponse } from "@artempoletsky/easyrpc/client";
+import { getAPIMethod, JSONErrorResponse } from "@artempoletsky/easyrpc/client";
+import { useErrorResponse, fetchCatch, useVars } from "@artempoletsky/easyrpc/react";
 import { API_ENDPOINT } from "~/app/kurgandb/generated";
 import { TableComponentProps } from "~/app/kurgandb/globals";
 import type { FGetUnreviewedLemmatizerPropositions, FResolvePropostion, FUnreviewAll } from "../api";
 import { ComponentType, ElementType, ReactNode, useEffect, useState } from "react";
-import useSWR from "swr";
 import type { LemmatizerProposition } from "~/globals";
 import { Button, ButtonProps, TextInputProps } from "@mantine/core";
 import TextInput from "~/app/kurgandb/comp/TextInput";
 
 import DictLink from "~/app/components/dictlink";
-import { fetchCatch, useVars } from "@artempoletsky/easyrpc/client";
+
 
 const getData = getAPIMethod<FGetUnreviewedLemmatizerPropositions>(API_ENDPOINT, "getUnreviewedLemmatizerPropositions");
 const resolveProposition = getAPIMethod<FResolvePropostion>(API_ENDPOINT, "resolveProposition");
 const unreviewAll = getAPIMethod<FUnreviewAll>(API_ENDPOINT, "unreviewAll");
 
 
-export default function LemmatizerPropositions({ scheme }: TableComponentProps) {
-  const swr = useSWR(" ", fetchCatch(getData).fetcher({ page: 1 }), {
-    revalidateIfStale: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-    // revalidateOnMount: false,
-  });
+type Props = TableComponentProps & {
+  unreviewed: LemmatizerProposition[];
+}
+export default function LemmatizerPropositions({ scheme, unreviewed: unreviewedInitial }: Props) {
 
+  const [unreviewed, setUnreviewed] = useState(unreviewedInitial);
 
   function removeFirst() {
-    if (!swr.data) throw new Error("error");
-    if (swr.data.length <= 0) {
+
+    if (unreviewed.length <= 0) {
       getData({ page: 1 });
     } else {
-      swr.mutate(swr.data.slice(1));
+      setUnreviewed(unreviewed.slice(1));
     }
   }
 
@@ -53,10 +51,7 @@ export default function LemmatizerPropositions({ scheme }: TableComponentProps) 
       }
     })
     .then(() => {
-      if (!swr.data) throw new Error();
-      swr.mutate(swr.data.filter(e => e.id != removedId), {
-        revalidate: false,
-      });
+      setUnreviewed(unreviewed.filter(e => e.id != removedId));
     })
     .catch(setErrorResponse);
 
@@ -88,7 +83,7 @@ export default function LemmatizerPropositions({ scheme }: TableComponentProps) 
     list: "decline",
   }));
 
-  const first: LemmatizerProposition = swr.data && swr.data[0] as any;
+  const first: LemmatizerProposition = unreviewed && unreviewed[0] as any;
 
   const [{ black, white, ovrWord, ovrLemma }, h] = useVars({
     placeholders: {
@@ -102,7 +97,7 @@ export default function LemmatizerPropositions({ scheme }: TableComponentProps) 
   });
 
   useEffect(() => {
-    const first = swr.data && swr.data[0];
+    const first = unreviewed && unreviewed[0];
     if (first) {
       h.setAll({
         white: first.word,
@@ -111,36 +106,25 @@ export default function LemmatizerPropositions({ scheme }: TableComponentProps) 
         ovrWord: first.proposition,
       });
     }
-  }, [swr.data]);
-
-  useEffect(() => {
-    setErrorResponse(swr.error);
-  }, [swr.error]);
+  }, [unreviewed]);
 
   const fcUnreview = fetchCatch(unreviewAll)
     .then(data => {
-      swr.mutate(data, { revalidate: false });
+      setUnreviewed(data);
     })
     .catch(setErrorResponse)
     .buttonElement(Button);
-
-  if (swr.isLoading) {
-    return "Loading...";
-  }
-  if (swr.error || swr.data === undefined) {
-    return errorMessage || "Error";
-  }
 
 
   const isBlacklist = first && !first.proposition;
 
 
   return <div>
-    To review: {swr.data.length}
+    To review: {unreviewed.length}
     <div className="mb-3">
       {fcUnreview.button("Unreview all")}
     </div>
-    {swr.data.map(e => <div className="mb-1">
+    {unreviewed.map(e => <div className="mb-1">
       <Button onClick={deleteFromList.action(e)}>Remove {e.id}</Button>
     </div>)}
     {first && <div className="mt-4">

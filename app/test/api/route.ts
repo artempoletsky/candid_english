@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ResponseError } from "@artempoletsky/easyrpc";
-import { getSession } from "~/app/session/route";
+
 import { Levels, dec, zLanguageLevel } from "~/lib/language_levels";
 import { NextPOST } from "@artempoletsky/easyrpc";
 import z from "zod";
@@ -11,6 +11,7 @@ import { revalidatePath } from "next/cache"
 import { query } from "~/db"
 import { LanguageLevel } from "~/lib/language_levels"
 import { TestQuestion } from "~/globals";
+import { getSession } from "~/app/session/session";
 
 
 export type QuestionLight = Omit<TestQuestion, "correctAnswers" | "word">
@@ -118,7 +119,7 @@ const ZBeginTest = z.object({
 export type ABeginTest = z.infer<typeof ZBeginTest>;
 
 async function beginTest(dict: ABeginTest) {
-  const SESSION = getSession();
+  const SESSION = await getSession();
 
 
   let activeEnglishTest = SESSION.activeEnglishTest;
@@ -148,7 +149,7 @@ export type AGiveAnswer = z.infer<typeof ZGiveAnswer>;
 const ANSWERS_TO_COMPLETE = 5;
 
 export async function giveAnswer({ dontKnow, answers }: AGiveAnswer) {
-  const session = getSession();
+  const session = await getSession();
   const testSession: TestSession | undefined = session.activeEnglishTest
   if (!testSession || !testSession.currentQuestion) throw new ResponseError("Test session is invalid");
 
@@ -195,7 +196,7 @@ export type FGiveAnswer = (args: AGiveAnswer) => ReturnType<typeof giveAnswer>;
 /////
 
 async function tryAgain() {
-  const SESSION = getSession();
+  const SESSION = await getSession();
   SESSION.activeEnglishTest = InitialTestSession;
   return lightenSession(SESSION.activeEnglishTest);
 }
@@ -203,7 +204,7 @@ async function tryAgain() {
 export type FTryAgain = typeof tryAgain;
 
 async function createSession() {
-  const SESSION = getSession();
+  const SESSION = await getSession();
   if (!SESSION.activeEnglishTest) {
     SESSION.activeEnglishTest = InitialTestSession;
   }

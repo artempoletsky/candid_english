@@ -63,6 +63,10 @@ export type Tables = {
     types.PostInsert,
     types.PostLight
   >;
+  email_confirmations: Table<
+    types.EmailConfirmation,
+    string
+  >;
 };
 
 
@@ -74,7 +78,7 @@ export async function query<Payload extends PlainObject, ReturnType>(predicate: 
 export function methodFactory<Payload extends PlainObject, PredicateReturnType, ReturnType = PredicateReturnType>(predicate: Predicate<Tables, Payload, PredicateReturnType>, then?: (dbResult: PredicateReturnType) => ReturnType) {
   return async function (payload: Payload) {
     const dbResult = await query(predicate, payload);
-    if (!then) return dbResult;
-    return then(dbResult);
+    if (!then) return dbResult as ReturnType;
+    return then(dbResult) as ReturnType;
   }
 }

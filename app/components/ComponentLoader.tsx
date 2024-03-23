@@ -1,6 +1,7 @@
 "use client";
 
-import { getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
+import { getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { useErrorResponse } from "@artempoletsky/easyrpc/react";
 import { ComponentType, ElementType, ReactElement, ReactNode, useEffect, useState } from "react";
 
 

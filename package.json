@@ -12,8 +12,8 @@
     "grab": "node grab/grab.mjs && node grab/parse.mjs"
   },
   "dependencies": {
-    "@artempoletsky/easyrpc": "^1.2.2",
-    "@artempoletsky/kurgandb": "^1.1.5",
+    "@artempoletsky/easyrpc": "file:../easyrpc",
+    "@artempoletsky/kurgandb": "file:../mydb",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@mantine/core": "^7.6.2",
@@ -29,6 +29,7 @@
     "md5": "^2.3.0",
     "next": "^14.1.0",
     "next-auth": "^4.24.7",
+    "nodemailer": "^6.9.13",
     "postcss": "^8.4.33",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -46,6 +47,7 @@
     "@types/lodash.debounce": "^4.0.7",
     "@types/md5": "^2.3.5",
     "@types/node": "20.6.2",
+    "@types/nodemailer": "^6.4.14",
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
     "@types/react-window": "^1.8.8",

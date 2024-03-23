@@ -1,0 +1,69 @@
+import { query } from "~/db";
+
+async function copySynonimsFromMongo() {
+
+  await dbConnect();
+  const t1 = performance.now();
+  const col = getCollection("ReversoSynonyms");
+  const docs: any[] = await col.find().toArray();
+  // console.log(docs);
+  const time1 = perf(t1);
+  const t2 = performance.now();
+  type Payload = typeof docs;
+  let result;
+
+  const syn: SynonymsData[] = [];
+  for (const d of docs) {
+    let part: string = "";
+    const data: any = {};
+
+    for (const key in d) {
+      if (key != "_id" && key != "word") {
+        if (key == "adverb / other") {
+          part = "other"
+        } else {
+          part = key;
+        }
+        data[part] = d[key];
+      }
+    }
+    if (!part) {
+      console.log(d);
+      continue;
+    }
+    syn.push({
+      word: d.word,
+      data
+    });
+  }
+
+  result = await query<SynonymsData[]>(({ }, { payload, db }) => {
+    if (db.doesTableExist("synonyms")) {
+      db.removeTable("synonyms");
+    }
+    let synonyms = db.createTable<string, SynonymsData>({
+      name: "synonyms",
+      fields: {
+        word: "string",
+        data: "json",
+      },
+      tags: {
+        word: ["primary"],
+      },
+      settings: {
+        dynamicData: false,
+        largeObjects: false,
+        manyRecords: true,
+      }
+    });
+
+    synonyms.insertMany(payload);
+    return synonyms.all().select();
+  }, syn);
+
+  return {
+    result,
+    time1,
+    time2: perf(t2),
+  };
+}

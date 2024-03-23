@@ -1,6 +1,7 @@
 "use client";
 
-import { fetchCatch, getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
+import { getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
 import { useContext, useEffect, useState } from "react";
 import { Session } from "~/globals";
 import PageGuest from "./PageGuest";

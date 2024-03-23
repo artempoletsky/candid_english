@@ -1,23 +1,15 @@
 import z from "zod";
 import { TestSession } from "./app/test/api/route";
+import { UserFull, EmailConfirmation } from "./app/kurgandb_admin/validation";
 
-export const ZUser = z.object({
-  email: z.string(),
-  username: z.string(),
-  password: z.string(),
-  fullName: z.string(),
-  knownWords: z.any(),
-  knownWordsVersion: z.date(),
-  image: z.string(),
-});
 
-export type UserFull = z.infer<typeof ZUser>;
+export type { UserFull as UserFull };
 
 export type UserLight = Omit<UserFull, "knownWords">;
 
 export type UserSelf = Omit<UserLight, "password">;
 
-export type User = Omit<UserFull, "password" | "knownWords" | "knownWordsVersion">;
+export type User = Omit<UserSelf, "knownWordsVersion" | "emailConfirmed">;
 
 export type UsersMeta = {};
 
@@ -171,3 +163,6 @@ export type Session = {
   user?: UserLight,
   authUser?: AuthData,
 }
+
+
+export type { EmailConfirmation as EmailConfirmation };
