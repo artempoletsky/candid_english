@@ -24,3 +24,12 @@ export const register = z.object({
 });
 
 export type ARegister = z.infer<typeof register>;
+
+
+export const getMyPage = z.object({});
+export const repeatConfirmationEmail = z.object({});
+
+export const confirmEmail = z.object({
+  secret: z.string(),
+});
+export type AConfirmEmail = z.infer<typeof confirmEmail>;

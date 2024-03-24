@@ -2,14 +2,15 @@ import z from "zod";
 import { TestSession } from "./app/test/api/route";
 import { UserFull, EmailConfirmation } from "./app/kurgandb_admin/validation";
 
+export const USER_ACTIONS_API = "/api/user";
 
 export type { UserFull as UserFull };
 
 export type UserLight = Omit<UserFull, "knownWords">;
 
-export type UserSelf = Omit<UserLight, "password">;
+export type UserSelf = Omit<UserLight, "password"> & UserRights;
 
-export type User = Omit<UserSelf, "knownWordsVersion" | "emailConfirmed">;
+export type User = Omit<UserLight, "knownWordsVersion" | "emailConfirmed">;
 
 export type UsersMeta = {};
 
@@ -100,13 +101,13 @@ export type LemmatizerPropositionsMeta = {};
 
 
 
-export const ZUserRight = z.object({
-  id: z.string(),
+export const ZUserRights = z.object({
+  username: z.string(),
   isAdmin: z.boolean(),
   isModerator: z.boolean(),
 });
 
-export type UserRight = z.infer<typeof ZUserRight>;
+export type UserRights = z.infer<typeof ZUserRights>;
 
 export type UserRightsMeta = {};
 
@@ -158,9 +159,8 @@ export type AuthData = {
 }
 export type Session = {
   id: string
-  isAdmin: boolean
   activeEnglishTest?: TestSession
-  user?: UserLight,
+  user?: UserSelf,
   authUser?: AuthData,
 }
 

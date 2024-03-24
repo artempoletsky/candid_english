@@ -4,6 +4,7 @@ import { useVars, useErrorResponse } from "@artempoletsky/easyrpc/react";
 import { Button, TextInput } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { getProviders, signIn } from "next-auth/react";
+import Link from "next/link";
 import { useEffect } from "react";
 import z from "zod";
 
@@ -71,6 +72,9 @@ export default function PageGuest({ onSignIn }: Props) {
   // });
 
   return <div>
+    <div className="mb-3">
+      <Link href="/registration"><Button>Create a new account</Button></Link>
+    </div>
     <form className="w-[350px]" autoComplete="on" action="/api/auth/signin" onSubmit={form.onSubmit(cred)}>
       <div className="">
         <TextInput

@@ -4,13 +4,14 @@ import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
 
 import { ChangeEvent, ChangeEventHandler, useRef, useState } from "react";
-import { ARegister, register as ZRegister } from "./api/schemas";
+import { ARegister, register as ZRegister } from "../api/user/schemas";
 import { useForm, zodResolver } from "@mantine/form";
-import type { FRegister } from "./api/methods";
+import type { FRegister } from "../api/user/methods";
 import { Button } from "@mantine/core";
 import TextInput from "./Textnput";
+import { USER_ACTIONS_API } from "~/globals";
 
-const register = getAPIMethod<FRegister>("/registration/api", "register");
+const register = getAPIMethod<FRegister>(USER_ACTIONS_API, "register");
 
 
 type Props = {};

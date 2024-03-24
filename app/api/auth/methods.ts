@@ -1,7 +1,7 @@
 import { cookies, headers } from "next/headers";
 import { getSession } from "~/app/session/session";
 import { methodFactory } from "~/db";
-import { AuthData, UserLight } from "~/globals";
+import { AuthData, UserLight, UserRights, UserSelf } from "~/globals";
 // import { getCsrfToken } from "next-auth/react";
 
 async function getCsrfToken() {
@@ -81,6 +81,13 @@ async function doPost(url: string, payload: Record<string, string>) {
   });
 }
 
+
+export async function clearSession() {
+  const session = await getSession();
+  session.authUser = undefined;
+  session.user = undefined;
+}
+
 export async function logout() {
 
   // const { NEXTAUTH_URL } = process.env;
@@ -91,13 +98,7 @@ export async function logout() {
 
   const result = await doPost("/api/auth/signout", {});
 
-  // console.log(result.ok);
-  // console.log(result.status);
-  // const session = await getSession();
-  // session.authUser = undefined;
-  // session.isAdmin = false;
-  // session.user = undefined;
-  // await sleep();
+  await clearSession();
 }
 export type FLogout = typeof logout;
 
@@ -122,17 +123,17 @@ export type FLogin = typeof login;
 
 
 
-type RGetUserDataByAuth = {
-  isAdmin: boolean;
-  user: UserLight;
-}
-export const getUserDataByAuth = methodFactory<AuthData, RGetUserDataByAuth>(({ users, user_rights }, auth, { $ }) => {
+export type RGetUserDataByAuth = {
+  user: UserSelf;
+};
+
+export const getUserDataByAuth = methodFactory<AuthData, RGetUserDataByAuth>(({ users }, auth, { $, drill }) => {
   const email = auth.email;
   if (!email) throw new Error("Email must be valid");
 
 
   let user: UserLight | undefined = users.where("email", email).select(rec => rec.$light())[0];
-  let isAdmin = false;
+
   if (!user) {
     let username = (email.match(/^([^@]+)@.*$/) as string[])[1] || "";
     if (users.has(username)) {
@@ -151,12 +152,8 @@ export const getUserDataByAuth = methodFactory<AuthData, RGetUserDataByAuth>(({ 
     user = users.at(username, rec => rec.$light());
   }
 
-  if (user_rights.has(user.username)) {
-    isAdmin = user_rights.at(user.username).isAdmin;
-  }
   return {
-    user,
-    isAdmin,
-  }
+    user: drill.userSelf(user),
+  };
 });
 

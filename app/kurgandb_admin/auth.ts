@@ -5,9 +5,9 @@ import { login as fLogin, logout as fLogout } from "../api/auth/methods";
 
 
 export async function isAdmin(): Promise<boolean> {
-  // return true;
   const session = await getSession();
-  return session.isAdmin;
+
+  return session.user?.isAdmin || false;
 }
 
 export async function login(username: string, password: string): Promise<boolean> {

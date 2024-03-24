@@ -1,9 +1,11 @@
 
 import PageUser from "./PageUser";
 import { Metadata } from "next";
-import { FGetPage } from "./api/methods";
+
 import PageLayout from "@/PageLayout";
 import ComponentLoader from "@/ComponentLoader";
+import { USER_ACTIONS_API } from "~/globals";
+import { FGetMyPage } from "~/app/api/user/methods";
 
 export const metadata: Metadata = {
   title: "",
@@ -11,7 +13,7 @@ export const metadata: Metadata = {
 
 type Props = {};
 export default async function (props: Props) {
-  const method = "user/api/?getPage" as unknown as FGetPage;
+  const method = USER_ACTIONS_API + "?getMyPage" as unknown as FGetMyPage;
   return (
     <PageLayout>
       <h1>{metadata.title as string}</h1>

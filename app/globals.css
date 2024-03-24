@@ -105,30 +105,6 @@ a {
 
 @layer base {
 
-  h1,
-  h2,
-  h3,
-  h4 {
-    /* text-align: center; */
-    font-weight: bold;
-    /* color: var(--dark-vivid); */
 
-    @apply mb-5 mt-3 text-slate-800;
-  }
-
-  h1 {
-    @apply text-2xl mb-10;
-  }
-
-  h2 {
-    @apply text-3xl;
-    color: var(--light-vivid);
-  }
-
-  h3 {
-    @apply text-xl;
-    color: var(--light);
-  }
-  
 }
 

@@ -1,6 +1,7 @@
 import { Predicate, queryUniversal } from "@artempoletsky/kurgandb";
 import type { PlainObject, Table } from "@artempoletsky/kurgandb/globals";
 import type * as types from "./globals";
+import { Plugins } from "./app/kurgandb_admin/plugins";
 
 
 export type Tables = {
@@ -46,7 +47,7 @@ export type Tables = {
     types.LemmatizerPropositionInsert
   >;
   user_rights: Table<
-    types.UserRight,
+    types.UserRights,
     string,
     types.UserRightsMeta
   >;
@@ -70,12 +71,12 @@ export type Tables = {
 };
 
 
-export async function query<Payload extends PlainObject, ReturnType>(predicate: Predicate<Tables, Payload, ReturnType>, payload?: Payload) {
-  return queryUniversal<Payload, ReturnType, Tables>(predicate, payload);
+export async function query<Payload extends PlainObject, ReturnType>(predicate: Predicate<Tables, Payload, ReturnType, Plugins>, payload?: Payload) {
+  return queryUniversal<Payload, ReturnType, Tables, Plugins>(predicate, payload);
 }
 
 
-export function methodFactory<Payload extends PlainObject, PredicateReturnType, ReturnType = PredicateReturnType>(predicate: Predicate<Tables, Payload, PredicateReturnType>, then?: (dbResult: PredicateReturnType) => ReturnType) {
+export function methodFactory<Payload extends PlainObject, PredicateReturnType, ReturnType = PredicateReturnType>(predicate: Predicate<Tables, Payload, PredicateReturnType, Plugins>, then?: (dbResult: PredicateReturnType) => ReturnType) {
   return async function (payload: Payload) {
     const dbResult = await query(predicate, payload);
     if (!then) return dbResult as ReturnType;
