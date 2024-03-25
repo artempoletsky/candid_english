@@ -188,6 +188,9 @@ async function giveAnswer({ dontKnow, answers }: AGiveAnswer) {
 
 
   session.activeEnglishTest = testSession;
+  if(testSession.completed){
+    session.englishLevel = testSession.currentLevel;
+  }
 
   if (testSession.currentQuestion) {
     return lightenSession(testSession);

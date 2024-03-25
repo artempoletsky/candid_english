@@ -5,7 +5,7 @@ import { useErrorResponse } from "@artempoletsky/easyrpc/react";
 import { ComponentType, ElementType, ReactElement, ReactNode, useEffect, useState } from "react";
 
 
-import RequestError from "./RequestError";
+import ErrorMessage from "./ErrorMessage";
 import { Loader } from "@mantine/core";
 
 
@@ -62,6 +62,6 @@ export default function ComponentLoader
   if (data) return <Component {...data} {...args} {..._props} ></Component>;
 
   if (error) return error;
-  return <RequestError requestError={errorResponse}></RequestError>;
+  return <ErrorMessage requestError={errorResponse}></ErrorMessage>;
 }
 

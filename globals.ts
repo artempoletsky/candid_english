@@ -1,6 +1,7 @@
 import z from "zod";
 import { TestSession } from "./app/test/api/route";
-import { UserFull, EmailConfirmation } from "./app/kurgandb_admin/validation";
+import { UserFull, EmailConfirmation, TestQuestion, CommentFull } from "./app/kurgandb_admin/validation";
+import { LanguageLevel } from "./lib/language_levels";
 
 export const USER_ACTIONS_API = "/api/user";
 
@@ -53,17 +54,7 @@ export type Synonym = z.infer<typeof ZSynonym>;
 export type SynonymsMeta = {};
 
 
-
-export const ZTestQuestion = z.object({
-  correctAnswers: z.any(),
-  difficulty: z.string(),
-  options: z.any(),
-  template: z.string(),
-  word: z.string(),
-});
-
-export type TestQuestion = z.infer<typeof ZTestQuestion>;
-
+export type { TestQuestion as TestQuestion }
 export type TestQuestionsMeta = {};
 
 
@@ -112,22 +103,24 @@ export type UserRights = z.infer<typeof ZUserRights>;
 export type UserRightsMeta = {};
 
 
+export type { CommentFull as CommentFull };
 
-export const ZComment = z.object({
-  id: z.number(),
-  text: z.string(),
-  date: z.date(),
-  parentType: z.string(),
-  parentTypeID: z.string(),
-  author: z.string(),
-  guestNickName: z.string(),
-});
+export type CommentInsert = Omit<CommentFull, "id">;
 
-export type Comment = z.infer<typeof ZComment>;
+export type Comment = {
+  id: number;
+  text: string;
+  author: string;
+  authorLvl: LanguageLevel | "";
+  avatar: string;
+  flags: (1 | 0)[];
+  date: Date;
+}
 
-export type CommentInsert = Omit<Comment, "id">;
-
-export type CommentsMeta = {};
+export type CommentsMeta = {
+  lastDiscussionId: number;
+  commentingMode: "guest" | "registered" | "emailVerified" | "none";
+};
 
 
 
@@ -162,6 +155,7 @@ export type Session = {
   activeEnglishTest?: TestSession;
   user?: UserSelf;
   authUser?: AuthData;
+  englishLevel: LanguageLevel | "";
 }
 
 

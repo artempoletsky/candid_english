@@ -54,7 +54,7 @@ export function createNewSession(req: NextRequest): string {
 
   const sessData: Session = {
     id: sessid,
-    isAdmin: false,
+    englishLevel: "",
   };
 
   wfs(getSessionFileName(sessid), {

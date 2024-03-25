@@ -52,7 +52,7 @@ export type Tables = {
     types.UserRightsMeta
   >;
   comments: Table<
-    types.Comment,
+    types.CommentFull,
     number,
     types.CommentsMeta,
     types.CommentInsert

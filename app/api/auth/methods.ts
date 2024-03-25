@@ -1,6 +1,6 @@
 import { cookies, headers } from "next/headers";
 import { getSession } from "~/app/session/session";
-import { methodFactory } from "~/db";
+import { methodFactory, query } from "~/db";
 import { AuthData, UserLight, UserRights, UserSelf } from "~/globals";
 // import { getCsrfToken } from "next-auth/react";
 
@@ -50,7 +50,6 @@ async function doPost(url: string, payload: Record<string, string>) {
     ...payload,
   });
 
-  console.log(hdrs.get("Referer"));
   // fetch("http://localhost:3000/api/auth/callback/credentials", {
   //   "headers": {
   //     "accept": "*/*",
@@ -127,33 +126,37 @@ export type RGetUserDataByAuth = {
   user: UserSelf;
 };
 
-export const getUserDataByAuth = methodFactory<AuthData, RGetUserDataByAuth>(({ users }, auth, { $, drill }) => {
+export async function createOrGetUser(auth: AuthData) {
   const email = auth.email;
   if (!email) throw new Error("Email must be valid");
+  const session = await getSession();
+  const user = await query(({ users }, { email, englishLevel }, { drill }) => {
 
+    let user: UserLight | undefined = users.where("email", email).select(rec => rec.$light())[0];
 
-  let user: UserLight | undefined = users.where("email", email).select(rec => rec.$light())[0];
-
-  if (!user) {
-    let username = (email.match(/^([^@]+)@.*$/) as string[])[1] || "";
-    if (users.has(username)) {
-      username = users.getFreeId();
+    if (!user) {
+      let username = (email.match(/^([^@]+)@.*$/) as string[])[1] || "";
+      if (users.has(username)) {
+        username = users.getFreeId();
+      }
+      users.insert({
+        englishLevel: englishLevel || "a0",
+        emailVerified: true,
+        knownWordsVersion: new Date(0),
+        password: "",
+        knownWords: [],
+        username,
+        email,
+        image: auth.image || "",
+        fullName: auth.name || "",
+      });
+      user = users.at(username, rec => rec.$light());
     }
-    users.insert({
-      emailConfirmed: true,
-      knownWordsVersion: new Date(0),
-      password: "",
-      knownWords: [],
-      username,
-      email,
-      image: auth.image || "",
-      fullName: auth.name || "",
-    });
-    user = users.at(username, rec => rec.$light());
-  }
 
-  return {
-    user: drill.userSelf(user),
-  };
-});
-
+    return drill.userSelf(user);
+  }, { email, englishLevel: session.englishLevel });
+  session.user = user;
+  session.englishLevel = user.englishLevel;
+  session.authUser = auth;
+  return { user };
+}

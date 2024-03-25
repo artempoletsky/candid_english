@@ -20,7 +20,7 @@
   --background-start-rgb: 214, 219, 220;
   --background-end: #f4f4f5;
   --animation-btn: 0s;
-  
+
 }
 
 @media (prefers-color-scheme: dark) {
@@ -103,8 +103,12 @@ a {
 
 
 
-@layer base {
+@layer base {}
 
-
+.pseudo {
+  border-bottom: 1px dashed;
+  @apply text-blue-900 border-blue-900;
+  font-style: normal;
+  cursor: pointer;
+  line-height: 1.1em;
 }
-

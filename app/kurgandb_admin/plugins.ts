@@ -1,20 +1,42 @@
 import { CallbackScope } from "@artempoletsky/kurgandb";
-import { PluginFactory, Table } from "@artempoletsky/kurgandb/globals";
-import { EmailConfirmation, UserLight, UserRights, UserSelf } from "~/globals";
+import { Tables } from "~/db";
+import {
+  Comment,
+  CommentFull,
+  User,
+  UserLight,
+  UserRights,
+  UserSelf,
+} from "~/globals";
 
 export const drill = function name({ db, $, _, z }: CallbackScope) {
-  const user_rights: Table<UserRights, string> = db.getTable("user_rights");
-  const email_confirmations: Table<EmailConfirmation, string> = db.getTable("email_confirmations");
-  const DefaultRights = user_rights.getRecordDraft() as Omit<UserRights, "username">;
+  const t: Tables = db.getTables() as Tables;
+  const DefaultRights = t.user_rights.getRecordDraft() as Omit<UserRights, "username">;
   delete (DefaultRights as any)["username"];
 
+  function createComment(c: CommentFull, author?: UserSelf): Comment {
+    const flags: (1 | 0)[] = [
+      author ? 1 : 0,
+      author && author.isAdmin ? 1 : 0,
+      author && author.isModerator ? 1 : 0,
+    ];
+    return {
+      authorLvl: c.authorLvl,
+      id: c.id,
+      author: author ? author.username : c.guestNickName,
+      avatar: author ? author.image : "",
+      date: c.date,
+      flags,
+      text: c.text,
+    };
+  }
   return {
     userSelf(user: UserLight): UserSelf {
       const { username } = user;
       const { password, ...userNoPwd } = user;
-      if (user_rights.has(username)) {
+      if (t.user_rights.has(username)) {
         return {
-          ...user_rights.at(username),
+          ...t.user_rights.at(username),
           ...userNoPwd,
         }
       }
@@ -29,15 +51,36 @@ export const drill = function name({ db, $, _, z }: CallbackScope) {
       return $.md5(rand + value);
     },
     createEmailConfirmation(email: string) {
-      email_confirmations.where("email", email).delete();
+      t.email_confirmations.where("email", email).delete();
 
       const secret = this.secret(email);
 
-      email_confirmations.insert({
+      t.email_confirmations.insert({
         secret,
         email,
       });
       return secret;
+    },
+    getComments(discussionId: number): Comment[] {
+      const commentsRaw = t.comments.where("discussionId", discussionId).limit(0).select();
+      const result: Comment[] = [];
+      const userIds = new Set<string>();
+      for (const c of commentsRaw) {
+        userIds.add(c.author);
+      }
+      userIds.delete("");
+      const discussionUsers = t.users.where("username", ...Array.from(userIds)).limit(0).select();
+      const usersDict = $.reduceDictionary<User, UserSelf>(discussionUsers, (res, user) => {
+        res[user.username] = this.userSelf(user as UserLight);
+      });
+
+      for (const c of commentsRaw) {
+        result.push(createComment(c, usersDict[c.author]));
+      }
+      return result;
+    },
+    commentByUser(commentRaw: CommentFull, author: User | undefined): Comment {
+      return createComment(commentRaw, author ? this.userSelf(author as UserLight) : undefined);
     }
   }
 }

@@ -72,7 +72,7 @@ export const register = methodFactory(({ users, email_confirmations }, { email, 
     username,
     email,
     password: $.encodePassword(password),
-    emailConfirmed: false,
+    emailVerified: false,
     knownWords: [],
     knownWordsVersion: new Date(0),
     fullName: "",
@@ -151,15 +151,14 @@ export async function confirmEmail(payload: AConfirmEmail) {
     const email = email_confirmations.at(secret, r => r.email);
     email_confirmations.where("secret", secret).delete();
     users.where("email", email).update(rec => {
-      rec.emailConfirmed = true;
+      rec.emailVerified = true;
     });
     return email;
   }, payload);
   const session = await getSession();
-  console.log(session);
   
   if (session.user && session.user.email == result) {
-    session.user.emailConfirmed = true;
+    session.user.emailVerified = true;
   }
   return result;
 }
@@ -202,7 +201,7 @@ export async function updateUserInfo(payload: AUpdateUserInfo) {
       if (passwordChanged) user.password = $.encodePassword(newInfo.password!);
       if (emailChanged) {
         user.email = newInfo.email!;
-        user.emailConfirmed = false;
+        user.emailVerified = false;
       }
     });
 
