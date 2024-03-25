@@ -178,17 +178,17 @@ export async function updateUserInfo(payload: AUpdateUserInfo) {
     if (password && $.encodePassword(password) != user.password) throw new $.ResponseError("password", "Incorrect password");
 
     const emailChanged = user.email != newInfo.email && !!newInfo.email;
-    const usernameChanged = user.username != newInfo.username && !!newInfo.username;
+    // const usernameChanged = user.username != newInfo.username && !!newInfo.username;
     const passwordChanged = !(!newInfo.password || user.password == $.encodePassword(newInfo.password));
     const fullNameChanged = user.fullName != newInfo.fullName && newInfo.fullName !== undefined;
     const imageChanged = user.image != newInfo.image && newInfo.image !== undefined;
 
-    const passwordRequired = usernameChanged || emailChanged || passwordChanged;
+    const passwordRequired = emailChanged || passwordChanged;
     if (passwordRequired && !password)
       throw new $.ResponseError("Password is required");
 
-    if (usernameChanged && users.has(newInfo.username!))
-      throw new $.ResponseError("username", "Already taken");
+    // if (usernameChanged && users.has(newInfo.username!))
+    //   throw new $.ResponseError("username", "Already taken");
 
     if (emailChanged) {
       const found = users.where("email", newInfo.email!).limit(1).select(u => 1);
@@ -198,7 +198,7 @@ export async function updateUserInfo(payload: AUpdateUserInfo) {
     users.where("username", username).limit(1).update(user => {
       if (fullNameChanged) user.fullName = newInfo.fullName!;
       if (imageChanged) user.image = newInfo.image!;
-      if (usernameChanged) user.username = newInfo.username!;
+      // if (usernameChanged) user.username = newInfo.username!;
       if (passwordChanged) user.password = $.encodePassword(newInfo.password!);
       if (emailChanged) {
         user.email = newInfo.email!;
@@ -206,12 +206,12 @@ export async function updateUserInfo(payload: AUpdateUserInfo) {
       }
     });
 
-    if (usernameChanged) {
-      user_rights.where("username", username).limit(1).update(rec => {
-        rec.username = newInfo.username!;
-      });
-    }
-    const newUserInfo = drill.userSelf(users.at(newInfo.username!, u => u.$light()));
+    // if (usernameChanged) {
+    //   user_rights.where("username", username).limit(1).update(rec => {
+    //     rec.username = newInfo.username!;
+    //   });
+    // }
+    const newUserInfo = drill.userSelf(users.at(username, u => u.$light()));
     let secret = "";
     if (emailChanged) {
       secret = drill.createEmailConfirmation(newUserInfo.email);

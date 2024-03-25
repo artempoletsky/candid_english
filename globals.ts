@@ -158,10 +158,10 @@ export type AuthData = {
   image?: string | null;
 }
 export type Session = {
-  id: string
-  activeEnglishTest?: TestSession
-  user?: UserSelf,
-  authUser?: AuthData,
+  id: string;
+  activeEnglishTest?: TestSession;
+  user?: UserSelf;
+  authUser?: AuthData;
 }
 
 

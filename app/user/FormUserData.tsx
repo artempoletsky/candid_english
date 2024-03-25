@@ -3,12 +3,14 @@ import { USER_ACTIONS_API, UserSelf } from "~/globals";
 import { FUpdateUserInfo } from "../api/user/methods";
 import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
-import { useForm } from "@mantine/form";
+import { useForm, zodResolver } from "@mantine/form";
 import TextInput from "../registration/Textnput";
 import { Button, Checkbox, Tooltip } from "@mantine/core";
 import { useContext, useState } from "react";
 import { UserContext, UserStore } from "../components/context";
 import { blinkBoolean } from "~/lib/utils_client";
+import z from "zod";
+import { zEmail, zPassword } from "../api/user/schemas";
 
 const updateUserInfo = getAPIMethod<FUpdateUserInfo>(USER_ACTIONS_API, "updateUserInfo");
 
@@ -18,22 +20,46 @@ type Props = {
   user: UserSelf;
 }
 
-type FormType = {
-  username: string;
-  fullName: string;
-  email: string;
-  image: string;
-  changePassword: boolean;
-  password: string;
-  newPassword: string;
-  confirmNewPassword: string;
-}
+const ZForm = z.object({
+  fullName: z.string(),
+  email: zEmail,
+  image: z.string(),
+  changePassword: z.boolean(),
+  password: z.string(),
+  newPassword: z.string(),
+  confirmNewPassword: z.string(),
+}).superRefine(({ changePassword, newPassword, confirmNewPassword, password }, ctx) => {
+  if (changePassword) {
+    let res = zPassword.safeParse(newPassword, { path: ["newPassword"] });
+    if (!res.success) {
+      ctx.addIssue(res.error.issues[0]);
+      return;
+    }
+
+    if (newPassword != confirmNewPassword) {
+      ctx.addIssue({
+        path: ["newPassword"],
+        code: "custom",
+        fatal: true,
+        message: "Passwords don't match",
+      });
+      ctx.addIssue({
+        path: ["confirmNewPassword"],
+        code: "custom",
+        fatal: true,
+        message: "Passwords don't match",
+      });
+    }
+  }
+});
+type FormType = z.infer<typeof ZForm>;
+
 export default function FormUserData({ user }: Props) {
 
 
   const form = useForm<FormType>({
     initialValues: {
-      username: user.username,
+      // username: user.username,
       fullName: user.fullName,
       email: user.email,
       image: user.image,
@@ -41,15 +67,16 @@ export default function FormUserData({ user }: Props) {
       password: "",
       newPassword: "",
       confirmNewPassword: "",
-    }
-  })
+    },
+    validate: zodResolver(ZForm),
+  });
+
   const [tooltipSaved, setTooltipSaved] = useState(false);
   const [setErrorResponse, mainErrorMessage, errorResponse] = useErrorResponse(form);
   const passwordRequired = form.isDirty("username") || form.isDirty("email") || form.values["changePassword"];
   const fc = fetchCatch(updateUserInfo)
     .before((values: FormType) => {
       const newInfo = {
-        username: values.username,
         email: values.email,
         password: values.changePassword ? values.newPassword : undefined,
         fullName: values.fullName,
@@ -65,7 +92,6 @@ export default function FormUserData({ user }: Props) {
       UserStore.setUser(updatedUser);
       blinkBoolean(setTooltipSaved);
       form.setInitialValues({
-        username: updatedUser.username,
         fullName: updatedUser.fullName,
         email: updatedUser.email,
         image: updatedUser.image,
@@ -84,7 +110,7 @@ export default function FormUserData({ user }: Props) {
     <form action="" onSubmit={form.onSubmit(onSubmit)}>
       <TextInput {...form.getInputProps("fullName")} label="Full name" />
       <TextInput {...form.getInputProps("email")} label="E-mail" />
-      <TextInput {...form.getInputProps("username")} label="Username" />
+      {/* <TextInput {...form.getInputProps("username")} label="Username" /> */}
       <input type="hidden" value={form.values["image"]} />
       <div className="overflow-hidden transition duration-300 transition-all" style={{
         height: passwordRequired ? 62 : 0

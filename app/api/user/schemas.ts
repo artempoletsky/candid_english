@@ -1,8 +1,8 @@
 import z from "zod";
 
-const zUsername = z.string().min(5, "At least 5 symbols");
-const zPassword = z.string().min(5, "At least 5 symbols");
-const zEmail = z.string().email();
+export const zUsername = z.string().min(5, "At least 5 symbols");
+export const zPassword = z.string().min(5, "At least 5 symbols");
+export const zEmail = z.string().email();
 
 export const register = z.object({
   email: zEmail,
@@ -40,7 +40,6 @@ export type AConfirmEmail = z.infer<typeof confirmEmail>;
 export const updateUserInfo = z.object({
   password: zPassword.optional(),
   newInfo: z.object({
-    username: zUsername,
     email: zEmail,
     fullName: z.string(),
     image: z.string(),

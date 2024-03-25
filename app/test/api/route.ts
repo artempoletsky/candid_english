@@ -23,20 +23,22 @@ export type AnswerRecord = {
 }
 
 export type TestSession = {
-  penaltyQuestions: number
-  correctAnswersCount: number
-  currentLevel: LanguageLevel
-  active: boolean
-  otherRatings: Record<string, string>
-  currentQuestion: TestQuestion | undefined
-  answers: AnswerRecord[]
+  completed: boolean;
+  penaltyQuestions: number;
+  correctAnswersCount: number;
+  currentLevel: LanguageLevel;
+  active: boolean;
+  otherRatings: Record<string, string>;
+  currentQuestion: TestQuestion | undefined;
+  answers: AnswerRecord[];
 }
 
 export type TestSessionLight = Omit<TestSession, "answers" | "currentQuestion"> & {
   currentQuestion: QuestionLight
 }
 
-export const InitialTestSession: TestSession = {
+const InitialTestSession: TestSession = {
+  completed: false,
   penaltyQuestions: 0,
   currentLevel: "c2",
   correctAnswersCount: 0,
@@ -58,7 +60,7 @@ async function getQuestionForLevel(level: LanguageLevel, exclude: string[] = [])
     ids = ids.filter(id => !payload.exclude.includes(id));
     if (!ids.length) throw new Error("Ids are empty");
 
-    let id = _.sample(ids) as string;
+    let id = _.sample(ids)!;
     return test_questions.at(id);
   }, {
     difficulty: level,
@@ -74,7 +76,8 @@ async function getQuestionForLevel(level: LanguageLevel, exclude: string[] = [])
   // };
 }
 
-function lightenSession(session: TestSession): TestSessionLight {
+function lightenSession(session: TestSession): TestSessionLight | TestSession {
+  if (session.completed) return session;
   const q: Partial<TestQuestion> | undefined = session.currentQuestion ? { ...session.currentQuestion } : undefined;
   if (q) {
     delete q.correctAnswers;
@@ -148,7 +151,7 @@ export type AGiveAnswer = z.infer<typeof ZGiveAnswer>;
 
 const ANSWERS_TO_COMPLETE = 5;
 
-export async function giveAnswer({ dontKnow, answers }: AGiveAnswer) {
+async function giveAnswer({ dontKnow, answers }: AGiveAnswer) {
   const session = await getSession();
   const testSession: TestSession | undefined = session.activeEnglishTest
   if (!testSession || !testSession.currentQuestion) throw new ResponseError("Test session is invalid");
@@ -167,6 +170,7 @@ export async function giveAnswer({ dontKnow, answers }: AGiveAnswer) {
     //pass the exam
     if (testSession.correctAnswersCount >= ANSWERS_TO_COMPLETE) {
       testSession.currentQuestion = undefined;
+      testSession.completed = true;
     }
   }
   if (dontKnow || !aRec.isCorrect) {
@@ -174,6 +178,7 @@ export async function giveAnswer({ dontKnow, answers }: AGiveAnswer) {
     //fail the exam
     if (testSession.currentLevel == "a0") {
       testSession.currentQuestion = undefined;
+      testSession.completed = true;
     }
   }
 
@@ -209,13 +214,15 @@ async function createSession() {
     SESSION.activeEnglishTest = InitialTestSession;
   }
 
-  return lightenSession(SESSION.activeEnglishTest);
+  return {
+    session: lightenSession(SESSION.activeEnglishTest),
+  }
 }
 
 export type FCreateSession = typeof createSession;
 
 
-export const POST = NextPOST(NextResponse, {
+export const POST = NextPOST({
   createSession: ZEmpty,
   beginTest: ZBeginTest,
   giveAnswer: ZGiveAnswer,

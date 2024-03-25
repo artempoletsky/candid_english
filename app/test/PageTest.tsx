@@ -13,24 +13,15 @@ import { Loader } from "@mantine/core";
 
 export type SessionUpdateCb = (session: TestSessionLight | TestSession) => any;
 const tryAgain: FTryAgain = getAPIMethod(API_ENGLISH_TEST, "tryAgain");
-const createSession: FCreateSession = getAPIMethod(API_ENGLISH_TEST, "createSession");
 
 
-export default function TestPageComponent() {
-  let [testSession, setTestSession] = useState<TestSession | TestSessionLight>();
+type Props = {
+  session: TestSessionLight | TestSession;
+}
+export default function PageTest({ session }: Props) {
+  let [testSession, setTestSession] = useState<TestSession | TestSessionLight>(session);
 
-  useEffect(() => {
-    createSession().then(setTestSession);
-  }, []);
-
-  if (!testSession) return <Loader type="dots" />;
-
-  return (
-    <>
-      {/* <div>Level: {testSession.currentLevel}; Correct answers count: {testSession.correctAnswersCount}</div> */}
-      {!testSession.active && <TestStart onStart={setTestSession} />}
-      {testSession.currentQuestion && <TestProgress onAnswer={setTestSession} testSession={testSession as TestSessionLight} />}
-      {testSession.active && !testSession.currentQuestion && <TestResult onTryAgain={() => tryAgain().then(setTestSession)} testSession={testSession as TestSession} />}
-    </>
-  );
+  if (!testSession.active) return <TestStart onStart={setTestSession} />;
+  if (!testSession.completed) return <TestProgress onAnswer={setTestSession} testSession={testSession as TestSessionLight} />;
+  return <TestResult onTryAgain={() => tryAgain().then(setTestSession)} testSession={testSession as TestSession} />
 }

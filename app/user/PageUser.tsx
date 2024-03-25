@@ -53,7 +53,7 @@ export default function TestComponent({ user: userInitial }: RGetMyPage) {
       <p className="mb-3">Hello {user.fullName || user.username}!</p>
       {user.isAdmin && <p className="text-rose-600 mb-3">You are admin</p>}
       {!user.emailConfirmed && <div>
-        <div className="text-red-600 mb-3">Please confirm you email {user.email}!</div>
+        <div className="text-red-600 mb-3">Please confirm your email {user.email}!</div>
         <div className="">
           {!newEmailSent ? <Button onClick={repeatEmail}>Send a new email</Button> : "Sent!"}
         </div>
