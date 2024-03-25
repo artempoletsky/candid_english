@@ -5,30 +5,29 @@ import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
 import { useContext, useEffect, useState } from "react";
 import { AuthData, Session, USER_ACTIONS_API, UserSelf } from "~/globals";
 import PageGuest from "./PageGuest";
-import { UserContext } from "../components/context";
+import { UserContext, UserStore } from "../components/context";
 import { FGetMyPage, FRepeatConfirmationEmail, RGetMyPage } from "../api/user/methods";
 import { Button, Tooltip } from "@mantine/core";
 import { blinkBoolean } from "~/lib/utils_client";
+import FormUserData from "./FormUserData";
 
 
 const getMyPage = getAPIMethod<FGetMyPage>(USER_ACTIONS_API, "getMyPage");
 const repeatConfirmationEmail = getAPIMethod<FRepeatConfirmationEmail>(USER_ACTIONS_API, "repeatConfirmationEmail");
 
 
-export default function TestComponent({ user: userInitial, authUser, isAdmin: isAdminInitial }: RGetMyPage) {
+export default function TestComponent({ user: userInitial }: RGetMyPage) {
 
 
   const [setErrorResponse, mainErrorMessage, errorResponse] = useErrorResponse();
   // console.log(userContext);
 
-  const { user, setUser } = useContext(UserContext);
-  const [isAdmin, setIsAdmin] = useState(isAdminInitial);
+  const user = useContext(UserContext);
+
   const [newEmailSent, setNewEmailSent] = useState(false);
 
   useEffect(() => {
-    setUser(userInitial);
-    localStorage.removeItem("user");
-    if (user) localStorage.setItem("user", JSON.stringify(user));
+    UserStore.setUser(userInitial);
   }, []);
 
   const fc = fetchCatch({
@@ -36,9 +35,8 @@ export default function TestComponent({ user: userInitial, authUser, isAdmin: is
   });
 
   const onSignIn = fc.method(getMyPage)
-    .then(({ user, isAdmin }) => {
-      setUser(user);
-      setIsAdmin(isAdmin);
+    .then(({ user }) => {
+      UserStore.setUser(user);
     }).action();
 
 
@@ -47,20 +45,20 @@ export default function TestComponent({ user: userInitial, authUser, isAdmin: is
 
   const repeatEmail = fc.method(repeatConfirmationEmail)
     .then(() => {
-      // blinkBoolean(setNewEmailSent);
       setNewEmailSent(true);
     }).action();
 
   return (
     <div className="">
-      <p className="">Hello {user.fullName || user.username}!</p>
-      {isAdmin && <p className="">You are admin</p>}
+      <p className="mb-3">Hello {user.fullName || user.username}!</p>
+      {user.isAdmin && <p className="text-rose-600 mb-3">You are admin</p>}
       {!user.emailConfirmed && <div>
         <div className="text-red-600 mb-3">Please confirm you email {user.email}!</div>
         <div className="">
           {!newEmailSent ? <Button onClick={repeatEmail}>Send a new email</Button> : "Sent!"}
         </div>
       </div>}
+      <FormUserData user={user} />
       <div className="text-red-600 min-h-[24px]">{mainErrorMessage}</div>
     </div >
   );

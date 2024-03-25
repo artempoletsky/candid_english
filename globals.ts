@@ -10,7 +10,7 @@ export type UserLight = Omit<UserFull, "knownWords">;
 
 export type UserSelf = Omit<UserLight, "password"> & UserRights;
 
-export type User = Omit<UserLight, "knownWordsVersion" | "emailConfirmed">;
+export type User = Omit<UserLight, "password" | "knownWordsVersion" | "emailConfirmed">;
 
 export type UsersMeta = {};
 

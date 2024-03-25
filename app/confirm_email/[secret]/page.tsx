@@ -3,13 +3,12 @@
 import { Metadata } from "next";
 
 import PageLayout from "@/PageLayout";
-import ComponentLoader from "@/ComponentLoader";
 
 import Link from "next/link";
 import { confirmEmail } from "~/app/api/user/methods";
 
 export const metadata: Metadata = {
-  title: "Confirm yer email",
+  title: "Confirm your email",
 };
 
 type Props = {

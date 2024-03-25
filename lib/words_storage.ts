@@ -1,6 +1,6 @@
 'use client';
 
-import { debounce } from "lodash";
+import debounce from "lodash.debounce";
 
 let myWords: Record<string, boolean>;
 

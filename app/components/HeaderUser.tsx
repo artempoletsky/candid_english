@@ -1,11 +1,13 @@
 "use client";
 
 import { useContext, useEffect, useState } from "react";
-import { UserContext } from "./context";
-import { UserSelf } from "~/globals";
+import { UserContext, UserStore } from "./context";
+import { USER_ACTIONS_API, UserSelf } from "~/globals";
 import Link from "next/link";
 import { Button } from "@mantine/core";
 import { signOut } from "next-auth/react";
+import { getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { FGetMyPage } from "../api/user/methods";
 
 function renderUser(user: UserSelf) {
   const image = user.image;
@@ -13,7 +15,7 @@ function renderUser(user: UserSelf) {
     signOut({
       callbackUrl: "/",
     }).then(() => {
-      localStorage.removeItem("user");
+      UserStore.setUser(null);
     });
   }
   return <div className="flex items-center gap-3">
@@ -24,22 +26,20 @@ function renderUser(user: UserSelf) {
   </div>
 }
 
-export default function HeaderUser() {
-  const { user, setUser } = useContext(UserContext);
-  useEffect(() => {
-    if (!user) {
-      const lsUser = window.localStorage.getItem("user");
-      if (lsUser) {
-        setUser(JSON.parse(lsUser));
-      }
-    } else {
-      const lsUser = window.localStorage.getItem("user");
-      if (!lsUser) {
-        window.localStorage.setItem("user", JSON.stringify(user));
-      }
-    }
-  }, [])
+const getMyPage = getAPIMethod<FGetMyPage>(USER_ACTIONS_API, "getMyPage");
 
+export default function HeaderUser() {
+  const user = useContext(UserContext);
+  const [loading, setLoading] = useState(user ? false : true);
+  useEffect(() => {
+    UserStore.setUser(UserStore.getUser());
+    setLoading(false);
+    // getMyPage().then(({ user }) => {
+    //   UserStore.setUser(user);
+    //   setLoading(false);
+    // });
+  }, []);
+  if (loading) return "";
   return <div className="absolute right-3 top-0 px-3 py-3">
     {user
       ? renderUser(user)
