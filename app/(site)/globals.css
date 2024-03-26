@@ -1,0 +1,115 @@
+/* @import "./daisy.custom.css" layer(utilities); */
+@layer tailwind {
+  @tailwind base;
+}
+
+/* @tailwind base; */
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --main-hue: 236;
+  --counter-hue: 120;
+  --dark: hsl(var(--main-hue), 0%, 10%);
+  --light: hsl(var(--main-hue), 0%, 34%);
+
+  --dark-vivid: hsl(var(--main-hue), 88%, 20%);
+  --light-vivid: hsl(var(--main-hue), 80%, 67%);
+
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end: #f4f4f5;
+  --animation-btn: 0s;
+
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: var(--dark);
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(to top,
+      transparent,
+      var(--background-end)) #ddd8cc no-repeat;
+}
+
+html {
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.txt-vol {
+  text-shadow: 1px 1px 0px rgba(255, 255, 255, 1),
+    -1px -1px 1px rgba(0, 0, 0, 0.25);
+}
+
+
+
+.icon:not(svg) {
+  display: inline-block;
+  width: 35px;
+  height: 35px;
+  vertical-align: middle;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.icon.reverso {
+  background-image: url("/icons/reverso.png");
+}
+
+.icon.oxford {
+  background-image: url("/icons/oxford.png");
+}
+
+.icon.urban {
+  background-image: url("/icons/urban_dictionary.png");
+}
+
+.icon.google {
+  background-image: url("/icons/google.png");
+}
+
+.icon.thumbs_up {
+  background-image: url("/icons/thumbs.png");
+  background-size: 35px auto;
+}
+
+.icon.thumbs_down {
+  background-image: url("/icons/thumbs.png");
+  background-size: 35px auto;
+  background-position: -18px 0;
+}
+
+.icon.small {
+  width: 18px;
+  height: 18px;
+}
+
+a {
+  /*color: rgb(28, 17, 131);*/
+  /* color: var(--dark-vivid); */
+  @apply text-blue-900;
+  text-decoration: underline;
+}
+
+
+
+@layer base {}
+
+.pseudo {
+  border-bottom: 1px dashed;
+  @apply text-blue-900 border-blue-900;
+  font-style: normal;
+  cursor: pointer;
+  line-height: 1.1em;
+  text-decoration: none;
+}

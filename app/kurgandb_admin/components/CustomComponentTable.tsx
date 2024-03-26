@@ -3,8 +3,8 @@ import { TableComponentProps } from "../../kurgandb/globals";
 import { Button } from "@mantine/core"
 import LemmatizerPropositions from "./LemmatizerPropositions";
 import TableMeta from "./TableMeta";
-import ComponentLoader from "~/app/kurgandb/comp/ComponentLoader";
 import { FGetUnreviewedLemmatizerPropositions } from "../api";
+import ComponentLoader from "../../kurgandb/comp/ComponentLoader";
 
 
 

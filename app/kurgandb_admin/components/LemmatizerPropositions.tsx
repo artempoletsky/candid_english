@@ -1,14 +1,14 @@
 import { getAPIMethod, JSONErrorResponse } from "@artempoletsky/easyrpc/client";
 import { useErrorResponse, fetchCatch, useVars } from "@artempoletsky/easyrpc/react";
-import { API_ENDPOINT } from "~/app/kurgandb/generated";
-import { TableComponentProps } from "~/app/kurgandb/globals";
+import { API_ENDPOINT } from "kdb/generated";
+import { TableComponentProps } from "kdb/globals";
 import type { FGetUnreviewedLemmatizerPropositions, FResolvePropostion, FUnreviewAll } from "../api";
 import { ComponentType, ElementType, ReactNode, useEffect, useState } from "react";
-import type { LemmatizerProposition } from "~/globals";
+import type { LemmatizerProposition } from "app/globals";
 import { Button, ButtonProps, TextInputProps } from "@mantine/core";
-import TextInput from "~/app/kurgandb/comp/TextInput";
+import TextInput from "kdb/comp/TextInput";
 
-import DictLink from "~/app/components/dictlink";
+import DictLink from "components/dictlink";
 
 
 const getData = getAPIMethod<FGetUnreviewedLemmatizerPropositions>(API_ENDPOINT, "getUnreviewedLemmatizerPropositions");

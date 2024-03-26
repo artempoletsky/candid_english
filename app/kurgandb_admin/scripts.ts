@@ -2,7 +2,7 @@ import { FieldType, PlainObject } from "@artempoletsky/kurgandb/globals";
 import fs from "fs";
 import generateDB from "./codegen/db/generate_db";
 import generateCodeFile from "./codegen/generate";
-import { query } from "~/db";
+import { query } from "app/db";
 
 
 

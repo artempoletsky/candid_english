@@ -1,5 +1,5 @@
 import { CallbackScope } from "@artempoletsky/kurgandb";
-import { Tables } from "~/db";
+import { Tables } from "app/db";
 import {
   Comment,
   CommentFull,
@@ -7,7 +7,7 @@ import {
   UserLight,
   UserRights,
   UserSelf,
-} from "~/globals";
+} from "app/globals";
 
 export const drill = function name({ db, $, _, z }: CallbackScope) {
   const t: Tables = db.getTables() as Tables;
@@ -81,7 +81,7 @@ export const drill = function name({ db, $, _, z }: CallbackScope) {
     },
     commentByUser(commentRaw: CommentFull, author: User | undefined): Comment {
       return createComment(commentRaw, author ? this.userSelf(author as UserLight) : undefined);
-    }
+    },
   }
 }
 

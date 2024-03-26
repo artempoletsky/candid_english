@@ -1,9 +1,9 @@
 import { ResponseError } from "@artempoletsky/easyrpc";
 import z from "zod";
-import { query } from "~/db";
-import { LEMMATIZER_BLACKLIST, LEMMATIZER_OVERRIDES, LEMMATIZER_WHITELIST } from "~/lib/paths";
-import simplify from "~/lib/simplify_words";
-import { rfs, wfs } from "~/lib/util";
+import { query } from "app/db";
+import { LEMMATIZER_BLACKLIST, LEMMATIZER_OVERRIDES, LEMMATIZER_WHITELIST } from "lib/paths";
+import simplify from "lib/simplify_words";
+import { rfs, wfs } from "lib/util";
 
 
 const ZGetPage = z.object({

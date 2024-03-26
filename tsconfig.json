@@ -19,8 +19,13 @@
       }
     ],
     "paths": {
-      "~/*": ["./*"],
-      "@/*": ["./app/components/*"]
+      // "~/*": ["./*"],
+      // "@/*": ["./app/(drill)/components/*"],
+      "components/*": ["./app/(site)/components/*"],
+      "lib/*": ["./lib/*"],
+      "app/*": ["./app/(site)/*"],
+      "kdb/*": ["./app/kurgandb/*"],
+      "kdbUser/*": ["./app/kurgandb_admin/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
