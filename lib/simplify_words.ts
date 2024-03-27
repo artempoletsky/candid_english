@@ -2,9 +2,9 @@ import words from "an-array-of-english-words";
 // import fs from "fs";
 // import lemmatize from "~/lib/wink_lemmatizer";
 import { rfs, wfs } from "./util";
-import { LEMMATIZER_BLACKLIST, LEMMATIZER_WHITELIST, LEMMATIZER_ALL, LEMMATIZER_OVERRIDES } from "~/lib/paths";
+import { LEMMATIZER_BLACKLIST, LEMMATIZER_WHITELIST, LEMMATIZER_ALL, LEMMATIZER_OVERRIDES } from "lib/paths";
 
-import { lemmatizeWord, invalidateDict } from "~/lib/lemmatizer";
+import { lemmatizeWord, invalidateDict } from "lib/lemmatizer";
 
 
 function toDict(arr: string[]): Record<string, number> {

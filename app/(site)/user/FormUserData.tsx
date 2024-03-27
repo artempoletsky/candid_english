@@ -7,10 +7,10 @@ import { useForm, zodResolver } from "@mantine/form";
 import TextInput from "../registration/Textnput";
 import { Button, Checkbox, Tooltip } from "@mantine/core";
 import { useContext, useState } from "react";
-import { UserContext, UserStore } from "../components/context";
 import { blinkBoolean } from "lib/utils_client";
 import z from "zod";
 import { zEmail, zPassword } from "../api/user/schemas";
+import { Store } from "app/StoreProvider";
 
 const updateUserInfo = getAPIMethod<FUpdateUserInfo>(USER_ACTIONS_API, "updateUserInfo");
 
@@ -89,7 +89,7 @@ export default function FormUserData({ user }: Props) {
     })
     .catch(setErrorResponse)
     .then(updatedUser => {
-      UserStore.setUser(updatedUser);
+      Store.setUser(updatedUser);
       blinkBoolean(setTooltipSaved);
       form.setInitialValues({
         fullName: updatedUser.fullName,

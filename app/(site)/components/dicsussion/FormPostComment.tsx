@@ -8,7 +8,8 @@ import { APostComment, postComment as zPostComment } from "app/api/discussion/sc
 import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import type { FPostComment } from "app/api/discussion/methods";
 import { useContext } from "react";
-import { UserContext } from "../context";
+import { useStore } from "app/StoreProvider";
+
 
 const postComment = getAPIMethod<FPostComment>("/api/discussion", "postComment");
 
@@ -17,7 +18,7 @@ type Props = {
   onPost: (comment: Comment) => void;
 }
 export default function FormPostComment({ discussionId, onPost }: Props) {
-  const user = useContext(UserContext);
+  const { user } = useStore();
   const [setErrorResponse, mainErrorMessage] = useErrorResponse();
   const form = useForm<APostComment>({
     initialValues: {

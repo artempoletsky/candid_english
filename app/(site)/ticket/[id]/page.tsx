@@ -1,7 +1,6 @@
 
 import PageExamTicket from "./PageExamTicket";
 import { Metadata } from "next";
-import PageLayout from "components/PageLayout";
 import { getTicketDiscussion } from "app/api/discussion/methods";
 // import PageNotFound from "~/app/not-found";
 import { notFound } from 'next/navigation'
@@ -17,14 +16,14 @@ export const metadata: Metadata = {
 
 type Props = {
   params: {
-    id: number;
+    id: string;
   }
 };
 export default async function ({ params: { id } }: Props) {
   // console.log(typeof id);
-
+  let idNumber: number;
   try {
-    id = z.coerce.number().parse(id);
+    idNumber = z.coerce.number().parse(id);
   } catch (error) {
     return notFound();
   }
@@ -32,7 +31,7 @@ export default async function ({ params: { id } }: Props) {
   let discussion;
   try {
     discussion = await getTicketDiscussion({
-      discussionId: id,
+      discussionId: idNumber,
     });
   } catch (error: any) {
     if (error.statusCode == 404) {
@@ -46,8 +45,6 @@ export default async function ({ params: { id } }: Props) {
   // const session = await getSession();
   // const method = "ticket/api/?getPage" as unknown as FGetPage;
   return (
-    <PageLayout>
-      <PageExamTicket {...discussion} />
-    </PageLayout>
+    <PageExamTicket {...discussion} />
   );
 }

@@ -5,10 +5,10 @@ import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
 import { useContext, useEffect, useState } from "react";
 import { AuthData, Session, USER_ACTIONS_API, UserSelf } from "app/globals";
 import PageGuest from "./PageGuest";
-import { UserContext, UserStore } from "../components/context";
 import { FGetMyPage, FRepeatConfirmationEmail, RGetMyPage } from "../api/user/methods";
 import { Button, Tooltip } from "@mantine/core";
 import FormUserData from "./FormUserData";
+import { Store, useStore } from "app/StoreProvider";
 
 
 const getMyPage = getAPIMethod<FGetMyPage>(USER_ACTIONS_API, "getMyPage");
@@ -21,13 +21,14 @@ export default function TestComponent({ user: userInitial }: RGetMyPage) {
   const [setErrorResponse, mainErrorMessage, errorResponse] = useErrorResponse();
   // console.log(userContext);
 
-  const user = useContext(UserContext);
+  const { user } = useStore();
 
   const [newEmailSent, setNewEmailSent] = useState(false);
 
-  useEffect(() => {
-    UserStore.setUser(userInitial);
+  useEffect(()=>{
+    Store.setUser(userInitial);
   }, []);
+  
 
   const fc = fetchCatch({
     errorCatcher: setErrorResponse
@@ -35,7 +36,7 @@ export default function TestComponent({ user: userInitial }: RGetMyPage) {
 
   const onSignIn = fc.method(getMyPage)
     .then(({ user }) => {
-      UserStore.setUser(user);
+      Store.setUser(user);
     }).action();
 
 

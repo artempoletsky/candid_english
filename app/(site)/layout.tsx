@@ -5,7 +5,9 @@ import { Inter } from 'next/font/google'
 
 const inter = Inter({ subsets: ['latin'] })
 import { ColorSchemeScript, MantineProvider, createTheme } from '@mantine/core';
-import Layout from './components/PageLayout';
+import Header from 'components/Header';
+import Footer from 'components/Footer';
+import StoreProvider from './StoreProvider';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -22,9 +24,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={inter.className}>
         <MantineProvider>
-          <Layout>
-            {children}
-          </Layout>
+          <StoreProvider>
+            <Header />
+            <div className="grow">
+              <div className="px-9 mx-auto max-w-[950px]">{children}</div>
+            </div>
+            <Footer />
+          </StoreProvider>
         </MantineProvider>
       </body>
     </html>

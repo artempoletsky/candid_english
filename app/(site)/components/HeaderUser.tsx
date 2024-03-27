@@ -1,13 +1,13 @@
 "use client";
 
 import { useContext, useEffect, useState } from "react";
-import { UserContext, UserStore } from "./context";
 import { USER_ACTIONS_API, UserSelf } from "app/globals";
 import Link from "next/link";
 import { Button } from "@mantine/core";
 import { signOut } from "next-auth/react";
 import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { FGetMyPage } from "../api/user/methods";
+import { Store, useStore } from "app/StoreProvider";
 
 function renderUser(user: UserSelf) {
   const image = user.image;
@@ -15,7 +15,7 @@ function renderUser(user: UserSelf) {
     signOut({
       callbackUrl: "/",
     }).then(() => {
-      UserStore.setUser(null);
+      Store.setUser(null);
     });
   }
   return <div className="flex items-center gap-3">
@@ -26,20 +26,11 @@ function renderUser(user: UserSelf) {
   </div>
 }
 
-const getMyPage = getAPIMethod<FGetMyPage>(USER_ACTIONS_API, "getMyPage");
+
 
 export default function HeaderUser() {
-  const user = useContext(UserContext);
-  const [loading, setLoading] = useState(user ? false : true);
-  useEffect(() => {
-    UserStore.setUser(UserStore.getUser());
-    setLoading(false);
-    // getMyPage().then(({ user }) => {
-    //   UserStore.setUser(user);
-    //   setLoading(false);
-    // });
-  }, []);
-  if (loading) return "";
+  const { user } = useStore();
+
   return <div className="absolute right-3 top-0 px-3 py-3">
     {user
       ? renderUser(user)
