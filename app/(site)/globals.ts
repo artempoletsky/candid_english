@@ -156,7 +156,6 @@ export type Session = {
   user?: UserSelf;
   authUser?: AuthData;
   englishLevel: LanguageLevel | "";
-  isTakenLevelSurvey : boolean;
 }
 
 

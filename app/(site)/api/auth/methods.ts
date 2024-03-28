@@ -133,7 +133,7 @@ export async function createOrGetUser(auth: AuthData) {
   const email = auth.email;
   if (!email) throw new Error("Email must be valid");
   const session = await getSession();
-  const user = await query(({ users }, { email, englishLevel }, { drill }) => {
+  const user = await query(({ users }, { email, englishLevel, auth }, { drill }) => {
 
     let user: UserLight | undefined = users.where("email", email).select(rec => rec.$light())[0];
 
@@ -157,7 +157,7 @@ export async function createOrGetUser(auth: AuthData) {
     }
 
     return drill.userSelf(user);
-  }, { email, englishLevel: session.englishLevel });
+  }, { email, englishLevel: session.englishLevel, auth });
   session.user = user;
   session.englishLevel = user.englishLevel;
   session.authUser = auth;

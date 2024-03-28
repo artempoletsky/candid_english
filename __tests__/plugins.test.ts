@@ -1,5 +1,5 @@
 // import {  } from "@artempoletsky/kurgandb/build/src/db.js";
-import { drill, Plugins } from "~/app/kurgandb_admin/plugins";
+import { Plugins, drill } from "kdbUser/plugins";
 import zod from "zod";
 
 const dbMock = {
