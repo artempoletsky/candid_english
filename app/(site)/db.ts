@@ -72,7 +72,15 @@ export type Tables = {
     types.CompletedExam,
     number,
     {},
-    types.CompletedExamInsert
+    types.CompletedExamInsert,
+    types.CompletedExamLight
+  >;
+  surveys: Table<
+    types.Survey
+    , number
+    , {}
+    , types.SurveyInsert
+    , types.SurveyLight
   >;
 };
 

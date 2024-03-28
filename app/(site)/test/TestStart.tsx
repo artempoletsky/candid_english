@@ -10,22 +10,23 @@ import Survey from "./Survey";
 
 type Props = {
   onStart: SessionUpdateCb;
-  survey: boolean;
+  takeSurvey: boolean;
 }
 
 const beginTest: FBeginTest = getAPIMethod(API_ENGLISH_TEST, "beginTest");
 
 
-export default function TestStart({ onStart, survey }: Props) {
+export default function TestStart({ onStart, takeSurvey }: Props) {
   function submitForm(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = formDataToDict(new FormData(e.target as HTMLFormElement));
-    beginTest(formData as ABeginTest).then(onStart);
+    beginTest({
+      survey: !takeSurvey ? undefined : (formData as any),
+    }).then(onStart);
   }
   return (
     <form onSubmit={submitForm} method="POST" encType="multipart/form-data">
-      <p className="mt-5">How do you rate your level of English?</p>
-      {survey && <Survey />}
+      {takeSurvey && <Survey />}
       <div className="mt-5 flex justify-center"><Button name="submit" type="submit" className="btn">Begin test</Button></div>
     </form>
   );

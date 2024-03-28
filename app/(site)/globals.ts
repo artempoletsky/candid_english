@@ -1,6 +1,6 @@
 import z from "zod";
 import { TestSession } from "app/test/api/route";
-import { UserFull, EmailConfirmation, TestQuestion, CommentFull, CompletedExam } from "../kurgandb_admin/validation";
+import { UserFull, EmailConfirmation, TestQuestion, CommentFull, CompletedExam, Survey } from "../kurgandb_admin/validation";
 import { LanguageLevel } from "../../lib/language_levels";
 
 export const USER_ACTIONS_API = "/api/user";
@@ -161,6 +161,13 @@ export type Session = {
 
 
 export type { EmailConfirmation as EmailConfirmation };
-export type { CompletedExam as CompletedExam };
 
+
+export type { CompletedExam as CompletedExam };
 export type CompletedExamInsert = Omit<CompletedExam, "id">;
+export type CompletedExamLight = Omit<CompletedExam, "answers">
+
+
+export type { Survey as Survey };
+export type SurveyInsert = Omit<Survey, "id">;
+export type SurveyLight = Omit<Survey, "data">;

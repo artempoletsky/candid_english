@@ -13,6 +13,7 @@ function injectOptions(injeced: Record<string, string>): Record<string, string> 
 
 export default function Survey() {
   return <div>
+    <p className="mt-5">How do you rate your level of English?</p>
     <Select className="select" name="ownRating" dict={injectOptions({
       x: "I don't know"
     })} />

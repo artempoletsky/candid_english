@@ -61,12 +61,6 @@ export type CommentFull = zod.infer<ReturnType<typeof comments>>;
 
 export const completed_exams = (table: Table, { z }: { z: typeof zod }) => {
   const zLevel = z.enum(["a0", "a1", "a2", "b1", "b2", "c1", "c2"]);
-  const zLevelEmpty = z.enum(["x", "a0", "a1", "a2", "b1", "b2", "c1", "c2"]);
-  const ZSurvey = z.object({
-    ownRating: zLevelEmpty,
-    online: zLevelEmpty,
-    certificate: zLevelEmpty,
-  });
   return z.object({
     id: z.number(),
     resultLevel: zLevel,
@@ -74,7 +68,7 @@ export const completed_exams = (table: Table, { z }: { z: typeof zod }) => {
       questionId: z.string(),
       userAnswers: z.array(z.string()),
     })),
-    survey: z.number(),
+    surveyId: z.number(),
     sessid: z.string(),
     username: z.string(),
   });

@@ -150,6 +150,8 @@ export type ABeginTest = z.infer<typeof ZBeginTest>;
 async function beginTest({ survey }: ABeginTest) {
   const SESSION = await getSession();
 
+  console.log(survey);
+  
 
   let activeEnglishTest = SESSION.activeEnglishTest;
   if (!activeEnglishTest) throw new ResponseError("Test session is invalid");
@@ -221,27 +223,34 @@ async function giveAnswer({ dontKnow, answers }: AGiveAnswer) {
       user.englishLevel = testSession.currentLevel;
     }
     const sessid = session.id;
-    await query(({ users, completed_exams }, { username, sessid, resultLevel, otherRatings: survey, answers }) => {
+    await query(({ users, completed_exams, surveys }, { username, sessid, resultLevel, survey, answers }) => {
       if (username) {
         users.where("username", username).limit(1).update(u => {
           u.englishLevel = resultLevel;
         });
       }
 
+      let surveyId = 0;
+      if (survey) {
+        surveyId = surveys.insert({
+          data: survey,
+          type: "EnglishLevelTest",
+          username,
+        });
+      }
+
       completed_exams.insert({
         sessid,
-        testSession: {
-          answers,
-          survey,
-          resultLevel,
-        },
+        surveyId,
+        answers,
+        resultLevel,
         username,
-      })
+      });
     }, {
       username: user?.username || "",
       resultLevel: testSession.currentLevel,
       sessid,
-      otherRatings: testSession.survey,
+      survey: testSession.survey,
       answers: testSession.answers.map(a => ({
         questionId: a.question.word,
         userAnswers: a.userAnswers,
@@ -269,17 +278,28 @@ async function tryAgain() {
 export type FTryAgain = typeof tryAgain;
 
 async function createSession() {
-  const SESSION = await getSession();
-  if (!SESSION.activeEnglishTest) {
-    SESSION.activeEnglishTest = InitialTestSession;
+  const session = await getSession();
+  if (!session.activeEnglishTest) {
+    session.activeEnglishTest = InitialTestSession;
   }
+  const takeSurvey: boolean = await query(({ surveys, completed_exams }, { username, sessid }) => {
+    if (username) {
+      return surveys.where("username", username).limit(1).select().length == 0;
+    }
+    return completed_exams.where("sessid", sessid).limit(1).select().length == 0;
+  }, {
+    username: session.user?.username || "",
+    sessid: session.id,
+  })
 
   return {
-    session: lightenSession(SESSION.activeEnglishTest),
+    session: lightenSession(session.activeEnglishTest),
+    takeSurvey,
   }
 }
 
 export type FCreateSession = typeof createSession;
+export type RCreateSession = Awaited<ReturnType<FCreateSession>>;
 
 
 export const POST = NextPOST({
