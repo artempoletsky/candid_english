@@ -55,6 +55,7 @@ export function createNewSession(req: NextRequest): string {
   const sessData: Session = {
     id: sessid,
     englishLevel: "",
+    isTakenLevelSurvey: false,
   };
 
   wfs(getSessionFileName(sessid), {

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Comment } from "app/globals";
+import { Commentary } from "app/globals";
 import LanguageLevel from "../LanguageLevel";
 
 function author(author: string, guest: boolean) {
@@ -7,7 +7,7 @@ function author(author: string, guest: boolean) {
   if (!guest) return author;
   return <Link href={`user/${author}`}>{author}</Link>;
 }
-export default function CompComment(comment: Comment) {
+export default function CompComment(comment: Commentary) {
   const date = new Date(comment.date);
   const guest = !!comment.flags[0];
   const admin = !!comment.flags[1];

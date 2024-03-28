@@ -9,7 +9,7 @@ export const postComment = z.object({
 });
 export type APostComment = z.infer<typeof postComment>;
 
-const getDiscussion = z.object({
+export const getDiscussion = z.object({
   discussionId: z.number(),
 });
 export type AGetDiscussion = z.infer<typeof getDiscussion>;

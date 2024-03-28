@@ -2,51 +2,39 @@ import { cookies, headers } from "next/headers";
 import { getSession } from "app/session/session";
 import { methodFactory, query } from "app/db";
 import { AuthData, UserLight, UserRights, UserSelf } from "app/globals";
+import emulateUserFetch from "lib/emulateUserFetch";
 // import { getCsrfToken } from "next-auth/react";
 
-async function getCsrfToken() {
+async function getCsrfToken(): Promise<[any, string]> {
   const hdrs = new Headers(headers());
+  hdrs.set("content-type", "application/json");
   hdrs.delete("content-length");
-
-  const res = await fetch(hdrs.get("origin") + "/api/auth/csrf", {
+  const [response, newCookies] = await emulateUserFetch(hdrs.get("origin") + "/api/auth/csrf", hdrs.get("cookie") || "", {
     headers: hdrs,
-  }).then(res => res.json());
-  return res.csrfToken;
+    redirect: "manual",
+  });
+
+  return [await response.json(), newCookies];
 }
 
-function getAuthCSRF() {
-  const cookieVals = cookies().get("next-auth.csrf-token");
-  return decodeURI(cookieVals?.value || "").split('|')[0];
-}
-
-function sleep(time: number = 200) {
-  return (new Promise((resolve) => {
-    setTimeout(resolve, time);
-  }));
-}
-
-async function createFormData(payload: Record<string, string>) {
+async function createFormData(payload: Record<string, string>): Promise<[FormData, string]> {
   const data = new FormData();
-  const csrfToken = await getCsrfToken();
 
+  const [csrfToken, newCookies] = await getCsrfToken();
+  
   if (!csrfToken) throw new Error("no token");
 
-  data.set("csrfToken", csrfToken);
+  data.set("csrfToken", csrfToken.csrfToken);
   for (const key in payload) {
     data.set(key, payload[key]);
   }
-  return data;
+  return [data, newCookies];
 }
 
 async function doPost(url: string, payload: Record<string, string>) {
 
-  const hdrs = new Headers(headers());
 
-  hdrs.set("content-type", "application/x-www-form-urlencoded");
-  // hdrs.set("content-type", "application/json");
-  hdrs.delete("content-length");
-
-  const body = await createFormData({
+  const [body, newCookies] = await createFormData({
     ...payload,
   });
 
@@ -68,16 +56,23 @@ async function doPost(url: string, payload: Record<string, string>) {
   //   "body": "redirect=false&username=&password=&callbackUrl=%2Fuser&csrfToken=47ecabcbd91fcec06aefac23d9e1c72ed5e314f16c49188ce275af405a183c62&json=true",
   //   "method": "POST"
   // });
+
   // console.log(hdrs.get("cookie"));
   const bodyStr = new URLSearchParams(body as any).toString();
-  // console.log();
 
-  return fetch(hdrs.get("origin") + url, {
+  const hdrs = new Headers(headers());
+
+  hdrs.set("content-type", "application/x-www-form-urlencoded");
+  hdrs.delete("content-length");
+  hdrs.set("cookie", newCookies);
+
+  const [result] = await emulateUserFetch(hdrs.get("origin") + url, newCookies, {
     headers: hdrs,
     method: "POST",
     body: bodyStr,
     redirect: "manual",
   });
+  return result;
 }
 
 
@@ -116,7 +111,15 @@ export async function login({ password, username }: ALogin) {
     password,
   });
 
-  return result.status == 200;
+  if (result.status == 200) {
+    try {
+      const resJSON = await result.json();
+      if (resJSON.url) return true;
+    } catch (error) {
+      return false;
+    }
+  }
+  return false;
 }
 export type FLogin = typeof login;
 

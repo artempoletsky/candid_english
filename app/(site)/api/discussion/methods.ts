@@ -2,13 +2,13 @@ import { ResponseError } from "@artempoletsky/easyrpc";
 import type { AGetDiscussion, APostComment } from "./schemas";
 import { methodFactory, query } from "app/db";
 import { getSession } from "app/session/session";
-import { User, UserLight, Comment } from "app/globals";
+import { User, UserLight, Commentary } from "app/globals";
 
 
-export async function postComment(payload: APostComment): Promise<Comment> {
+export async function postComment(payload: APostComment): Promise<Commentary> {
   const session = await getSession();
   console.log(session);
-  
+
   return await query(({ comments, users }, { user, sessid, guestName, text, discussionId, englishLevel }, { $, drill }) => {
     const { commentingMode } = comments.meta;
     if (commentingMode == "none") throw new ResponseError("Commenting is temporary turned off");
@@ -60,3 +60,9 @@ export const getTicketDiscussion = methodFactory((({ test_questions }, { discuss
 
 export type FGetTicketDiscussion = typeof getTicketDiscussion;
 export type RGetTicketDiscussion = Awaited<ReturnType<FGetTicketDiscussion>>;
+
+
+export const getDiscussion = methodFactory((({ }, { discussionId }: AGetDiscussion, { $, drill }) => {
+  return drill.getComments(discussionId);
+}));
+export type FGetDiscussion = typeof getDiscussion;

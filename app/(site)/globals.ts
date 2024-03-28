@@ -1,6 +1,6 @@
 import z from "zod";
 import { TestSession } from "app/test/api/route";
-import { UserFull, EmailConfirmation, TestQuestion, CommentFull } from "../kurgandb_admin/validation";
+import { UserFull, EmailConfirmation, TestQuestion, CommentFull, CompletedExam } from "../kurgandb_admin/validation";
 import { LanguageLevel } from "../../lib/language_levels";
 
 export const USER_ACTIONS_API = "/api/user";
@@ -107,7 +107,7 @@ export type { CommentFull as CommentFull };
 
 export type CommentInsert = Omit<CommentFull, "id">;
 
-export type Comment = {
+export type Commentary = {
   id: number;
   text: string;
   author: string;
@@ -156,7 +156,11 @@ export type Session = {
   user?: UserSelf;
   authUser?: AuthData;
   englishLevel: LanguageLevel | "";
+  isTakenLevelSurvey : boolean;
 }
 
 
 export type { EmailConfirmation as EmailConfirmation };
+export type { CompletedExam as CompletedExam };
+
+export type CompletedExamInsert = Omit<CompletedExam, "id">;

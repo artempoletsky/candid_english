@@ -1,6 +1,6 @@
 "use client";
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
-import { Comment } from "app/globals";
+import { Commentary } from "app/globals";
 import ErrorMessage from "../ErrorMessage";
 import { Button, TextInput, Textarea } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
@@ -15,7 +15,7 @@ const postComment = getAPIMethod<FPostComment>("/api/discussion", "postComment")
 
 type Props = {
   discussionId: number;
-  onPost: (comment: Comment) => void;
+  onPost: (comment: Commentary) => void;
 }
 export default function FormPostComment({ discussionId, onPost }: Props) {
   const { user } = useStore();

@@ -26,5 +26,5 @@ export default function LanguageLevel({ level, size }: Props) {
     case "c2": colorClass = "bg-red-500"; break;
   }
 
-  return <span className={`uppercase text-white rounded ml-[2px] mr-2 px-2 py-1 ${sizeClass} ${colorClass}`}>{level}</span>
+  return <span className={`inline-block uppercase text-white rounded ml-[2px] mr-2 px-2 py-1 ${sizeClass} ${colorClass}`}>{level}</span>
 }

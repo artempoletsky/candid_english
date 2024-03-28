@@ -14,7 +14,10 @@ import { TestQuestion } from "app/globals";
 import { getSession } from "app/session/session";
 
 
-export type QuestionLight = Omit<TestQuestion, "correctAnswers" | "word">
+export type ExamTicketLight = {
+  template: string;
+  options: string[][];
+}
 
 export type AnswerRecord = {
   question: TestQuestion
@@ -28,13 +31,21 @@ export type TestSession = {
   correctAnswersCount: number;
   currentLevel: LanguageLevel;
   active: boolean;
-  otherRatings: Record<string, string>;
+  survey?: SurveyLanguageLevel;
   currentQuestion: TestQuestion | undefined;
   answers: AnswerRecord[];
 }
 
-export type TestSessionLight = Omit<TestSession, "answers" | "currentQuestion"> & {
-  currentQuestion: QuestionLight
+export type TestSessionLight = Omit<TestSession,
+  | "currentQuestion"
+  | "penaltyQuestions"
+  | "correctAnswersCount"
+  | "currentLevel"
+  | "otherRatings"
+  | "currentQuestion"
+  | "answers"
+> & {
+  currentQuestion: ExamTicketLight | undefined;
 }
 
 const InitialTestSession: TestSession = {
@@ -44,7 +55,11 @@ const InitialTestSession: TestSession = {
   correctAnswersCount: 0,
   active: false,
   currentQuestion: undefined,
-  otherRatings: {},
+  survey: {
+    certificate: "x",
+    online: "x",
+    ownRating: "x",
+  },
   answers: [],
 };
 
@@ -78,16 +93,22 @@ async function getQuestionForLevel(level: LanguageLevel, exclude: string[] = [])
 
 function lightenSession(session: TestSession): TestSessionLight | TestSession {
   if (session.completed) return session;
-  const q: Partial<TestQuestion> | undefined = session.currentQuestion ? { ...session.currentQuestion } : undefined;
-  if (q) {
-    delete q.correctAnswers;
-    delete q.word;
+  const current = session.currentQuestion;
+  let currentQuestion: ExamTicketLight | undefined;
+  if (current) {
+    currentQuestion = {
+      options: current.options,
+      template: current.template,
+    }
   }
 
-  const result: any = { ...session };
-  delete result.answers;
-  result.currentQuestion = q;
-  return result as TestSessionLight;
+  const result: TestSessionLight = {
+    active: session.active,
+    completed: session.completed,
+    currentQuestion,
+  };
+
+  return result;
 }
 
 function makeAnswerRecord(answers: string[], question: TestQuestion): AnswerRecord {
@@ -113,21 +134,26 @@ const ZEmpty = z.object({});
 const zStringNotEmpty = z.string().min(1, "Required");
 
 const zLanguageLevelExclude = z.enum(["x", ...Levels]);
-const ZBeginTest = z.object({
-  own_rating: zLanguageLevelExclude,
+const ZSurvey = z.object({
+  ownRating: zLanguageLevelExclude,
   online: zLanguageLevelExclude,
   certificate: zLanguageLevelExclude,
 });
 
+export type SurveyLanguageLevel = z.infer<typeof ZSurvey>;
+const ZBeginTest = z.object({
+  survey: ZSurvey.optional(),
+});
+
 export type ABeginTest = z.infer<typeof ZBeginTest>;
 
-async function beginTest(dict: ABeginTest) {
+async function beginTest({ survey }: ABeginTest) {
   const SESSION = await getSession();
 
 
   let activeEnglishTest = SESSION.activeEnglishTest;
   if (!activeEnglishTest) throw new ResponseError("Test session is invalid");
-  activeEnglishTest.otherRatings = dict;
+  activeEnglishTest.survey = survey;
   activeEnglishTest.active = true;
 
   activeEnglishTest.currentQuestion = await getQuestionForLevel("c2");
@@ -193,12 +219,34 @@ async function giveAnswer({ dontKnow, answers }: AGiveAnswer) {
     const user = session.user;
     if (user) {
       user.englishLevel = testSession.currentLevel;
-      await query(({ users }, { englishLevel, username }) => {
-        users.where("username", username).limit(1).update(u => {
-          u.englishLevel = englishLevel;
-        })
-      }, user);
     }
+    const sessid = session.id;
+    await query(({ users, completed_exams }, { username, sessid, resultLevel, otherRatings: survey, answers }) => {
+      if (username) {
+        users.where("username", username).limit(1).update(u => {
+          u.englishLevel = resultLevel;
+        });
+      }
+
+      completed_exams.insert({
+        sessid,
+        testSession: {
+          answers,
+          survey,
+          resultLevel,
+        },
+        username,
+      })
+    }, {
+      username: user?.username || "",
+      resultLevel: testSession.currentLevel,
+      sessid,
+      otherRatings: testSession.survey,
+      answers: testSession.answers.map(a => ({
+        questionId: a.question.word,
+        userAnswers: a.userAnswers,
+      }))
+    });
   }
 
   if (testSession.currentQuestion) {

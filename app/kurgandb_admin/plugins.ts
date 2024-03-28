@@ -1,7 +1,7 @@
 import { CallbackScope } from "@artempoletsky/kurgandb";
 import { Tables } from "app/db";
 import {
-  Comment,
+  Commentary,
   CommentFull,
   User,
   UserLight,
@@ -14,7 +14,7 @@ export const drill = function name({ db, $, _, z }: CallbackScope) {
   const DefaultRights = t.user_rights.getRecordDraft() as Omit<UserRights, "username">;
   delete (DefaultRights as any)["username"];
 
-  function createComment(c: CommentFull, author?: UserSelf): Comment {
+  function createComment(c: CommentFull, author?: UserSelf): Commentary {
     const flags: (1 | 0)[] = [
       author ? 1 : 0,
       author && author.isAdmin ? 1 : 0,
@@ -61,9 +61,9 @@ export const drill = function name({ db, $, _, z }: CallbackScope) {
       });
       return secret;
     },
-    getComments(discussionId: number): Comment[] {
+    getComments(discussionId: number): Commentary[] {
       const commentsRaw = t.comments.where("discussionId", discussionId).limit(0).select();
-      const result: Comment[] = [];
+      const result: Commentary[] = [];
       const userIds = new Set<string>();
       for (const c of commentsRaw) {
         userIds.add(c.author);
@@ -79,7 +79,7 @@ export const drill = function name({ db, $, _, z }: CallbackScope) {
       }
       return result;
     },
-    commentByUser(commentRaw: CommentFull, author: User | undefined): Comment {
+    commentByUser(commentRaw: CommentFull, author: User | undefined): Commentary {
       return createComment(commentRaw, author ? this.userSelf(author as UserLight) : undefined);
     },
   }

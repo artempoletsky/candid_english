@@ -68,6 +68,12 @@ export type Tables = {
     types.EmailConfirmation,
     string
   >;
+  completed_exams: Table<
+    types.CompletedExam,
+    number,
+    {},
+    types.CompletedExamInsert
+  >;
 };
 
 

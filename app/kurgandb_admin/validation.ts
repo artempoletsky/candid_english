@@ -36,6 +36,7 @@ export const test_questions = (table: Table, { z }: { z: typeof zod }) => {
     template: z.string(),
     word: z.string(),
     discussionId: z.number(),
+    explanation: z.string(),
   });
 }
 
@@ -56,3 +57,39 @@ export const comments = (table: Table, { z }: { z: typeof zod }) => {
 }
 
 export type CommentFull = zod.infer<ReturnType<typeof comments>>;
+
+
+export const completed_exams = (table: Table, { z }: { z: typeof zod }) => {
+  const zLevel = z.enum(["a0", "a1", "a2", "b1", "b2", "c1", "c2"]);
+  const zLevelEmpty = z.enum(["x", "a0", "a1", "a2", "b1", "b2", "c1", "c2"]);
+  const ZSurvey = z.object({
+    ownRating: zLevelEmpty,
+    online: zLevelEmpty,
+    certificate: zLevelEmpty,
+  });
+  return z.object({
+    id: z.number(),
+    resultLevel: zLevel,
+    answers: z.array(z.object({
+      questionId: z.string(),
+      userAnswers: z.array(z.string()),
+    })),
+    survey: z.number(),
+    sessid: z.string(),
+    username: z.string(),
+  });
+}
+
+export type CompletedExam = zod.infer<ReturnType<typeof completed_exams>>;
+
+export const surveys = (table: Table, { z }: { z: typeof zod }) => {
+
+  return z.object({
+    id: z.number(),
+    type: z.string(),
+    data: z.record(z.string()),
+    username: z.string(),
+  });
+}
+
+export type Survey = zod.infer<ReturnType<typeof surveys>>;

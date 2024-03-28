@@ -34,7 +34,7 @@ export default function StoreProvider({ children }: ChildrenProps) {
     getMyPage().then(({ user }) => {
       Store.setUser(user);
     });
-  });
+  }, []);
   return (<StoreContext.Provider value={store}>
     {children}
   </StoreContext.Provider>);
