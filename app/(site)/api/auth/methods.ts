@@ -21,7 +21,7 @@ async function createFormData(payload: Record<string, string>): Promise<[FormDat
   const data = new FormData();
 
   const [csrfToken, newCookies] = await getCsrfToken();
-  
+
   if (!csrfToken) throw new Error("no token");
 
   data.set("csrfToken", csrfToken.csrfToken);
@@ -139,21 +139,31 @@ export async function createOrGetUser(auth: AuthData) {
 
     if (!user) {
       let username = (email.match(/^([^@]+)@.*$/) as string[])[1] || "";
-      if (users.has(username)) {
-        username = users.getFreeId();
+      let found = false;
+      let resultUsername = username;
+      let tries = 1;
+      const candidates = new Set<string>()
+      users.indexIds<string>("username", (value) => {
+        const result = value.startsWith(username);
+        if (result) candidates.add(username);
+        return false;
+      });
+      while (candidates.has(resultUsername)) {
+        resultUsername = username + tries++;
       }
-      users.insert({
+
+      const id = users.insert({
         englishLevel: englishLevel || "a0",
         emailVerified: true,
         knownWordsVersion: new Date(0),
         password: "",
         knownWords: [],
-        username,
+        username: resultUsername,
         email,
         image: auth.image || "",
         fullName: auth.name || "",
       });
-      user = users.at(username, rec => rec.$light());
+      user = users.at(id, rec => rec.$light());
     }
 
     return drill.userSelf(user);

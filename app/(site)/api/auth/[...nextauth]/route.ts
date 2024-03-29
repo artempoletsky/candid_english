@@ -38,15 +38,11 @@ const handler = NextAuth({
       },
       async authorize(credentials, request) {
         const user: UserLight | undefined = await query(({ users }, { username, password }, { $ }) => {
-          let user: UserLight;
-          if (users.has(username)) {
-            user = users.at(username, r => r.$light());
-            if (user.password == $.encodePassword(password)) {
-              return user;
-            }
-            return undefined;
-          }
-          return users.where("email", username).where("password", $.encodePassword(password)).limit(1).select(u => u.$light())[0];
+          // let user: UserLight;
+          const passwordEncoded = $.encodePassword(password);
+          const found = users.where("username", username).where("password", passwordEncoded).limit(1).select(r => r.$light());
+          if (found.length) return found[0];
+          return users.where("email", username).where("password", passwordEncoded).limit(1).select(u => u.$light())[0];
         }, credentials as { username: string, password: string });
         if (!user) return null;
         return {

@@ -1,9 +1,14 @@
 
+import { GlobalScope } from "@artempoletsky/kurgandb";
 import { RecordValidator, Table } from "@artempoletsky/kurgandb/globals";
 import zod from "zod";
+import { Plugins } from "./plugins";
 
-export const users = (users: Table, { z }: { z: typeof zod }) => {
+type Scope = GlobalScope & Plugins;
+export const users = (users: Table, { z, zodRules }: Scope) => {
+
   return z.object({
+    id: z.number(),
     username: z.string(),
     email: z.string().email(),
     password: z.string(),
@@ -12,7 +17,7 @@ export const users = (users: Table, { z }: { z: typeof zod }) => {
     knownWordsVersion: z.coerce.date(),
     image: z.string(),
     emailVerified: z.boolean(),
-    englishLevel: z.enum(["a0", "a1", "a2", "b1", "b2", "c1", "c2"]),
+    englishLevel: zodRules.levelA0C2,
   });
 }
 
@@ -28,10 +33,10 @@ export const email_confirmations = (table: Table, { z }: { z: typeof zod }) => {
 export type EmailConfirmation = zod.infer<ReturnType<typeof email_confirmations>>;
 
 
-export const test_questions = (table: Table, { z }: { z: typeof zod }) => {
+export const test_questions = (table: Table, { z, zodRules }: Scope) => {
   return z.object({
     correctAnswers: z.array(z.number()),
-    difficulty: z.enum(["a1", "a2", "b1", "b2", "c1", "c2"]),
+    difficulty: zodRules.levelA1C1,
     options: z.array(z.array(z.string())),
     template: z.string(),
     word: z.string(),
@@ -43,7 +48,7 @@ export const test_questions = (table: Table, { z }: { z: typeof zod }) => {
 export type TestQuestion = zod.infer<ReturnType<typeof test_questions>>;
 
 
-export const comments = (table: Table, { z }: { z: typeof zod }) => {
+export const comments = (table: Table, { z, zodRules }: Scope) => {
   return z.object({
     id: z.number(),
     text: z.string().min(1).max(255),
@@ -52,18 +57,17 @@ export const comments = (table: Table, { z }: { z: typeof zod }) => {
     guestNickName: z.string(),
     discussionId: z.number(),
     sessid: z.string(),
-    authorLvl: z.enum(["", "a0", "a1", "a2", "b1", "b2", "c1", "c2"]),
+    authorLvl: zodRules.levelA0C2Empty,
   });
 }
 
 export type CommentFull = zod.infer<ReturnType<typeof comments>>;
 
 
-export const completed_exams = (table: Table, { z }: { z: typeof zod }) => {
-  const zLevel = z.enum(["a0", "a1", "a2", "b1", "b2", "c1", "c2"]);
+export const completed_exams = (table: Table, { z, zodRules }: Scope) => {
   return z.object({
     id: z.number(),
-    resultLevel: zLevel,
+    resultLevel: zodRules.levelA0C2,
     answers: z.array(z.object({
       questionId: z.string(),
       userAnswers: z.array(z.string()),
@@ -76,7 +80,7 @@ export const completed_exams = (table: Table, { z }: { z: typeof zod }) => {
 
 export type CompletedExam = zod.infer<ReturnType<typeof completed_exams>>;
 
-export const surveys = (table: Table, { z }: { z: typeof zod }) => {
+export const surveys = (table: Table, { z }: Scope) => {
 
   return z.object({
     id: z.number(),

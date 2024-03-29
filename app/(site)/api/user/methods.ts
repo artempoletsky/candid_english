@@ -114,10 +114,10 @@ export async function getMyPage(): Promise<RGetMyPage> {
     user: null,
   };
 
-  const user = await query(({ user_rights, users }, { username }, { drill, db }) => {
-    if (!users.has(username)) return undefined;
-    return drill.userSelf(users.at(username, u => u.$light()));
-  }, { username: session.user.username });
+  const user = await query(({ user_rights, users }, { id }, { drill, db }) => {
+    if (!users.has(id)) return undefined;
+    return drill.userSelf(users.at(id, u => u.$light()));
+  }, { id: session.user.id });
 
   session.user = user;
   return {
@@ -177,10 +177,10 @@ export async function updateUserInfo(payload: AUpdateUserInfo) {
   const session = await getSession();
   if (!session.user) throw new ResponseError("You must be signed in to perform this action");
 
-  const { user, secret } = await query(({ users, user_rights, email_confirmations }, { newInfo, password, username }, { $, drill }) => {
-    if (!users.has(username)) throw new $.ResponseError("User {...} doesn't exist", [username]);
+  const { user, secret } = await query(({ users, user_rights, email_confirmations }, { newInfo, password, id }, { $, drill }) => {
+    if (!users.has(id)) throw new $.ResponseError("User {...} doesn't exist", [id + ""]);
 
-    const user = users.at(username, u => u.$light());
+    const user = users.at(id, u => u.$light());
     if (password && $.encodePassword(password) != user.password) throw new $.ResponseError("password", "Incorrect password");
 
     const emailChanged = user.email != newInfo.email && !!newInfo.email;
@@ -201,7 +201,7 @@ export async function updateUserInfo(payload: AUpdateUserInfo) {
       if (found.length != 0) throw new $.ResponseError("email", "Already taken");
     }
 
-    users.where("username", username).limit(1).update(user => {
+    users.where("id", id).limit(1).update(user => {
       if (fullNameChanged) user.fullName = newInfo.fullName!;
       if (imageChanged) user.image = newInfo.image!;
       // if (usernameChanged) user.username = newInfo.username!;
@@ -217,7 +217,7 @@ export async function updateUserInfo(payload: AUpdateUserInfo) {
     //     rec.username = newInfo.username!;
     //   });
     // }
-    const newUserInfo = drill.userSelf(users.at(username, u => u.$light()));
+    const newUserInfo = drill.userSelf(users.at(id, u => u.$light()));
     let secret = "";
     if (emailChanged) {
       secret = drill.createEmailConfirmation(newUserInfo.email);
@@ -228,13 +228,13 @@ export async function updateUserInfo(payload: AUpdateUserInfo) {
     }
   }, {
     ...payload,
-    username: session.user.username,
+    id: session.user.id,
   });
   if (secret)
     nodemailerSendConfirmation({
       secret,
       to: user.email,
-      username: user.username,
+      username: user.fullName || user.username,
     });
   session.user = user;
   return user;

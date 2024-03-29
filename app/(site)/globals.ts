@@ -2,16 +2,40 @@ import z from "zod";
 import { TestSession } from "app/test/api/route";
 import { UserFull, EmailConfirmation, TestQuestion, CommentFull, CompletedExam, Survey } from "../kurgandb_admin/validation";
 import { LanguageLevel } from "../../lib/language_levels";
+import { zodRules } from "kdbUser/plugins";
+import { GlobalScope } from "@artempoletsky/kurgandb";
+
+
+
+export const SITE_NAME = "Intermediate Drill";
+
+
+export type AuthData = {
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+}
+export type Session = {
+  id: string;
+  activeEnglishTest?: TestSession;
+  user?: UserSelf;
+  authUser?: AuthData;
+  englishLevel: z.infer<typeof zodRulesGlobal.levelA0C2Empty>;
+}
+
+export const zodRulesGlobal = zodRules.install({ z } as GlobalScope);
 
 export const USER_ACTIONS_API = "/api/user";
 
 export type { UserFull as UserFull };
 
-export type UserLight = Omit<UserFull, "knownWords">;
-
 export type UserSelf = Omit<UserLight, "password"> & UserRights;
 
-export type User = Omit<UserLight, "password" | "knownWordsVersion" | "emailConfirmed">;
+export type UserInsert = Omit<UserFull, "id">;
+
+export type UserLight = Omit<UserFull, "knownWords">;
+
+export type User = Omit<UserFull, "password" | "knownWords" | "knownWordsVersion" | "emailVerified">;
 
 export type UsersMeta = {};
 
@@ -140,25 +164,6 @@ export type PostLight = Omit<Post, "text">;
 
 export type PostsMeta = {};
 
-
-
-export const SITE_NAME = "Intermediate Drill";
-
-
-export type AuthData = {
-  name?: string | null;
-  email?: string | null;
-  image?: string | null;
-}
-export type Session = {
-  id: string;
-  activeEnglishTest?: TestSession;
-  user?: UserSelf;
-  authUser?: AuthData;
-  englishLevel: LanguageLevel | "";
-}
-
-
 export type { EmailConfirmation as EmailConfirmation };
 
 
@@ -170,3 +175,4 @@ export type CompletedExamLight = Omit<CompletedExam, "answers">
 export type { Survey as Survey };
 export type SurveyInsert = Omit<Survey, "id">;
 export type SurveyLight = Omit<Survey, "data">;
+

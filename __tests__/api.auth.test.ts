@@ -2,6 +2,7 @@
 
 import { createOrGetUser } from "app/api/auth/methods";
 import { query } from "app/db";
+import { getSession } from "app/session/session";
 // import {  } from "../app/(site)/session/session";
 import zod from "zod";
 
@@ -32,10 +33,6 @@ describe("API auth", () => {
 
     idsToRemove.push("batman");
 
-    const freeId = await query(({ users }) => {
-      return users.getFreeId();
-    }, {});
-
     user = (await createOrGetUser({
       email: "batman@arkham.com",
       image,
@@ -45,7 +42,11 @@ describe("API auth", () => {
     idsToRemove.push(user.username);
 
     expect(user.email).toBe("batman@arkham.com");
-    expect(user.username).toBe(freeId);
+    expect(user.username).toBe("batman1");
+
+    const session = await getSession();
+    expect(session.user).toBeDefined();
+    expect(session.user?.username).toBe("batman1");
 
   });
 

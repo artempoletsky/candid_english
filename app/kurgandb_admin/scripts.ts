@@ -50,7 +50,33 @@ export const Next_routes = {
 }
 
 export async function Do_nothing() {
-  return await query(({ test_questions, comments }, { }, { }) => {
-
+  return await query(({ test_questions, comments }, { }, { db }) => {
+    db.createTable({
+      name: "users",
+      fields: {
+        id: "number",
+        username: "string",
+        email: "string",
+        fullName: "string",
+        password: "string",
+        knownWords: "json",
+        knownWordsVersion: "date",
+        image: "string",
+        emailVerified: "boolean",
+        englishLevel: "string",
+      },
+      tags: {
+        id: ["primary", "autoinc"],
+        username: ["unique"],
+        email: ["unique"],
+        fullName: [],
+        password: ["hidden"],
+        knownWords: ["heavy", "hidden"],
+        knownWordsVersion: ["hidden"],
+        image: [],
+        emailVerified: ["hidden"],
+        englishLevel: [],
+      }
+    });
   });
 }

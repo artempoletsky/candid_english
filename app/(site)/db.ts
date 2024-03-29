@@ -7,9 +7,9 @@ import { Plugins } from "../kurgandb_admin/plugins";
 export type Tables = {
   users: Table<
     types.UserFull,
-    string,
+    number,
     types.UsersMeta,
-    types.UserFull,
+    types.UserInsert,
     types.UserLight,
     types.User
   >;
