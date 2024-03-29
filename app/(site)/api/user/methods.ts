@@ -189,7 +189,7 @@ export async function updateUserInfo(payload: AUpdateUserInfo) {
     const fullNameChanged = user.fullName != newInfo.fullName && newInfo.fullName !== undefined;
     const imageChanged = user.image != newInfo.image && newInfo.image !== undefined;
 
-    const passwordRequired = emailChanged || passwordChanged;
+    const passwordRequired = emailChanged || passwordChanged && user.password;
     if (passwordRequired && !password)
       throw new $.ResponseError("Password is required");
 

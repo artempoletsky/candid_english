@@ -1,5 +1,5 @@
 
-import { USER_ACTIONS_API, UserSelf } from "app/globals";
+import { USER_ACTIONS_API, UserSelf, zodRulesGlobal } from "app/globals";
 import { FUpdateUserInfo } from "../api/user/methods";
 import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
@@ -9,7 +9,7 @@ import { Button, Checkbox, Tooltip } from "@mantine/core";
 import { useContext, useState } from "react";
 import { blinkBoolean } from "lib/utils_client";
 import z from "zod";
-import { zEmail, zPassword } from "../api/user/schemas";
+
 import { Store } from "app/StoreProvider";
 
 const updateUserInfo = getAPIMethod<FUpdateUserInfo>(USER_ACTIONS_API, "updateUserInfo");
@@ -22,7 +22,7 @@ type Props = {
 
 const ZForm = z.object({
   fullName: z.string(),
-  email: zEmail,
+  email: zodRulesGlobal.email,
   image: z.string(),
   changePassword: z.boolean(),
   password: z.string(),
@@ -30,7 +30,7 @@ const ZForm = z.object({
   confirmNewPassword: z.string(),
 }).superRefine(({ changePassword, newPassword, confirmNewPassword, password }, ctx) => {
   if (changePassword) {
-    let res = zPassword.safeParse(newPassword, { path: ["newPassword"] });
+    let res = zodRulesGlobal.password.safeParse(newPassword, { path: ["newPassword"] });
     if (!res.success) {
       ctx.addIssue(res.error.issues[0]);
       return;

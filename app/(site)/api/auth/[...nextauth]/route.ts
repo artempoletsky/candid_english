@@ -5,6 +5,7 @@ import { getSession } from "app/session/session";
 import { query } from "app/db";
 import { UserFull, UserLight } from "app/globals";
 import { clearSession, createOrGetUser } from "../methods";
+import { authorize } from "./adapter";
 
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env;
 if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) throw new Error("Google ENV credentials is invalid!");
@@ -36,22 +37,7 @@ const handler = NextAuth({
           type: "password",
         },
       },
-      async authorize(credentials, request) {
-        const user: UserLight | undefined = await query(({ users }, { username, password }, { $ }) => {
-          // let user: UserLight;
-          const passwordEncoded = $.encodePassword(password);
-          const found = users.where("username", username).where("password", passwordEncoded).limit(1).select(r => r.$light());
-          if (found.length) return found[0];
-          return users.where("email", username).where("password", passwordEncoded).limit(1).select(u => u.$light())[0];
-        }, credentials as { username: string, password: string });
-        if (!user) return null;
-        return {
-          id: user.username,
-          email: user.email,
-          name: user.fullName,
-          image: user.image,
-        };
-      },
+      authorize,
     }),
     GoogleProvider({
       clientId: GOOGLE_CLIENT_ID,

@@ -1,14 +1,12 @@
 import z from "zod";
 
-export const zUsername = z.string().min(5, "At least 5 symbols");
-export const zPassword = z.string().min(5, "At least 5 symbols");
-export const zEmail = z.string().email();
+import { zodRulesGlobal as r } from "app/globals";
 
 export const register = z.object({
-  email: zEmail,
-  username: zUsername,
-  password: zPassword,
-  passwordConfirmation: zPassword,
+  email: r.email,
+  username: r.username,
+  password: r.password,
+  passwordConfirmation: r.password,
 }).superRefine(({ password, passwordConfirmation }, ctx) => {
   if (password != passwordConfirmation) {
     ctx.addIssue({
@@ -38,12 +36,13 @@ export const confirmEmail = z.object({
 export type AConfirmEmail = z.infer<typeof confirmEmail>;
 
 export const updateUserInfo = z.object({
-  password: zPassword.optional(),
+  password: r.password.optional(),
   newInfo: z.object({
-    email: zEmail,
+    email: r.email,
+    username: r.username,
     fullName: z.string(),
     image: z.string(),
-    password: zPassword,
+    password: r.password,
   }).partial(),
 });
 
