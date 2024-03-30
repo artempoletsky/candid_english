@@ -15,7 +15,7 @@ describe("API auth", () => {
 
   });
 
-  const idsToRemove: string[] = [];
+  const idsToRemove: number[] = [];
   test("createOrGetUser", async () => {
     const email = "batman@gotham.com";
     const image = "https://gotham.com/profilepic/123123";
@@ -33,7 +33,7 @@ describe("API auth", () => {
     expect(user.fullName).toBe(name);
     expect(user.username).toBe("batman");
 
-    idsToRemove.push("batman");
+    idsToRemove.push(user.id);
 
     user = (await createOrGetUser({
       email: "batman@arkham.com",
@@ -41,7 +41,7 @@ describe("API auth", () => {
       name,
     })).user;
 
-    idsToRemove.push(user.username);
+    idsToRemove.push(user.id);
 
     expect(user.email).toBe("batman@arkham.com");
     expect(user.username).toBe("batman1");
@@ -57,7 +57,7 @@ describe("API auth", () => {
     });
   });
 
-  test("changePassword", async () => {
+  test("change password", async () => {
     let batman = await updateUserInfo({
       password: undefined,
       newInfo: {
@@ -86,14 +86,24 @@ describe("API auth", () => {
       username: "batman",
     });
     expect(result).toBe(true);
-    
+
 
     expect(session.user?.email).toBe("batman@gotham.com");
   });
 
+  test("change username", async () => {
+    let formerBatman = await updateUserInfo({
+      password: "qwerty",
+      newInfo: {
+        username: "robin",
+      }
+    });
+    expect(formerBatman.username).toBe("robin");
+  });
+
   afterAll(async () => {
     await query(({ users }, { idsToRemove }) => {
-      users.where("username", ...idsToRemove).delete();
+      users.where("id", ...idsToRemove).delete();
     }, { idsToRemove });
   });
 });

@@ -1,11 +1,13 @@
 import z from "zod";
 import { TestSession } from "app/test/api/route";
-import { UserFull, EmailConfirmation, TestQuestion, CommentFull, CompletedExam, Survey } from "../kurgandb_admin/validation";
+import { UserFull, EmailConfirmation, TestQuestion, CommentFull, CompletedExam, Survey, UserRights } from "../kurgandb_admin/validation";
 import { LanguageLevel } from "../../lib/language_levels";
 import { zodRules } from "kdbUser/plugins";
 import { GlobalScope } from "@artempoletsky/kurgandb";
-
-
+// import { logNextSide } from "./api/chat";
+// import "./api/chat";
+// import "../../socket/server";
+// logNextSide("test");
 
 export const SITE_NAME = "Intermediate Drill";
 
@@ -29,7 +31,11 @@ export const USER_ACTIONS_API = "/api/user";
 
 export type { UserFull as UserFull };
 
-export type UserSelf = Omit<UserLight, "password"> & UserRights;
+export type { UserRights as UserRights };
+
+export type UserSelf = Omit<UserLight, "password"> & UserRights & {
+  isPasswordSet: boolean;
+};
 
 export type UserInsert = Omit<UserFull, "id">;
 
@@ -115,16 +121,6 @@ export type LemmatizerPropositionInsert = Omit<LemmatizerProposition, "id">;
 export type LemmatizerPropositionsMeta = {};
 
 
-
-export const ZUserRights = z.object({
-  username: z.string(),
-  isAdmin: z.boolean(),
-  isModerator: z.boolean(),
-});
-
-export type UserRights = z.infer<typeof ZUserRights>;
-
-export type UserRightsMeta = {};
 
 
 export type { CommentFull as CommentFull };

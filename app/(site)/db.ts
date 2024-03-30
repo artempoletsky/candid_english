@@ -48,8 +48,7 @@ export type Tables = {
   >;
   user_rights: Table<
     types.UserRights,
-    string,
-    types.UserRightsMeta
+    number
   >;
   comments: Table<
     types.CommentFull,

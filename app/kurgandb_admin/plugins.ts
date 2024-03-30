@@ -19,7 +19,7 @@ import {
 
 export const drill = {
   npm: [],
-  install: async function ({ db, $, _, z }: GlobalScope) {
+  install: function ({ db, $, _, z }: GlobalScope) {
     const t: Tables = db.getTables() as Tables;
     const DefaultRights = t.user_rights.getRecordDraft() as Omit<UserRights, "username">;
     delete (DefaultRights as any)["username"];
@@ -42,17 +42,19 @@ export const drill = {
     }
     return {
       userSelf(user: UserLight): UserSelf {
-        const { username } = user;
         const { password, ...userNoPwd } = user;
-        if (t.user_rights.has(username)) {
+        const isPasswordSet = password !== "";
+        if (t.user_rights.has(user.id)) {
           return {
-            ...t.user_rights.at(username),
+            ...t.user_rights.at(user.id),
             ...userNoPwd,
+            isPasswordSet,
           }
         }
         return {
           ...DefaultRights,
           ...userNoPwd,
+          isPasswordSet,
         }
       },
       secret(value: string) {

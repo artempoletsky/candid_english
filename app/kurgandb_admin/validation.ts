@@ -21,6 +21,17 @@ export const users = (users: Table, { z, zodRules }: Scope) => {
   });
 }
 
+export const user_rights = (users: Table, { z }: Scope) => {
+
+  return z.object({
+    id: z.coerce.number(),
+    isAdmin: z.boolean(),
+    isModerator: z.boolean(),
+  });
+}
+
+export type UserRights = zod.infer<ReturnType<typeof user_rights>>;
+
 export type UserFull = zod.infer<ReturnType<typeof users>>;
 
 export const email_confirmations = (table: Table, { z }: { z: typeof zod }) => {
