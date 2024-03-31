@@ -1,11 +1,11 @@
-import { JSONErrorResponse } from "@artempoletsky/easyrpc/client";
+import { JSONErrorResponse, RequestErrorSetter } from "@artempoletsky/easyrpc/client";
 // import { DocumentComponentProps } from "../../kurgandb/globals";
 import { Button, Checkbox, TextInput } from "@mantine/core";
 import CustomRecordTicket from "./CustomRecordTicket";
 
 
 export type DocumentComponentProps<Type> = {
-  onRequestError: (e: JSONErrorResponse) => void;
+  onRequestError: RequestErrorSetter;
   // onUpdateRecord: (record: PlainObject) => void
   tableName: string;
   record: Type;

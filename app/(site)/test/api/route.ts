@@ -17,6 +17,7 @@ import { getSession } from "app/session/session";
 export type ExamTicketLight = {
   template: string;
   options: string[][];
+  image: string;
 }
 
 export type AnswerRecord = {
@@ -99,6 +100,7 @@ function lightenSession(session: TestSession): TestSessionLight | TestSession {
     currentQuestion = {
       options: current.options,
       template: current.template,
+      image: current.image,
     }
   }
 

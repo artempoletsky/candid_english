@@ -3,6 +3,7 @@ import Select from "components/select";
 import { TestQuestion } from "kdbUser/validation";
 import LanguageLevel from "./LanguageLevel";
 import React, { HTMLAttributes, ReactNode } from "react";
+import Image from "next/image";
 
 interface TestSentenceProps extends HTMLAttributes<HTMLDivElement> {
   ticket: TestQuestion | ExamTicketLight;
@@ -42,6 +43,7 @@ export default function ExamTicket({ ticket, userAnswers, className }: TestSente
   }
 
   return <div className={className}>
+    {ticket.image && <Image src={ticket.image} alt="image" width={400} height={400} />}
     {"difficulty" in ticket && <LanguageLevel level={ticket.difficulty} />}
     {result}
   </div>;

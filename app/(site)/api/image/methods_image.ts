@@ -1,9 +1,10 @@
 import sharp, { Sharp } from "sharp";
 import fs from "fs";
+import { ResponseError } from "@artempoletsky/easyrpc";
 
 export async function save(destination: string, file: File, size: number) {
   const result = `${destination}_${size}.jpg`;
-  (await createSharp(file, size)).toFile(`${process.cwd()}/public${result}`);
+  await (await createSharp(file, size)).toFile(`${process.cwd()}/public${result}`);
   return result;
 }
 
@@ -12,7 +13,14 @@ export async function saveAvatar(userId: number, file: File) {
 }
 
 async function createSharp(file: File, size: number) {
-  return sharp(await file.arrayBuffer()).resize(size).jpeg();
+  let image: Sharp;
+  try {
+    image = sharp(await file.arrayBuffer());
+    await image.metadata();
+  } catch (error) {
+    throw new ResponseError("wrong image format");
+  }
+  return image.resize(size).jpeg();
 }
 
 export async function saveExamTicketImage(id: number, file: File) {

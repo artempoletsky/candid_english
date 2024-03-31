@@ -1,8 +1,8 @@
 
 import { API_UPLOAD_IMAGE, TestQuestion } from "app/globals";
 import { DocumentComponentProps, bind } from "./CustomComponentRecord";
-import { ReactNode } from "react";
-import { Button, FileInput, Radio, RadioGroup, TextInput } from "@mantine/core";
+import { ReactNode, useState, DragEvent, ClipboardEvent } from "react";
+import { Button, FileInput, Loader, Radio, RadioGroup, TextInput } from "@mantine/core";
 import Image from "next/image";
 import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import type { FRemoveTicketImage } from "kdbUser/api";
@@ -10,7 +10,7 @@ import { API_ENDPOINT } from "kdb/generated";
 
 const removeTicketImage = getAPIMethod<FRemoveTicketImage>(API_ENDPOINT, "removeTicketImage");
 
-function uploadFile(file: File, id: number): Promise<string> {
+async function uploadFile(file: File, id: number): Promise<string> {
 
   var data = new FormData();
   data.append("file", file);
@@ -20,15 +20,35 @@ function uploadFile(file: File, id: number): Promise<string> {
   return fetch(API_UPLOAD_IMAGE, {
     method: "POST",
     body: data,
-  }).then(e => e.json());
+  }).then(e => {
+    if (e.ok) {
+      return e.json();
+    } else {
+      return new Promise((resolve, reject) => {
+        e.json().then(reject);
+      });
+    }
+  });
 }
 
-export default function CustomRecordTicket({ record }: DocumentComponentProps<TestQuestion>) {
+export default function CustomRecordTicket({ record, onRequestError }: DocumentComponentProps<TestQuestion>) {
   if (!record.options) return "";
   // console.log(record.difficulty);
   // console.log(record.options);
 
   // return "";
+  function onChooseFile(file: File | null) {
+    if (!file) return;
+    onRequestError();
+    setImageUploading(true);
+    uploadFile(file, record.discussionId)
+      .then(imageUrl => {
+        setImageUploading(false);
+        record.image = imageUrl
+      })
+      .catch(onRequestError)
+  }
+
   function onOptionChange(i: number, j: number) {
     return function (e: any) {
       record.options[i][j] = e.target.value;
@@ -49,28 +69,57 @@ export default function CustomRecordTicket({ record }: DocumentComponentProps<Te
     const options: ReactNode[] = [];
     for (let j = 0; j < g.length; j++) {
       const optionValue = g[j];
-      options.push(<div className="flex items-center gap-3">
+      options.push(<div key={`${i}${j}`} className="flex items-center gap-3">
         <Radio value={optionValue}></Radio>
         <TextInput value={optionValue} onChange={onOptionChange(i, j)} />
       </div>)
     }
     const correctIndex = record.correctAnswers[i];
-    optionGroups.push(<RadioGroup value={g[correctIndex]} onChange={onCorrectChange(i)}>{options}</RadioGroup>)
+    optionGroups.push(<RadioGroup key={`${i}`} value={g[correctIndex]} onChange={onCorrectChange(i)}>{options}</RadioGroup>)
   }
-  return <div className="max-w-[550px]">
+
+  function onImagePaste(e: ClipboardEvent<HTMLDivElement>) {
+    const file = e.clipboardData.files[0];
+    if (file) {
+      e.preventDefault();
+      onChooseFile(file);
+    }
+  }
+  function onDrop(e: DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setDragActive(false);
+    onChooseFile(e.dataTransfer.files[0]);
+  }
+  function onDragEnter(e: DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setDragActive(true);
+  }
+  function onDragLeave(e: DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    setDragActive(false);
+  }
+  const [dragActive, setDragActive] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
+  return <div className={`relative max-w-[550px]`}
+    onPaste={onImagePaste}
+    onDragOver={onDragEnter}
+  >
+    {/* <div className="absolute inset-0 z-10"></div> */}
+
+    {dragActive && <div className="absolute inset-0 z-10 rounded outline outline-2 outline-blue-500" onDragLeave={onDragLeave} onDrop={onDrop}></div>}
     {optionGroups}
-    <div className="my-3">
-      {record.image && <Image height={200} width={200} alt="image" src={record.image + "?" + Math.random()} />}
-    </div>
+
+    {record.image && !imageUploading && <div className="my-3 flex items-center gap-3">
+      <img height={200} width={200} alt="image" src={record.image + "?" + Math.random()} />
+      <Button onClick={e => removeTicketImage({ id: record.discussionId }).then(() => { record.image = "" })} className="mt-3">Remove image</Button>
+    </div>}
+
+    {imageUploading && <Loader />}
 
     <div className="my-3" dangerouslySetInnerHTML={{ __html: record.explanation }}>
     </div>
-    <FileInput value={null} onChange={file => {
-      if (!file) return;
-      uploadFile(file, record.discussionId).then(imageUrl => record.image = imageUrl);
-      // setFileToUpload(file);
-    }} placeholder="Upload image" />
-    <Button onClick={e => removeTicketImage({ id: record.discussionId }).then(() => { record.image = "" })} className="mt-3">Remove image</Button>
+    <FileInput value={null} onChange={onChooseFile} placeholder="Upload image" />
+
   </div>
 
 }
