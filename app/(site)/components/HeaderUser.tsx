@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useEffect, useState } from "react";
-import { USER_ACTIONS_API, UserSelf } from "app/globals";
+import { API_USER_ACTIONS, UserSelf } from "app/globals";
 import Link from "next/link";
 import { Button } from "@mantine/core";
 import { signOut } from "next-auth/react";

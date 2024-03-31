@@ -19,11 +19,11 @@ export default function Survey() {
     })} />
     <p className="mt-5">How other online English tests rate your level of English (in general)?</p>
     <Select className="select" name="online" dict={injectOptions({
-      x: "I didn't tried them"
+      x: "I haven't tried them"
     })} />
     <p className="mt-5">In case you have taken an official English exam like TOEFL, IELTS, etc. what result did you get?</p>
     <Select className="select" name="certificate" dict={injectOptions({
-      x: "I didn't take one"
+      x: "I haven't taken one"
     })} />
   </div>
 }

@@ -1,9 +1,10 @@
 import { ResponseError } from "@artempoletsky/easyrpc";
 import z from "zod";
-import { query } from "app/db";
+import { query, methodFactory } from "app/db";
 import { LEMMATIZER_BLACKLIST, LEMMATIZER_OVERRIDES, LEMMATIZER_WHITELIST } from "lib/paths";
 import simplify from "lib/simplify_words";
 import { rfs, wfs } from "lib/util";
+import { removeExamTicketImage } from "app/api/image/methods_image";
 
 
 const ZGetPage = z.object({
@@ -88,14 +89,46 @@ export type FUnreviewAll = typeof unreviewAll;
 //////////////////////////////////////////////////////////////////////////
 
 
+
+const ZRemoveTicketImage = z.object({
+  id: z.number().int(),
+});
+
+export type ARemoveTicketImage = z.infer<typeof ZRemoveTicketImage>;
+
+
+async function removeTicketImage({ id }: ARemoveTicketImage) {
+  return removeExamTicketImage(id);
+}
+
+export type FRemoveTicketImage = typeof removeTicketImage;
+//////////////////////////////////////////////////////////////////////////
+
+
+
+const getFreeDiscussionId = methodFactory(({ test_questions, posts }) => {
+  // console.log();
+  
+  const last1:number = test_questions.indexKeys("discussionId").at(-1) as any || 0;
+  const last2:number = posts.indexKeys("discussionId").at(-1) as any || 0;
+  return Math.max(last1, last2) + 1;
+});
+
+export type FGetFreeDiscussionId = typeof getFreeDiscussionId;
+//////////////////////////////////////////////////////////////////////////
+
 export const customRules = {
   unreviewAll: ZEmpty,
   getUnreviewedLemmatizerPropositions: ZGetPage,
   resolveProposition: ZResolvePropostion,
+  removeTicketImage: ZRemoveTicketImage,
+  getFreeDiscussionId: ZEmpty,
 };
 
 export const customAPI = {
   unreviewAll,
   getUnreviewedLemmatizerPropositions,
   resolveProposition,
+  removeTicketImage,
+  getFreeDiscussionId,
 }

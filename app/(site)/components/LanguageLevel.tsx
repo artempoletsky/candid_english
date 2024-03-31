@@ -4,8 +4,9 @@ import { LanguageLevel } from "lib/language_levels";
 type Props = {
   level: LanguageLevel | "";
   size?: "sm" | "lg";
+  wordsCount?: number;
 }
-export default function LanguageLevel({ level, size }: Props) {
+export default function LanguageLevel({ level, size, wordsCount }: Props) {
   if (!size) size = "sm";
   if (!level) return "";
 
@@ -26,5 +27,6 @@ export default function LanguageLevel({ level, size }: Props) {
     case "c2": colorClass = "bg-red-500"; break;
   }
 
-  return <span className={`inline-block uppercase text-white rounded ml-[2px] mr-2 px-2 py-1 ${sizeClass} ${colorClass}`}>{level}</span>
+  const wordsCountString = wordsCount === undefined ? "" : `(${wordsCount})`;
+  return <span className={`inline-block uppercase text-white rounded ml-[2px] mr-2 px-2 py-1 ${sizeClass} ${colorClass}`}>{level}{wordsCountString}</span>
 }

@@ -8,8 +8,8 @@ type Scope = GlobalScope & Plugins;
 export const users = (users: Table, { z, zodRules }: Scope) => {
 
   return z.object({
-    id: z.number(),
-    username: z.string(),
+    id: z.coerce.number().int(),
+    username: zodRules.username,
     email: z.string().email(),
     password: z.string(),
     fullName: z.string(),
@@ -18,6 +18,7 @@ export const users = (users: Table, { z, zodRules }: Scope) => {
     image: z.string(),
     emailVerified: z.boolean(),
     englishLevel: zodRules.levelA0C2,
+    wordsCount: z.number().int(),
   });
 }
 
@@ -47,12 +48,13 @@ export type EmailConfirmation = zod.infer<ReturnType<typeof email_confirmations>
 export const test_questions = (table: Table, { z, zodRules }: Scope) => {
   return z.object({
     correctAnswers: z.array(z.number()),
-    difficulty: zodRules.levelA1C1,
+    difficulty: zodRules.levelA1C2,
     options: z.array(z.array(z.string())),
     template: z.string(),
     word: z.string(),
     discussionId: z.number(),
     explanation: z.string(),
+    image: z.string(),
   });
 }
 

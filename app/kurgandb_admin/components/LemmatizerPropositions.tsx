@@ -3,7 +3,7 @@ import { useErrorResponse, fetchCatch, useVars } from "@artempoletsky/easyrpc/re
 import { API_ENDPOINT } from "kdb/generated";
 import { TableComponentProps } from "kdb/globals";
 import type { FGetUnreviewedLemmatizerPropositions, FResolvePropostion, FUnreviewAll } from "../api";
-import { ComponentType, ElementType, ReactNode, useEffect, useState } from "react";
+import { ComponentType, ElementType, ReactElement, ReactNode, useEffect, useState } from "react";
 import type { LemmatizerProposition } from "app/globals";
 import { Button, ButtonProps, TextInputProps } from "@mantine/core";
 import TextInput from "kdb/comp/TextInput";

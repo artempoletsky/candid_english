@@ -9,9 +9,9 @@ import { useForm, zodResolver } from "@mantine/form";
 import type { FRegister } from "../api/user/methods";
 import { Button } from "@mantine/core";
 import TextInput from "./Textnput";
-import { USER_ACTIONS_API } from "app/globals";
+import { API_USER_ACTIONS } from "app/globals";
 
-const register = getAPIMethod<FRegister>(USER_ACTIONS_API, "register");
+const register = getAPIMethod<FRegister>(API_USER_ACTIONS, "register");
 
 
 type Props = {};

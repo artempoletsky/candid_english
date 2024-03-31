@@ -1,5 +1,5 @@
 
-import { USER_ACTIONS_API, UserSelf, zodRulesGlobal } from "app/globals";
+import { API_USER_ACTIONS, UserSelf, zodRulesGlobal } from "app/globals";
 import { FUpdateUserInfo } from "../api/user/methods";
 import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
@@ -12,7 +12,7 @@ import z from "zod";
 
 import { Store } from "app/StoreProvider";
 
-const updateUserInfo = getAPIMethod<FUpdateUserInfo>(USER_ACTIONS_API, "updateUserInfo");
+const updateUserInfo = getAPIMethod<FUpdateUserInfo>(API_USER_ACTIONS, "updateUserInfo");
 
 
 
@@ -118,8 +118,8 @@ export default function FormUserData({ user: userInitial }: Props) {
   function onSubmit(values: FormType) {
     fc.action(values)();
   }
-  return (<div>
-    <p className="">Edit your personal information:</p>
+  return (<div className="mt-3">
+    <p className="font-semibold font-lg mb-1">Edit your personal information:</p>
     <form action="" onSubmit={form.onSubmit(onSubmit)}>
       <TextInput {...form.getInputProps("fullName")} label="Full name" />
       <TextInput {...form.getInputProps("email")} label="E-mail" />

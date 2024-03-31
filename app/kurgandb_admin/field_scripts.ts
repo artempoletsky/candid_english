@@ -4,11 +4,21 @@ import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { API_ENDPOINT } from "../kurgandb/generated";
 import { FieldScriptsObject } from "../kurgandb/globals";
 import { encodePassword } from "@artempoletsky/kurgandb/globals";
+import type { FGetFreeDiscussionId } from "./api";
+import { TestQuestion, UserFull } from "app/globals";
 
+const getFreeDiscussionId = getAPIMethod<FGetFreeDiscussionId>(API_ENDPOINT, "getFreeDiscussionId");
 
-// const exampleCustomMethod = getAPIMethod<FExapleCustomMethod>(API_ENDPOINT, "exampleCustomMethod");
+const discussionId = {
+  Get_free(record: any) {
+    getFreeDiscussionId({}).then(id => {
+      console.log(id);
 
-type UserFull = { username: string, password: string };
+      record.discussionId = id;
+    });
+  }
+}
+
 export const fieldScripts: FieldScriptsObject = {
   users: { // the name of the table
     password: {
@@ -16,5 +26,18 @@ export const fieldScripts: FieldScriptsObject = {
         record.password = encodePassword(record.password);
       }
     }
-  }
+  },
+  test_questions: {
+    discussionId,
+    explanation: {
+      Oxford(rec: TestQuestion) {
+        rec.explanation += `<a 
+target="_blank" 
+href="https://www.oxfordlearnersdictionaries.com/definition/english/${rec.word.replaceAll(" ", "-")}">${rec.word}</a>`;
+      }
+    }
+  },
+  posts: {
+    discussionId,
+  },
 }

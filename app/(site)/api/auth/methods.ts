@@ -91,6 +91,7 @@ export async function createOrGetUser(auth: AuthData) {
         email,
         image: auth.image || "",
         fullName: auth.name || "",
+        wordsCount: 0,
       });
       user = users.at(id, rec => rec.$light());
     }

@@ -27,7 +27,9 @@ export type Session = {
 
 export const zodRulesGlobal = zodRules.install({ z } as GlobalScope);
 
-export const USER_ACTIONS_API = "/api/user";
+export const API_USER_ACTIONS = "/api/user";
+
+export const API_UPLOAD_IMAGE = "/api/image/";
 
 export type { UserFull as UserFull };
 
@@ -150,6 +152,7 @@ export const ZPost = z.object({
   text: z.string(),
   cut: z.string(),
   author: z.string(),
+  discussionId: z.number().int(),
 });
 
 export type Post = z.infer<typeof ZPost>;

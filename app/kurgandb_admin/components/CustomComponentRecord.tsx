@@ -1,8 +1,27 @@
-import { DocumentComponentProps } from "../../kurgandb/globals";
+import { JSONErrorResponse } from "@artempoletsky/easyrpc/client";
+// import { DocumentComponentProps } from "../../kurgandb/globals";
 import { Button, Checkbox, TextInput } from "@mantine/core";
+import CustomRecordTicket from "./CustomRecordTicket";
 
 
-export default function CustomComponentRecord(params: DocumentComponentProps) {
+export type DocumentComponentProps<Type> = {
+  onRequestError: (e: JSONErrorResponse) => void;
+  // onUpdateRecord: (record: PlainObject) => void
+  tableName: string;
+  record: Type;
+  insertMode?: boolean;
+  recordId: string | number | undefined;
+}
+
+export function bind(record: any, prop: string) {
+  return {
+    value: record[prop],
+    onChange: (e: any) => record[prop] = e.target.value,
+  }
+}
+
+export default function CustomComponentRecord(params: DocumentComponentProps<any>) {
+  if (params.tableName == "test_questions") return <CustomRecordTicket {...params} />
   return (
     <div className="max-w-[550px]">
       {"username" in params.record &&

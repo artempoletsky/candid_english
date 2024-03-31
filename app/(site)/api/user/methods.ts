@@ -81,6 +81,7 @@ export async function register(payload: ARegister) {
       knownWordsVersion: new Date(0),
       fullName: "",
       image: "",
+      wordsCount: 0,
     });
     const secret = drill.createEmailConfirmation(email);
 

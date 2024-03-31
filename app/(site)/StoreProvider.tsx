@@ -1,6 +1,6 @@
 "use client";
 import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useEffect, useState } from "react";
-import { USER_ACTIONS_API, UserSelf } from "app/globals";
+import { API_USER_ACTIONS, UserSelf } from "app/globals";
 import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { FGetMyPage } from "./api/user/methods";
 // import { BreadcrumbsArray } from "./layout";
@@ -27,7 +27,7 @@ export type ChildrenProps = {
   children?: ReactNode;
 }
 
-const getMyPage = getAPIMethod<FGetMyPage>(USER_ACTIONS_API, "getMyPage");
+const getMyPage = getAPIMethod<FGetMyPage>(API_USER_ACTIONS, "getMyPage");
 export default function StoreProvider({ children }: ChildrenProps) {
   const store = createStore();
   useEffect(() => {
