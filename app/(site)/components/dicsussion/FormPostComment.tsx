@@ -5,13 +5,10 @@ import ErrorMessage from "../ErrorMessage";
 import { Button, TextInput, Textarea } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { APostComment, postComment as zPostComment } from "app/api/discussion/schemas";
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
-import type { FPostComment } from "app/api/discussion/methods";
-import { useContext } from "react";
 import { useStore } from "app/StoreProvider";
+import { rpc } from "app/rpc";
 
-
-const postComment = getAPIMethod<FPostComment>("/api/discussion", "postComment");
+const { postComment } = rpc("discussion").methods("postComment");
 
 type Props = {
   discussionId: number;

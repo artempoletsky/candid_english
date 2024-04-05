@@ -1,0 +1,15 @@
+
+import { RPC } from "@artempoletsky/easyrpc/client";
+// import * as myApi from "path/api/methods";
+
+type SiteAPI = {
+  // myApi: typeof myApi,
+}
+
+const endpoints = {
+  // myApi: "/path/api"
+};
+
+export function rpc<T extends keyof SiteAPI>(name: T) {
+  return RPC<SiteAPI[T]>(name);
+}

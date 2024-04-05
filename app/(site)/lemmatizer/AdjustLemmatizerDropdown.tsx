@@ -3,11 +3,10 @@ import { useState } from "react";
 
 import { ActionIcon, Button, Menu, TextInput } from "@mantine/core";
 
-import { getAPIMethod } from '@artempoletsky/easyrpc/client';
-import { FProposeAdjustment } from "./api/route";
+import { rpc } from "app/rpc";
 
 const isAdmin = false;
-const proposeAdjustment = getAPIMethod<FProposeAdjustment>("/lemmatizer/api/", "proposeAdjustment");
+const { proposeAdjustment } = rpc("lemmatizer").methods("proposeAdjustment");
 
 
 type Props = {

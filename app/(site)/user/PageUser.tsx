@@ -1,9 +1,7 @@
 "use client";
 
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
 import { useContext, useEffect, useState } from "react";
-import { AuthData, Session, API_USER_ACTIONS, UserSelf } from "app/globals";
 import PageGuest from "./PageGuest";
 import { FGetMyPage, FRepeatConfirmationEmail, RGetMyPage } from "../api/user/methods";
 import { Button, Tooltip } from "@mantine/core";
@@ -11,10 +9,9 @@ import FormUserData from "./FormUserData";
 import { Store, useStore } from "app/StoreProvider";
 import LanguageLevel from "components/LanguageLevel";
 import Link from "next/link";
+import { rpc } from "app/rpc";
 
-const getMyPage = getAPIMethod<FGetMyPage>(API_USER_ACTIONS, "getMyPage");
-const repeatConfirmationEmail = getAPIMethod<FRepeatConfirmationEmail>(API_USER_ACTIONS, "repeatConfirmationEmail");
-
+const { getMyPage, repeatConfirmationEmail } = rpc("user").methods("getMyPage", "repeatConfirmationEmail");
 
 export default function TestComponent({ user: userInitial }: RGetMyPage) {
 
@@ -26,10 +23,10 @@ export default function TestComponent({ user: userInitial }: RGetMyPage) {
 
   const [newEmailSent, setNewEmailSent] = useState(false);
 
-  useEffect(()=>{
+  useEffect(() => {
     Store.setUser(userInitial);
   }, []);
-  
+
 
   const fc = fetchCatch({
     errorCatcher: setErrorResponse
@@ -57,7 +54,7 @@ export default function TestComponent({ user: userInitial }: RGetMyPage) {
       <LanguageLevel size="lg" level={user.englishLevel} />
       {user.englishLevel !== "c2" && <p className="mt-2">
         You can improve your score by <Link href="/test">taking our test</Link>
-      </p> }
+      </p>}
       <p className="mt-1">You know {user.wordsCount} English words</p>
       {!user.emailVerified && <div>
         <div className="text-red-600 mb-3">Please confirm your email {user.email}!</div>

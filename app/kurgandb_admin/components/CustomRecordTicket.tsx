@@ -3,12 +3,10 @@ import { API_UPLOAD_IMAGE, TestQuestion } from "app/globals";
 import { DocumentComponentProps, bind } from "./CustomComponentRecord";
 import { ReactNode, useState, DragEvent, ClipboardEvent } from "react";
 import { Button, FileInput, Loader, Radio, RadioGroup, TextInput } from "@mantine/core";
-import Image from "next/image";
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
-import type { FRemoveTicketImage } from "kdbUser/api";
-import { API_ENDPOINT } from "kdb/generated";
+import { adminRPCCustom } from "kdb/globals";
 
-const removeTicketImage = getAPIMethod<FRemoveTicketImage>(API_ENDPOINT, "removeTicketImage");
+
+const removeTicketImage = adminRPCCustom().method("removeTicketImage");
 
 async function uploadFile(file: File, id: number): Promise<string> {
 

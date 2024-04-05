@@ -2,8 +2,8 @@ import z from "zod";
 import { TestSession } from "app/test/api/route";
 import { UserFull, EmailConfirmation, TestQuestion, CommentFull, CompletedExam, Survey, UserRights } from "../kurgandb_admin/validation";
 import { LanguageLevel } from "../../lib/language_levels";
-import { zodRules } from "kdbUser/plugins";
-import { GlobalScope } from "@artempoletsky/kurgandb";
+import { zodGlobals } from "lib/zodGlobals";
+import type { GlobalScope } from "@artempoletsky/kurgandb";
 // import { logNextSide } from "./api/chat";
 // import "./api/chat";
 // import "../../socket/server";
@@ -17,17 +17,15 @@ export type AuthData = {
   email?: string | null;
   image?: string | null;
 }
+
 export type Session = {
   id: string;
+  ip: string;
   activeEnglishTest?: TestSession;
   user?: UserSelf;
   authUser?: AuthData;
-  englishLevel: z.infer<typeof zodRulesGlobal.levelA0C2Empty>;
+  englishLevel: z.infer<typeof zodGlobals.levelA0C2Empty>;
 }
-
-export const zodRulesGlobal = zodRules.install({ z } as GlobalScope);
-
-export const API_USER_ACTIONS = "/api/user";
 
 export const API_UPLOAD_IMAGE = "/api/image/";
 
@@ -139,9 +137,11 @@ export type Commentary = {
   date: Date;
 }
 
+export const CommentingModes = ["guest", "registered", "emailVerified", "none"] as const;
+export type CommentingMode = typeof CommentingModes[number];
 export type CommentsMeta = {
   lastDiscussionId: number;
-  commentingMode: "guest" | "registered" | "emailVerified" | "none";
+  commentingMode: CommentingMode;
 };
 
 

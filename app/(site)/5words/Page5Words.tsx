@@ -1,15 +1,14 @@
 "use client";
 import DictLink from "components/dictlink";
 
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { fetchCatch } from "@artempoletsky/easyrpc/react";
-import type { FGetFiveWords } from "./api/route";
 import { useEffect, useState } from "react";
 import { Button } from "@mantine/core";
+import { rpc } from "app/rpc";
 
 export const AvailableLevels = ["a1", "a2", "b1", "b2", "c1", "all"] as const;
 type TAvaliableLevels = typeof AvailableLevels[number];
-const getFiveWords: FGetFiveWords = getAPIMethod("/5words/api/", "getFiveWords");
+const getFiveWords = rpc("fiveWords").method("getFiveWords");
 
 type Props = {
   words: string[];

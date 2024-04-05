@@ -19,8 +19,8 @@ const customJestConfig = {
 let currentFile = false;
 const files = fs.readdirSync('./__tests__');
 
-currentFile = 'api.auth.test.ts';
-// currentFile = 'plugins.test.ts';
+// currentFile = 'api.auth.test.ts';
+currentFile = 'plugins.test.ts';
 // currentFile = 'lemmatizer.test.ts';
 // currentFile = 'admin_adjust_lemmatizer.test.ts';
 

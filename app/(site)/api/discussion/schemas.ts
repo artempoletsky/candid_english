@@ -14,4 +14,9 @@ export const getDiscussion = z.object({
 });
 export type AGetDiscussion = z.infer<typeof getDiscussion>;
 
-export const getTicketDiscussion = getDiscussion;
+
+export const getTicketDiscussion = z.object({
+  encryptedDiscussionId: z.string(),
+});
+export type AGetTicketDiscussion = z.infer<typeof getTicketDiscussion>;
+

@@ -1,17 +1,16 @@
 "use client";
 
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
 
 import { ChangeEvent, ChangeEventHandler, useRef, useState } from "react";
 import { ARegister, register as ZRegister } from "../api/user/schemas";
 import { useForm, zodResolver } from "@mantine/form";
-import type { FRegister } from "../api/user/methods";
 import { Button } from "@mantine/core";
 import TextInput from "./Textnput";
-import { API_USER_ACTIONS } from "app/globals";
+import { rpc } from "app/rpc";
 
-const register = getAPIMethod<FRegister>(API_USER_ACTIONS, "register");
+
+const { register } = rpc("user").methods("register");
 
 
 type Props = {};

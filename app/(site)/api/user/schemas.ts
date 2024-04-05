@@ -1,6 +1,6 @@
 import z from "zod";
 
-import { zodRulesGlobal as r } from "app/globals";
+import { zodGlobals as r } from "lib/zodGlobals";
 
 export const register = z.object({
   email: r.email,

@@ -30,8 +30,10 @@ async function proposeAdjustment(args: AProposeAdjustment) {
 
 export type FProposeAdjustment = typeof proposeAdjustment;
 
+const API = {
+  proposeAdjustment
+};
+export type API = typeof API;
 export const POST = NextPOST({
   proposeAdjustment: ZProposeAdjustment
-}, {
-  proposeAdjustment
-});
+}, API);

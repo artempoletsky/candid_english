@@ -1,11 +1,9 @@
 import { FormEvent } from "react";
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { formDataToDict } from "lib/utils_client";
-import { API_ENGLISH_TEST } from "lib/paths";
-import type { FBeginTest, ABeginTest } from "./api/route";
 import { SessionUpdateCb } from "./PageTest";
 import { Button } from "@mantine/core";
 import Survey from "./Survey";
+import { rpc } from "app/rpc";
 
 
 type Props = {
@@ -13,7 +11,7 @@ type Props = {
   takeSurvey: boolean;
 }
 
-const beginTest: FBeginTest = getAPIMethod(API_ENGLISH_TEST, "beginTest");
+const beginTest = rpc("exam").method("beginTest");
 
 
 export default function TestStart({ onStart, takeSurvey }: Props) {

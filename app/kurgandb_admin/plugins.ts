@@ -1,5 +1,8 @@
 import { GlobalScope } from "@artempoletsky/kurgandb";
 import { Tables } from "app/db";
+import aes from "lib/aes";
+import zodRules from "lib/zodGlobals";
+
 import {
   Commentary,
   CommentFull,
@@ -17,12 +20,15 @@ import {
 //   commentByUser: (commentRaw: CommentFull, author: User | undefined) => Commentary;
 // }
 
+// const aesjs = $.require("aes-js");
+
 export const drill = {
   npm: [],
   install: function ({ db, $, _, z }: GlobalScope) {
     const t: Tables = db.getTables() as Tables;
     const DefaultRights = t.user_rights.getRecordDraft() as Omit<UserRights, "username">;
     delete (DefaultRights as any)["username"];
+
 
     function createComment(c: CommentFull, author?: UserSelf): Commentary {
       const flags: (1 | 0)[] = [
@@ -98,31 +104,11 @@ export const drill = {
   },
 }
 
-export const zodRules = {
-  npm: [],
-  install: ({ z }: GlobalScope) => {
-    const levelA0C2 = z.enum(["a0", "a1", "a2", "b1", "b2", "c1", "c2"]);
-    const levelA1C1 = z.enum(["a1", "a2", "b1", "b2", "c1"]);
-    const levelA1C2 = z.enum(["a1", "a2", "b1", "b2", "c1", "c2"]);
-    const levelA0C2X = z.enum(["x", "a0", "a1", "a2", "b1", "b2", "c1", "c2"]);
-    const levelA0C2Empty = z.enum(["", "a0", "a1", "a2", "b1", "b2", "c1", "c2"]);
-    const username = z.string().min(5, "At least 5 symbols");
-    const password = z.string().min(5, "At least 5 symbols");
-    const email = z.string().email();
-    return {
-      levelA0C2,
-      levelA1C1,
-      levelA1C2,
-      levelA0C2X,
-      levelA0C2Empty,
-      username,
-      password,
-      email,
-    }
-  }
-}
 
+export { aes as aes };
+export { zodRules as zodRules };
 export type Plugins = {
   drill: Awaited<ReturnType<typeof drill.install>>;
   zodRules: Awaited<ReturnType<typeof zodRules.install>>;
+  aes: Awaited<ReturnType<typeof aes.install>>;
 }

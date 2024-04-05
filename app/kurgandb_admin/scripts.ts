@@ -50,19 +50,7 @@ export const Next_routes = {
 }
 
 export async function Do_nothing() {
-  return await query(({ test_questions, comments }, { }, { db }) => {
-    db.createTable({
-      name: "user_rights",
-      fields: {
-        id: "number",
-        isAdmin: "boolean",
-        isModerator: "boolean",
-      },
-      tags: {
-        id: ["primary"],
-        isAdmin: ["index"],
-        isModerator: ["index"],
-      }
-    });
+  return await query(({ test_questions }, { }, { aes }) => {
+    return "done";
   });
 }

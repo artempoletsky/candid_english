@@ -12,8 +12,8 @@ import Select from "@/select";
 import { LanguageLevel } from "~/lib/language_levels";
 import { LevelOptions, LevelOptionsAny, PartOptions, PartOptionsAny } from "~/lib/select_options";
 import { FChangeField } from "./api/route";
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
-import { TestWord } from "~/db";
+import { TestWord } from "app/db";
+import { rpc } from "app/rpc";
 
 export type Word = {
   id: string
@@ -36,11 +36,8 @@ const LevelOptionsAnyExclude: Record<string, string> = Object.assign({
 
 
 
-const API_WORDLIST_URL = "/admin/wordlist/api";
+const { changeField, getTestWords } = rpc("adminWordlist").methods("changeField", "getTestWords");
 
-const changeField = getAPIMethod<FChangeField>(API_WORDLIST_URL, "changeField");
-
-const getTestWords = getAPIMethod(API_WORDLIST_URL, "getTestWords");
 const fetcher = (...args: any) => getTestWords();
 
 export default function WordList() {

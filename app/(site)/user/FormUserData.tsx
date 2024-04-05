@@ -1,19 +1,18 @@
 
-import { API_USER_ACTIONS, UserSelf, zodRulesGlobal } from "app/globals";
-import { FUpdateUserInfo } from "../api/user/methods";
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { UserSelf } from "app/globals";
+import { zodGlobals } from "lib/zodGlobals";
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
 import { useForm, zodResolver } from "@mantine/form";
 import TextInput from "../registration/Textnput";
 import { Button, Checkbox, Tooltip } from "@mantine/core";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { blinkBoolean } from "lib/utils_client";
 import z from "zod";
 
 import { Store } from "app/StoreProvider";
+import { rpc } from "app/rpc";
 
-const updateUserInfo = getAPIMethod<FUpdateUserInfo>(API_USER_ACTIONS, "updateUserInfo");
-
+const updateUserInfo = rpc("user").method("updateUserInfo");
 
 
 type Props = {
@@ -30,15 +29,15 @@ export default function FormUserData({ user: userInitial }: Props) {
 
   const ZForm = z.object({
     fullName: z.string(),
-    email: zodRulesGlobal.email,
-    username: zodRulesGlobal.username,
+    email: zodGlobals.email,
+    username: zodGlobals.username,
     image: z.string(),
     password: z.string(),
     newPassword: z.string(),
     confirmNewPassword: z.string(),
   }).superRefine(({ newPassword, confirmNewPassword, password }, ctx) => {
     if (changePassword) {
-      let res = zodRulesGlobal.password.safeParse(newPassword, { path: ["newPassword"] });
+      let res = zodGlobals.password.safeParse(newPassword, { path: ["newPassword"] });
       if (!res.success) {
         ctx.addIssue(res.error.issues[0]);
         return;
@@ -81,7 +80,7 @@ export default function FormUserData({ user: userInitial }: Props) {
   const fc = fetchCatch(updateUserInfo)
     .before((values: FormType) => {
       console.log(values.username);
-      
+
       const newInfo = {
         email: values.email,
         username: values.username,
@@ -89,7 +88,7 @@ export default function FormUserData({ user: userInitial }: Props) {
         fullName: values.fullName,
         image: values.image,
       };
-      
+
       // console.log(newInfo);
       // return undefined;
       const sendPassword = passwordRequired && user.isPasswordSet;

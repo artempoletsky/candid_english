@@ -1,10 +1,11 @@
 
 import { TableComponentProps } from "../../kurgandb/globals";
 import { Button } from "@mantine/core"
-import LemmatizerPropositions from "./LemmatizerPropositions";
+import LemmatizerPropositions from "./CustomTableLemmatizerPropositions";
 import TableMeta from "./TableMeta";
 import { FGetUnreviewedLemmatizerPropositions } from "../api";
 import ComponentLoader from "../../kurgandb/comp/ComponentLoader";
+import CustomTableComments from "./CustomTableComments";
 
 
 
@@ -18,6 +19,8 @@ export default function CustomComponentTable(props: TableComponentProps) {
       args={{ page: 1 }}
       props={props}
     />
+  } else if (tableName == "comments") {
+    return <CustomTableComments {...props} />
   }
   return (
     <div className="">

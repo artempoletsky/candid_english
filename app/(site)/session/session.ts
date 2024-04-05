@@ -52,7 +52,12 @@ export function createNewSession(req: NextRequest): string {
   const secret = md5("" + Date.now() + Math.random());
   const sessid = generateSessionID(req, secret);
 
+  // if (!req.ip) throw new Error("ip is undefined");
+  // console.log(headers());
+  let ip = req.headers.get("X-Forwarded-For");
+  if (ip == "::1" || !ip) ip = "127.0.0.1";
   const sessData: Session = {
+    ip,
     id: sessid,
     englishLevel: "",
   };

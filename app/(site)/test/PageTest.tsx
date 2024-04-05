@@ -5,14 +5,12 @@ import TestProgress from "./TestProgress";
 
 import TestResult from "./TestResult";
 import { useState, useEffect } from "react";
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
-import { API_ENGLISH_TEST } from "lib/paths";
 
-import { FTryAgain, FCreateSession, TestSessionLight, TestSession, RCreateSession } from "./api/route";
-import { Loader } from "@mantine/core";
+import { TestSessionLight, TestSession, RCreateSession } from "./api/route";
+import { rpc } from "app/rpc";
 
 export type SessionUpdateCb = (session: TestSessionLight | TestSession) => any;
-const tryAgain: FTryAgain = getAPIMethod(API_ENGLISH_TEST, "tryAgain");
+const { tryAgain } = rpc("exam").methods("tryAgain");
 
 
 

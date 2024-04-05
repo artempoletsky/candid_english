@@ -1,8 +1,9 @@
-import { getAPIMethod, JSONErrorResponse } from "@artempoletsky/easyrpc/client";
+import { RPC, JSONErrorResponse } from "@artempoletsky/easyrpc/client";
 import { useErrorResponse, fetchCatch, useVars } from "@artempoletsky/easyrpc/react";
 import { API_ENDPOINT } from "kdb/generated";
-import { TableComponentProps } from "kdb/globals";
-import type { FGetUnreviewedLemmatizerPropositions, FResolvePropostion, FUnreviewAll } from "../api";
+import { TableComponentProps, adminRPCCustom } from "kdb/globals";
+
+
 import { ComponentType, ElementType, ReactElement, ReactNode, useEffect, useState } from "react";
 import type { LemmatizerProposition } from "app/globals";
 import { Button, ButtonProps, TextInputProps } from "@mantine/core";
@@ -11,9 +12,11 @@ import TextInput from "kdb/comp/TextInput";
 import DictLink from "components/dictlink";
 
 
-const getData = getAPIMethod<FGetUnreviewedLemmatizerPropositions>(API_ENDPOINT, "getUnreviewedLemmatizerPropositions");
-const resolveProposition = getAPIMethod<FResolvePropostion>(API_ENDPOINT, "resolveProposition");
-const unreviewAll = getAPIMethod<FUnreviewAll>(API_ENDPOINT, "unreviewAll");
+const {
+  getUnreviewedLemmatizerPropositions: getData,
+  resolveProposition,
+  unreviewAll
+} = adminRPCCustom().methods("getUnreviewedLemmatizerPropositions", "resolveProposition", "unreviewAll");
 
 
 type Props = TableComponentProps & {

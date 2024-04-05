@@ -12,7 +12,7 @@ import { query } from "app/db"
 import { LanguageLevel } from "lib/language_levels"
 import { TestQuestion } from "app/globals";
 import { getSession } from "app/session/session";
-
+import { encryptId, decryptId } from "lib/aes";
 
 export type ExamTicketLight = {
   template: string;
@@ -21,9 +21,10 @@ export type ExamTicketLight = {
 }
 
 export type AnswerRecord = {
-  question: TestQuestion
-  userAnswers: string[]
-  isCorrect: boolean
+  question: TestQuestion;
+  encyptedDiscussionId: string;
+  userAnswers: string[];
+  isCorrect: boolean;
 }
 
 export type TestSession = {
@@ -125,6 +126,7 @@ function makeAnswerRecord(answers: string[], question: TestQuestion): AnswerReco
 
   return {
     question,
+    encyptedDiscussionId: encryptId(question.discussionId),
     isCorrect,
     userAnswers: answers
   }
@@ -153,7 +155,7 @@ async function beginTest({ survey }: ABeginTest) {
   const SESSION = await getSession();
 
   console.log(survey);
-  
+
 
   let activeEnglishTest = SESSION.activeEnglishTest;
   if (!activeEnglishTest) throw new ResponseError("Test session is invalid");
@@ -304,14 +306,16 @@ export type FCreateSession = typeof createSession;
 export type RCreateSession = Awaited<ReturnType<FCreateSession>>;
 
 
+const API = {
+  createSession,
+  beginTest,
+  giveAnswer,
+  tryAgain,
+};
+export type API = typeof API;
 export const POST = NextPOST({
   createSession: ZEmpty,
   beginTest: ZBeginTest,
   giveAnswer: ZGiveAnswer,
   tryAgain: ZEmpty,
-}, {
-  createSession,
-  beginTest,
-  giveAnswer,
-  tryAgain,
-});
+}, API);

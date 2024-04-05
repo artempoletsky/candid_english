@@ -1,7 +1,7 @@
 
 import PageExamTicket from "./PageExamTicket";
 import { Metadata } from "next";
-import { getTicketDiscussion } from "app/api/discussion/methods";
+import { getTicketDiscussion } from "app/api/discussion/methods_discussion";
 // import PageNotFound from "~/app/not-found";
 import { notFound } from 'next/navigation'
 
@@ -20,19 +20,12 @@ type Props = {
   }
 };
 export default async function ({ params: { id } }: Props) {
-  // console.log(typeof id);
-  let idNumber: number;
-  try {
-    idNumber = z.coerce.number().parse(id);
-  } catch (error) {
-    return notFound();
-  }
-
+  
   let discussion;
   try {
     discussion = await getTicketDiscussion({
-      discussionId: idNumber,
-    });
+      encryptedDiscussionId: id,
+    });   
   } catch (error: any) {
     if (error.statusCode == 404) {
       return notFound();

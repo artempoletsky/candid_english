@@ -37,16 +37,20 @@ async function changeField(args: AChangeField) {
 }
 
 
-export const getTestWords: () => Promise<TestWord[]> = noPayloadQueryMethod(({ test_words }, {}) => {
+export const getTestWords: () => Promise<TestWord[]> = noPayloadQueryMethod(({ test_words }, { }) => {
   return test_words.all().limit(0).select();
 });
 
 export type FChangeField = typeof changeField;
 
-export const POST = NextPOST(NextResponse, {
-  changeField: VChangeField,
-  getTestWords: {},
-}, {
+const API = {
   changeField,
   getTestWords,
-});
+};
+
+export type API = typeof API;
+
+export const POST = NextPOST({
+  changeField: VChangeField,
+  getTestWords: {},
+}, API);

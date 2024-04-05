@@ -71,6 +71,7 @@ export const comments = (table: Table, { z, zodRules }: Scope) => {
     discussionId: z.number(),
     sessid: z.string(),
     authorLvl: zodRules.levelA0C2Empty,
+    ip: z.string(),
   });
 }
 

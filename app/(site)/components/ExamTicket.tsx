@@ -21,7 +21,7 @@ export default function ExamTicket({ ticket, userAnswers, className }: TestSente
   for (let i = 0; i < chunks.length; i++) {
     const chunk = chunks[i];
     const options = ticket.options[i];
-    result.push(<span dangerouslySetInnerHTML={{ __html: chunk }}></span>);
+    result.push(<span key={`chunk_${i}`} dangerouslySetInnerHTML={{ __html: chunk }}></span>);
     if (!options) break;
     if ("correctAnswers" in ticket) {
       const correctId = ticket.correctAnswers[i];

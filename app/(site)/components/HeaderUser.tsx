@@ -1,11 +1,10 @@
 "use client";
 
 import { useContext, useEffect, useState } from "react";
-import { API_USER_ACTIONS, UserSelf } from "app/globals";
+import { UserSelf } from "app/globals";
 import Link from "next/link";
 import { Button } from "@mantine/core";
 import { signOut } from "next-auth/react";
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
 import { FGetMyPage } from "../api/user/methods";
 import { Store, useStore } from "app/StoreProvider";
 

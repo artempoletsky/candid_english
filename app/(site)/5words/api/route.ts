@@ -37,10 +37,13 @@ async function getFiveWordsPage(payload: AGetFiveWords) {
 
 export type FGetFiveWordsPage = typeof getFiveWordsPage;
 
+const API = {
+  getFiveWords,
+  getFiveWordsPage,
+};
+export type API = typeof API;
+
 export const POST = NextPOST({
   getFiveWords: ZFiveWords,
   getFiveWordsPage: ZFiveWords,
-}, {
-  getFiveWords,
-  getFiveWordsPage,
-});
+}, API);

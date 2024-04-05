@@ -21,6 +21,7 @@
     "@mantine/dates": "^7.6.2",
     "@mantine/form": "^7.6.2",
     "@mantine/hooks": "^7.6.2",
+    "aes-js": "^3.1.2",
     "an-array-of-english-words": "^2.0.0",
     "autoprefixer": "10.4.15",
     "eslint": "8.49.0",
@@ -47,6 +48,7 @@
   },
   "devDependencies": {
     "@swc/core": "^1.3.93",
+    "@types/aes-js": "^3.1.4",
     "@types/jest": "^29.5.6",
     "@types/lodash.debounce": "^4.0.7",
     "@types/md5": "^2.3.5",

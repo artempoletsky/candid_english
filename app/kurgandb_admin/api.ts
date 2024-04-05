@@ -5,6 +5,7 @@ import { LEMMATIZER_BLACKLIST, LEMMATIZER_OVERRIDES, LEMMATIZER_WHITELIST } from
 import simplify from "lib/simplify_words";
 import { rfs, wfs } from "lib/util";
 import { removeExamTicketImage } from "app/api/image/methods_image";
+import { CommentingModes } from "app/globals";
 
 
 const ZGetPage = z.object({
@@ -106,23 +107,33 @@ export type FRemoveTicketImage = typeof removeTicketImage;
 
 
 
-const getFreeDiscussionId = methodFactory(({ test_questions, posts }) => {
-  // console.log();
-  
-  const last1:number = test_questions.indexKeys("discussionId").at(-1) as any || 0;
-  const last2:number = posts.indexKeys("discussionId").at(-1) as any || 0;
-  return Math.max(last1, last2) + 1;
+const getFreeDiscussionId = methodFactory(({ comments }) => {
+  return ++comments.meta.lastDiscussionId;
 });
 
 export type FGetFreeDiscussionId = typeof getFreeDiscussionId;
 //////////////////////////////////////////////////////////////////////////
 
+const ZSetCommentingMode = z.object({
+  commentingMode: z.enum(CommentingModes),
+});
+
+export type ASetCommentingMode = z.infer<typeof ZSetCommentingMode>;
+
+const setCommentingMode = methodFactory(({ comments }, { commentingMode }: ASetCommentingMode) => {
+  comments.meta.commentingMode = commentingMode;
+  return comments.meta;
+});
+
+export type FSetCommentingMode = typeof setCommentingMode;
+//////////////////////////////////////////////////////////////////////////
 export const customRules = {
   unreviewAll: ZEmpty,
   getUnreviewedLemmatizerPropositions: ZGetPage,
   resolveProposition: ZResolvePropostion,
   removeTicketImage: ZRemoveTicketImage,
   getFreeDiscussionId: ZEmpty,
+  setCommentingMode: ZSetCommentingMode,
 };
 
 export const customAPI = {
@@ -131,4 +142,5 @@ export const customAPI = {
   resolveProposition,
   removeTicketImage,
   getFreeDiscussionId,
+  setCommentingMode,
 }

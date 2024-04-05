@@ -1,13 +1,12 @@
 
-import { getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { RPC } from "@artempoletsky/easyrpc/client";
 
 import { API_ENDPOINT } from "../kurgandb/generated";
-import { FieldScriptsObject } from "../kurgandb/globals";
+import { FieldScriptsObject, adminRPCCustom } from "../kurgandb/globals";
 import { encodePassword } from "@artempoletsky/kurgandb/globals";
-import type { FGetFreeDiscussionId } from "./api";
 import { TestQuestion, UserFull } from "app/globals";
 
-const getFreeDiscussionId = getAPIMethod<FGetFreeDiscussionId>(API_ENDPOINT, "getFreeDiscussionId");
+const { getFreeDiscussionId } = adminRPCCustom().methods("getFreeDiscussionId");
 
 const discussionId = {
   Get_free(record: any) {

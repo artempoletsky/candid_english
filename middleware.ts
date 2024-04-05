@@ -31,7 +31,6 @@ setInterval(() => {
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-
   const session_route = "/session"
   if (pathname == session_route || pathname.startsWith("/_next/")) {
     return;
@@ -41,6 +40,8 @@ export async function middleware(request: NextRequest) {
 
   const cookies = utils.parseCookie(requestCookiesStr);
   const requestHeaders = new Headers(request.headers);
+
+  // console.log(requestHeaders);
 
   let sessid = cookies[COOKIE_SESSION_KEY];
   let newCookies: string[] = [];
