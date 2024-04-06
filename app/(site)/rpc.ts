@@ -4,8 +4,9 @@ import type { API as adminWordlist } from "./admin/wordlist/api/route";
 import type { API as lemmatizer } from "./lemmatizer/api/route";
 import type { API as exam } from "./test/api/route";
 import type { API as fiveWords } from "./5words/api/route";
-import type * as discussion from "./api/discussion/methods_discussion";
 import type * as user from "./api/user/methods";
+import type * as discussion from "./api/discussion/methods_discussion";
+import type * as words from "./api/words/methods_words";
 
 
 type SiteAPI = {
@@ -15,6 +16,7 @@ type SiteAPI = {
   fiveWords: fiveWords;
   discussion: typeof discussion;
   user: typeof user;
+  words: typeof words;
 };
 
 const endPoints = {
@@ -23,9 +25,11 @@ const endPoints = {
   lemmatizer: "/lemmatizer/api",
   exam: "/test/api",
   user: "/api/user",
-  fiveWords: "/5words/api/",
+  fiveWords: "/5words/api",
+  words: "/api/words",
 };
 
 export function rpc<T extends keyof SiteAPI>(name: T) {
-  return RPC<SiteAPI[T]>(endPoints[name]);
+  return RPC<SiteAPI[T]>(endPoints[name], {
+  });
 }

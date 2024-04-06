@@ -32,3 +32,17 @@ export function blinkBoolean(setter: (b: boolean) => void, timeout = 1000) {
   }, timeout);
 }
 
+export function saveTextFile(fileName: string, textData: string) {
+  let blobData = new Blob([textData], { type: "text/plain" });
+  let url = window.URL.createObjectURL(blobData);
+
+  let a = document.createElement("a");
+  a.setAttribute("style", "display: none");
+  document.body.appendChild(a);
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  window.URL.revokeObjectURL(url);
+  a.remove();
+}
+

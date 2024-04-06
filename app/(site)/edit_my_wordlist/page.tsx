@@ -1,5 +1,5 @@
 
-import MyWordlist from "./my_wordlist";
+import PageMyWords from "./PageMyWords";
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -10,7 +10,7 @@ export default async function EditMyWordlistPage() {
   return (
     <>
       <h1>{"" + metadata.title}</h1>
-      <MyWordlist></MyWordlist>
+      <PageMyWords></PageMyWords>
     </>
   );
 }

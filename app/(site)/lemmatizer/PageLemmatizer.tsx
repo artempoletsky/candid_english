@@ -1,21 +1,22 @@
 "use client";
 
-import { getMyWords } from "lib/words_storage";
 
 import { AtomizedWord } from "app/api/lemmatize_text/route";
 import { useState, useEffect, useRef } from "react";
-import { addWords } from "app/edit_my_wordlist/my_wordlist";
 
 import AdjustLemmatizerDropdown from "./AdjustLemmatizerDropdown";
 import DictLink from "components/dictlink";
 import { API_LEMMATIZE } from "lib/paths";
 import { Checkbox, FileInput, Table } from "@mantine/core";
+import { rpc } from "app/rpc";
+import { Store, useStore } from "app/StoreProvider";
+import { fetchCatch } from "@artempoletsky/easyrpc/react";
 
 type AtomizedWordResponse = {
   words: AtomizedWord[]
 };
 
-
+const addWords = rpc("words").method("addWords");
 
 function uploadFile(file: File): Promise<AtomizedWordResponse> {
 
@@ -30,16 +31,15 @@ function uploadFile(file: File): Promise<AtomizedWordResponse> {
 }
 
 
-export default function Lemmatizer() {
-  let [words, setWords] = useState<AtomizedWord[]>([]);
-  let [myWords, setMyWords] = useState<Record<string, boolean>>({});
-  let fileInput = useRef<any>(null);
-  let [filterKnownWords, setFilterKnownWords] = useState(true);
+export default function PageLemmatizer() {
+  const [words, setWords] = useState<AtomizedWord[]>([]);
+  const { myWords } = useStore();
+  const fileInput = useRef<any>(null);
+  const [filterKnownWords, setFilterKnownWords] = useState(true);
 
-  useEffect(() => {
-    setMyWords({ ...getMyWords() });
-  }, []);
-
+  const fc = fetchCatch(addWords)
+    .then(Store.updateMyWords)
+    .before((word: string) => ({ words: [word] }));
 
   function parseSentence(word: AtomizedWord) {
     const json = JSON.parse(word.sentence);
@@ -65,7 +65,7 @@ export default function Lemmatizer() {
   const notInDict: AtomizedWord[] = [];
 
   for (const lres of words) {
-    if (filterKnownWords && myWords[lres.id]) continue;
+    if (filterKnownWords && myWords.has(lres.id)) continue;
 
     const arr = lres.isInDictionary ? inDict : notInDict;
     arr.push(lres);
@@ -75,8 +75,9 @@ export default function Lemmatizer() {
   // console.log(filteredWords);
 
   function discardWord(w: AtomizedWord) {
-    words = words.filter(word => word.id != w.id);
-    setWords(words);
+    return function () {
+      setWords(words.filter(word => word.id != w.id));
+    }
   }
 
 
@@ -92,8 +93,8 @@ export default function Lemmatizer() {
           {array.map(w => (
             <Table.Tr key={w.id}>
               <Table.Td className="w-0 whitespace-nowrap">
-                <i onClick={e => addWords([w.id]).then(words => setMyWords({ ...words }))} title="Mark as learned" className="icon small thumbs_up cursor-pointer mr-2"></i>
-                <i onClick={e => discardWord(w)} title="Discard" className="icon small thumbs_down m-0 cursor-pointer mr-2"></i>
+                <i onClick={fc.action(w.id)} title="Mark as learned" className="icon small thumbs_up cursor-pointer mr-2"></i>
+                <i onClick={discardWord(w)} title="Discard" className="icon small thumbs_down m-0 cursor-pointer mr-2"></i>
                 <AdjustLemmatizerDropdown sentence={parseSentence(w).text} word={w} removeCall={discardWord} />
               </Table.Td>
               <Table.Td className="w-0">{w.count}</Table.Td>

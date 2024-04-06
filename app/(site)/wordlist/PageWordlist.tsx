@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import css from "./wordlist.module.css";
 import debounce from "lodash.debounce";
-import { addWords, removeWords } from "app/edit_my_wordlist/my_wordlist";
+import { addWords, removeWords } from "app/edit_my_wordlist/PageMyWords";
 import { isWordLearned, getMyWords } from "lib/words_storage";
 
 import DictLink from "components/dictlink";
