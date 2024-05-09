@@ -2,10 +2,10 @@
 import PageUser from "./PageUser";
 import { Metadata } from "next";
 
-import PageLayout from "components/PageLayout";
 import ComponentLoader from "components/ComponentLoader";
-import { API_USER_ACTIONS } from "app/globals";
 import { FGetMyPage } from "app/api/user/methods";
+import { rpc } from "app/rpc";
+
 
 export const metadata: Metadata = {
   title: "",
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 type Props = {};
 export default async function (props: Props) {
-  const method = API_USER_ACTIONS + "?getMyPage" as unknown as FGetMyPage;
+  const method = rpc("user").hackRoute("getMyPage");
   return (
     <ComponentLoader
       Component={PageUser}
