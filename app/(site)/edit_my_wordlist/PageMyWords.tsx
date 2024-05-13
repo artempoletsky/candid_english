@@ -4,11 +4,11 @@ import { FixedSizeList as List } from "react-window";
 import { useState, useEffect } from "react";
 import { DictRange, userView } from "lib/language_levels";
 import { rpc } from "app/rpc";
-import { Store, useStore } from "app/StoreProvider";
 import { fetchCatch } from "@artempoletsky/easyrpc/react";
 import { WordlistsLevel } from "app/api/words/schemas_words";
 import { Button, FileInput, TextInput } from "@mantine/core";
 import { saveTextFile } from "lib/utils_client";
+import { useStore, updateMyWords } from "app/store";
 
 const {
   addWords, removeWords, addWordlists, removeWordlists
@@ -18,7 +18,7 @@ const {
 
 export default function PageMyWords() {
   // initWordsLocalStorage();
-  const { myWords } = useStore();
+  const [myWords] = useStore("myWords");
 
   const [newWord, setNewWord] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -32,7 +32,7 @@ export default function PageMyWords() {
   function clearMyWords() {
     removeWords({
       words: Array.from(myWords),
-    }).then(Store.updateMyWords);
+    }).then(updateMyWords);
   }
 
   function updateViewWords(words: Record<string, boolean>): Promise<Record<string, boolean>> {
@@ -44,7 +44,7 @@ export default function PageMyWords() {
 
   const fc = fetchCatch(addWords)
     .then(arg => {
-      Store.updateMyWords(arg);
+      updateMyWords(arg);
       setNewWord("");
     });
 
@@ -125,7 +125,7 @@ export default function PageMyWords() {
                 .filter((w: string) => w.match(/^\p{L}.*/u));
 
               addWords({ words })
-                .then(Store.updateMyWords);
+                .then(updateMyWords);
               // console.log(words);
               setUploadFile(null);
             }

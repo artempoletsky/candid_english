@@ -9,8 +9,9 @@ import { useState } from "react";
 import { blinkBoolean } from "lib/utils_client";
 import z from "zod";
 
-import { Store } from "app/StoreProvider";
+
 import { rpc } from "app/rpc";
+import { useStore } from "app/store";
 
 const updateUserInfo = rpc("user").method("updateUserInfo");
 
@@ -24,6 +25,7 @@ type Props = {
 export default function FormUserData({ user: userInitial }: Props) {
 
   const [user, setUser] = useState(userInitial);
+  const [userStore, setUserStore] = useStore("user");
   const [changePassword, setChangePassword] = useState(!user.isPasswordSet);
 
 
@@ -101,7 +103,7 @@ export default function FormUserData({ user: userInitial }: Props) {
     .then(updatedUser => {
       setUser(updatedUser);
       setChangePassword(false);
-      Store.setUser(updatedUser);
+      setUserStore(updatedUser);
       blinkBoolean(setTooltipSaved);
       form.setInitialValues({
         fullName: updatedUser.fullName,

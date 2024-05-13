@@ -11,8 +11,8 @@ import Select from "components/select";
 import Checkbox from "components/checkbox";
 import { LevelOptionsAny, PartOptionsAny } from "lib/select_options";
 import { LanguageLevel } from "lib/language_levels";
-import { Store, useStore } from "app/StoreProvider";
 import { rpc } from "app/rpc";
+import { useStore, updateMyWords } from "app/store";
 
 
 export type Word = {
@@ -37,7 +37,7 @@ export default function WordList({ words }: { words: Word[] }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [excludedWords, setExcludedWords] = useState<Array<String>>([]);
 
-  const { myWords } = useStore();
+  const [myWords] = useStore("myWords");
 
   const dataEmpty = !words;
   if (dataEmpty) {
@@ -46,7 +46,7 @@ export default function WordList({ words }: { words: Word[] }) {
 
   function toggleWord(word: string, isKnown: boolean) {
     const fn = isKnown ? addWords : removeWords;
-    fn({ words: [word] }).then(Store.updateMyWords);
+    fn({ words: [word] }).then(updateMyWords);
   }
 
 

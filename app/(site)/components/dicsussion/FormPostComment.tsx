@@ -5,8 +5,8 @@ import ErrorMessage from "../ErrorMessage";
 import { Button, TextInput, Textarea } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { APostComment, postComment as zPostComment } from "app/api/discussion/schemas";
-import { useStore } from "app/StoreProvider";
 import { rpc } from "app/rpc";
+import { useStore } from "app/store";
 
 const { postComment } = rpc("discussion").methods("postComment");
 
@@ -15,7 +15,7 @@ type Props = {
   onPost: (comment: Commentary) => void;
 }
 export default function FormPostComment({ discussionId, onPost }: Props) {
-  const { user } = useStore();
+  const [user] = useStore("user");
   const [setErrorResponse, mainErrorMessage] = useErrorResponse();
   const form = useForm<APostComment>({
     initialValues: {
@@ -27,7 +27,7 @@ export default function FormPostComment({ discussionId, onPost }: Props) {
   });
 
   const fc = fetchCatch(postComment)
-    .before(({ text, guestName }) => {
+    .before<APostComment>(({ text, guestName }) => {
       return {
         guestName,
         discussionId,
@@ -40,10 +40,7 @@ export default function FormPostComment({ discussionId, onPost }: Props) {
       onPost(comment);
     });
 
-  function onSubmit(params: APostComment) {
-    fc.action(params)();
-  }
-  return <form action="#" onSubmit={form.onSubmit(onSubmit)}>
+  return <form action="#" onSubmit={form.onSubmit(fc.handle)}>
     <p className="font-semibold text-gray-800">Add comment:</p>
     {!user && <TextInput
       label="Nickname"

@@ -9,8 +9,9 @@ import DictLink from "components/dictlink";
 import { API_LEMMATIZE } from "lib/paths";
 import { Checkbox, FileInput, Table } from "@mantine/core";
 import { rpc } from "app/rpc";
-import { Store, useStore } from "app/StoreProvider";
+
 import { fetchCatch } from "@artempoletsky/easyrpc/react";
+import { useStore, updateMyWords } from "app/store";
 
 type AtomizedWordResponse = {
   words: AtomizedWord[]
@@ -33,12 +34,12 @@ function uploadFile(file: File): Promise<AtomizedWordResponse> {
 
 export default function PageLemmatizer() {
   const [words, setWords] = useState<AtomizedWord[]>([]);
-  const { myWords } = useStore();
+  const [myWords] = useStore("myWords");
   const fileInput = useRef<any>(null);
   const [filterKnownWords, setFilterKnownWords] = useState(true);
 
   const fc = fetchCatch(addWords)
-    .then(Store.updateMyWords)
+    .then(updateMyWords)
     .before((word: string) => ({ words: [word] }));
 
   function parseSentence(word: AtomizedWord) {

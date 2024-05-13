@@ -6,16 +6,15 @@ import Link from "next/link";
 import { Button } from "@mantine/core";
 import { signOut } from "next-auth/react";
 import { FGetMyPage } from "../api/user/methods";
-import { Store, useStore } from "app/StoreProvider";
+import { useStore } from "app/store";
 
-function renderUser(user: UserSelf) {
+
+function RenderUser(user: UserSelf, onLogout: () => void) {
   const image = user.image;
   function onSignOut() {
     signOut({
       callbackUrl: "/",
-    }).then(() => {
-      Store.setUser(null);
-    });
+    }).then(onLogout);
   }
   return <div className="flex items-center gap-3">
     {image && <Link href="/user"><img className="rounded-full h-[42px]" src={image} /></Link>}
@@ -28,11 +27,13 @@ function renderUser(user: UserSelf) {
 
 
 export default function HeaderUser() {
-  const { user } = useStore();
-
+  const [user, setUser] = useStore("user");
+  
   return <div className="absolute right-3 top-0 px-3 py-3">
     {user
-      ? renderUser(user)
+      ? RenderUser(user, () => {
+        setUser(null);
+      })
       : <div className="py-2">
         <Link href="/user">Sign in</Link>
       </div>}

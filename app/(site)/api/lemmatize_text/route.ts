@@ -18,7 +18,7 @@ export type AtomizedWord = {
 }
 
 
-export function parseSRT(text: string): Subtitle[] {
+function parseSRT(text: string): Subtitle[] {
   const subsRaw = text.split(/[\n\r]+/);
   const subs: Subtitle[] = [];
   let i = -1;
@@ -48,7 +48,7 @@ export function parseSRT(text: string): Subtitle[] {
 }
 
 
-export function atomizeSRT(subs: Subtitle[]): AtomizedWord[] {
+function atomizeSRT(subs: Subtitle[]): AtomizedWord[] {
   const dict: { [key: string]: AtomizedWord } = {};
 
   for (const sub of subs) {

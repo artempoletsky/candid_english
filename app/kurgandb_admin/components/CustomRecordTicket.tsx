@@ -30,7 +30,6 @@ async function uploadFile(file: File, id: number): Promise<string> {
 }
 
 export default function CustomRecordTicket({ record, onRequestError }: DocumentComponentProps<TestQuestion>) {
-  if (!record.options) return "";
   // console.log(record.difficulty);
   // console.log(record.options);
 

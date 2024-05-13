@@ -7,7 +7,8 @@ const inter = Inter({ subsets: ["latin"] })
 import { ColorSchemeScript, MantineProvider, createTheme } from "@mantine/core";
 import Header from "components/Header";
 import Footer from "components/Footer";
-import StoreProvider from "./StoreProvider";
+import { StoreProvider } from "@artempoletsky/easystore";
+// import StoreProvider from "./StoreProvider";
 // import Chat from "components/chat/Chat";
 
 export const metadata: Metadata = {

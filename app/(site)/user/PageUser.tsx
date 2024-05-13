@@ -6,25 +6,25 @@ import PageGuest from "./PageGuest";
 import { FGetMyPage, FRepeatConfirmationEmail, RGetMyPage } from "../api/user/methods";
 import { Button, Tooltip } from "@mantine/core";
 import FormUserData from "./FormUserData";
-import { Store, useStore } from "app/StoreProvider";
 import LanguageLevel from "components/LanguageLevel";
 import Link from "next/link";
 import { rpc } from "app/rpc";
+import { useStore } from "app/store";
 
 const { getMyPage, repeatConfirmationEmail } = rpc("user").methods("getMyPage", "repeatConfirmationEmail");
 
-export default function TestComponent({ user: userInitial }: RGetMyPage) {
+export default function PageUser({ user: userInitial }: RGetMyPage) {
 
 
   const [setErrorResponse, mainErrorMessage, errorResponse] = useErrorResponse();
   // console.log(userContext);
 
-  const { user } = useStore();
+  const [user, setUserStore] = useStore("user");
 
   const [newEmailSent, setNewEmailSent] = useState(false);
 
   useEffect(() => {
-    Store.setUser(userInitial);
+    setUserStore(userInitial);
   }, []);
 
 
@@ -34,7 +34,7 @@ export default function TestComponent({ user: userInitial }: RGetMyPage) {
 
   const onSignIn = fc.method(getMyPage)
     .then(({ user }) => {
-      Store.setUser(user);
+      setUserStore(user);
     }).action();
 
 
