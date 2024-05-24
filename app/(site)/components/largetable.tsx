@@ -4,7 +4,6 @@
 import React from 'react'
 import { useState, useRef, useContext } from 'react'
 import { FixedSizeList, FixedSizeListProps } from 'react-window'
-import { render } from 'react-dom'
 
 /** Context for cross component communication */
 const VirtualTableContext = React.createContext<{

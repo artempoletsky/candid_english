@@ -26,7 +26,7 @@ export default function Page5Words({ words: initialWords }: Props) {
   return (
     <div>
       <div className="flex gap-3 mb-3">
-        {AvailableLevels.map(level => <Button className="btn" onClick={fc.action(level)}>Load {level}</Button>)}
+        {AvailableLevels.map(level => <Button key={level} className="btn" onClick={fc.action(level)}>Load {level}</Button>)}
       </div>
       <ul>
         {words.map((w, i) => <li key={i}><DictLink word={{ id: w, word: w }} service="oxford" type="anchor" /></li>)}

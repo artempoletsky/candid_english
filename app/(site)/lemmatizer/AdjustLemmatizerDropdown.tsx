@@ -19,7 +19,7 @@ export default function AdjustLemmatizerDropdown({ word, removeCall, sentence }:
   const wordStr = word.word.toLowerCase();
   const id = word.id.toLowerCase();
   
-  let [dropDownVisible, setDropdownVisible] = useState(false);
+  const [dropDownVisible, setDropdownVisible] = useState(false);
 
   function onSuccess() {
     setDropdownVisible(false);
@@ -41,9 +41,8 @@ export default function AdjustLemmatizerDropdown({ word, removeCall, sentence }:
     propose((document.getElementById("proposion_input") as HTMLInputElement).value);
   }
 
-
   return (
-    <Menu shadow="sm" classNames={{
+    <Menu opened={dropDownVisible} onChange={setDropdownVisible} shadow="sm" classNames={{
       dropdown: "bg-stone-100 border border-stone-300"
     }}>
       <Menu.Target>

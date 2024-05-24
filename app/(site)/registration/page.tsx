@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 type Props = {};
-export default async function (props: Props) {
+export default async function Page(props: Props) {
 
   const session = await getSession();
   if (session.user) {

@@ -14,7 +14,7 @@ type Props = {
     secret: string;
   }
 };
-export default async function ({ params: { secret } }: Props) {
+export default async function Page({ params: { secret } }: Props) {
   const result = await confirmEmail({ secret });
 
   return (

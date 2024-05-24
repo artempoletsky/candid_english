@@ -19,7 +19,7 @@ type Props = {
     id: string;
   }
 };
-export default async function ({ params: { id } }: Props) {
+export default async function Page({ params: { id } }: Props) {
   
   let discussion;
   try {

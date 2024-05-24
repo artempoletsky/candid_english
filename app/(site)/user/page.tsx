@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 type Props = {};
-export default async function (props: Props) {
+export default async function Page(props: Props) {
   const method = rpc("user").hackRoute("getMyPage");
   return (
     <ComponentLoader

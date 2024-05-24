@@ -17,7 +17,7 @@ function RenderUser(user: UserSelf, onLogout: () => void) {
     }).then(onLogout);
   }
   return <div className="flex items-center gap-3">
-    {image && <Link href="/user"><img className="rounded-full h-[42px]" src={image} /></Link>}
+    {image && <Link href="/user"><img alt="avatar" className="rounded-full h-[42px]" src={image} /></Link>}
     <Link href="/user">{user.username}</Link>
     <Button onClick={onSignOut}>Sign out</Button>
     {/* <Link href="/user">sign out</Link> */}

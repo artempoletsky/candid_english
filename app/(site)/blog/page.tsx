@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 
-export default async function BlogMain() {
+export default async function Page() {
   const allPostsData = getSortedPostsData();
   return (
     <>

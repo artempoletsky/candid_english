@@ -39,7 +39,7 @@ export default function LemmatizerPropositions({ scheme, unreviewed: unreviewedI
   const fc = fetchCatch(resolveProposition)
     .then(removeFirst)
     .catch(setErrorResponse)
-    .buttonElement(Button);
+    .buttonComponent(Button);
 
 
   let removedId: number = 0;
@@ -116,7 +116,7 @@ export default function LemmatizerPropositions({ scheme, unreviewed: unreviewedI
       setUnreviewed(data);
     })
     .catch(setErrorResponse)
-    .buttonElement(Button);
+    .buttonComponent(Button);
 
 
   const isBlacklist = first && !first.proposition;
@@ -127,7 +127,7 @@ export default function LemmatizerPropositions({ scheme, unreviewed: unreviewedI
     <div className="mb-3">
       {fcUnreview.button("Unreview all")}
     </div>
-    {unreviewed.map(e => <div className="mb-1">
+    {unreviewed.map(e => <div key={e.id} className="mb-1">
       <Button onClick={deleteFromList.action(e)}>Remove {e.id}</Button>
     </div>)}
     {first && <div className="mt-4">
