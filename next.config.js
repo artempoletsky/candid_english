@@ -15,6 +15,7 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
   },
+  output: 'standalone',
 }
 
 module.exports = nextConfig

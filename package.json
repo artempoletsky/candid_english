@@ -6,7 +6,7 @@
     "chat": "tsx socket/server",
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3001",
     "lint": "next lint",
     "test": "jest",
     "db": "npx node_modules/@artempoletsky/kurgandb",

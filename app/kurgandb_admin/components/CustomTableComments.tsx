@@ -36,7 +36,7 @@ export default function CustomTableComments({ scheme, meta: metaInitial }: Props
       value={meta.commentingMode}
       data={CommentingModes}
       allowDeselect={false}
-      onChange={fc.handle}
+      onChange={fc.handle as any}
     />
     <ErrorMessage message={errorMessage} />
   </div>
