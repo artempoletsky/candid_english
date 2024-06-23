@@ -89,6 +89,12 @@ export default function LemmatizerPropositions({ scheme, unreviewed: unreviewedI
   const first: LemmatizerProposition = unreviewed && unreviewed[0] as any;
 
   const [{ black, white, ovrWord, ovrLemma }, h] = useVars({
+    initialValues: {
+      black: "",
+      white: "",
+      ovrWord: "",
+      ovrLemma: "",
+    },
     placeholders: {
       black: "Blacklist",
       white: "Whitelist",
@@ -105,8 +111,8 @@ export default function LemmatizerPropositions({ scheme, unreviewed: unreviewedI
       h.setAll({
         white: first.word,
         black: first.oldLemma,
-        ovrLemma: first.word,
-        ovrWord: first.proposition,
+        ovrLemma: first.proposition,
+        ovrWord: first.word,
       });
     }
   }, [unreviewed]);
@@ -118,14 +124,23 @@ export default function LemmatizerPropositions({ scheme, unreviewed: unreviewedI
     .catch(setErrorResponse)
     .buttonComponent(Button);
 
+  const fcRefresh = fcUnreview.method(getData)
+    .before(() => ({
+      page: 1,
+    }))
+    .then(data => {
+      setUnreviewed(data.unreviewed);
+    });
+
 
   const isBlacklist = first && !first.proposition;
 
 
   return <div>
     To review: {unreviewed.length}
-    <div className="mb-3">
+    <div className="mb-3 flex gap-3">
       {fcUnreview.button("Unreview all")}
+      {fcRefresh.button("Refresh")}
     </div>
     {unreviewed.map(e => <div key={e.id} className="mb-1">
       <Button onClick={deleteFromList.action(e)}>Remove {e.id}</Button>

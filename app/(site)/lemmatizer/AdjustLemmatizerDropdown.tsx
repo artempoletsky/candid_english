@@ -53,7 +53,8 @@ export default function AdjustLemmatizerDropdown({ word, removeCall, sentence }:
       <Menu.Dropdown>
 
         <ul className="p-3">
-          <li className="flex gap-3 items-center">
+          <p className="">Suggest an adjustment:</p>
+          <li className="flex gap-3 items-center mb-1">
             <span>{wordStr} is a form of</span>
             <TextInput placeholder="propose a word" defaultValue={wordStr} id="proposion_input" />
             <Button onClick={proposeOverride}>OK</Button>

@@ -37,6 +37,7 @@ export default function PageLemmatizer() {
   const [myWords] = useStore("myWords");
   const fileInput = useRef<any>(null);
   const [filterKnownWords, setFilterKnownWords] = useState(true);
+  const [uploadCompleted, setUploadCompleted] = useState(false);
 
   const fc = fetchCatch(addWords)
     .then(updateMyWords)
@@ -120,8 +121,9 @@ export default function PageLemmatizer() {
 
   return (
     <div>
+      <h1 className="h1">Text lemmatizer</h1>
       {/* <FileInput /> */}
-      <FileInput placeholder="Upload srt file" value={fileToUpload} id="subtitles_file" className="file-input w-full max-w-xs mr-2" onChange={file => {
+      <FileInput placeholder="Upload srt file" value={fileToUpload} id="subtitles_file" className="file-input w-full max-w-xs mr-2 mb-3" onChange={file => {
         setFileToUpload(file);
         // const input = e.target;
         if (!file) return;
@@ -133,18 +135,25 @@ export default function PageLemmatizer() {
             return;
           }
           setWords(res.words);
+          setUploadCompleted(true);
         });
       }} />
-      <div className="mt-3">
-        <Checkbox checked={filterKnownWords} onChange={e => setFilterKnownWords(e.target.checked)} label="Filter known words" />
-      </div>
-      {printTable(inDict)}
 
-      {notInDict.length != 0 && <>
-        <h3>Probably not English words:</h3>
-        {printTable(notInDict)}
+      {uploadCompleted ? <>
+        <div className="mt-3">
+          <Checkbox checked={filterKnownWords} onChange={e => setFilterKnownWords(e.target.checked)} label="Filter known words" />
+        </div>
+        {printTable(inDict)}
+
+        {notInDict.length != 0 && <>
+          <h3>Probably not English words:</h3>
+          {printTable(notInDict)}
+        </>}
+      </> : <>        
+        <p>Upload text here, and we will disassemble it to a list of words that you can learn.</p>
+        <p>Only .srt files are suppoted for now.</p>
+        <p>You can download subtitles for your favorite movies and TV shows here: <a target="_blank" href="https://www.opensubtitles.org/en/search/sublanguageid-eng">www.opensubtitles.org</a></p>
       </>}
-
     </div>
   );
 }
