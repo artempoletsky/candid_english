@@ -1,6 +1,6 @@
 
 
-
+import _ from "lodash";
 
 
 
@@ -14,9 +14,6 @@ export type LemmatizeResult = {
 
 const DoubleConsonants = ['rr', 'tt', 'pp', 'dd', 'gg', 'kk', 'zz', 'cc', 'bb', 'nn', 'mm'];
 const Suffixes = {
-  "ers": "",
-  "ers'": "",
-
   "ing": "",
   "in'": "",
   "er": "",
@@ -28,37 +25,60 @@ const Suffixes = {
   "ly": "",
 };
 
-import { rfs, createIfNotExists } from "./util";
-import { LEMMATIZER_ALL, LEMMATIZER_IRREGULAR, LEMMATIZER_OVERRIDES } from "./paths";
+import { rfs, createIfNotExists, arrToDict } from "./util";
+import { LEMMATIZER_ALL, LEMMATIZER_IRREGULAR, LEMMATIZER_OVERRIDES, LEMMATIZER_WHITELIST, OXFORD_LIST_LIGHT } from "./paths";
+
+
+
 createIfNotExists(LEMMATIZER_ALL, {});
 
-let WordsDict: Record<string, number>;
+let WordsDict: Set<string>;
 let Overrides: Record<string, string>;
 let Irregular: Record<string, string>;
+let WhiteList: Set<string>;
 const CWD = process.cwd();
 export function invalidateDict() {
   // delete require.cache[Object.keys(require.cache).find(k => k.endsWith('all_words.json')) as string];
-  WordsDict = rfs(LEMMATIZER_ALL);
+  WordsDict = new Set(rfs(LEMMATIZER_ALL));
   Overrides = rfs(LEMMATIZER_OVERRIDES);
   Irregular = rfs(LEMMATIZER_IRREGULAR);
+  WhiteList = new Set([...rfs(LEMMATIZER_WHITELIST), ...rfs(OXFORD_LIST_LIGHT).map((w: any) => w.word)]);
 }
 invalidateDict();
 
-type LemmatizeWordOptions = {
-  searchWordInDict: boolean
-};
-const LemmatizeWordOptionsDefault: LemmatizeWordOptions = {
-  searchWordInDict: true
-};
-export function lemmatizeWord(word: string, dict: Record<string, any>, options?: LemmatizeWordOptions) {
-  options = options ? { ...LemmatizeWordOptionsDefault, ...options } : LemmatizeWordOptionsDefault;
 
-  const { searchWordInDict } = options;
 
+export type LemmatizerOptionsInner = {
+  cutPrefixes: {
+    un: boolean;
+    re: boolean;
+  },
+};
+
+export type LemmatizerOptions = {
+  searchWordInDict?: boolean;
+  cutPrefixes?: {
+    un?: boolean;
+    re?: boolean;
+  },
+};
+
+const LemmatizeWordOptionsDefault: LemmatizerOptionsInner = {
+  cutPrefixes: {
+    un: true,
+    re: true,
+  },
+};
+
+
+export function cutSuffix(word: string, dict: Set<string>, options: LemmatizerOptionsInner): string {
   let lemma = word, suffix = "";
 
-  if (searchWordInDict && dict[word]) {
-    return word;
+  let ss = ['ss', 'll'];
+  for (const s of ss) {
+    if (lemma.endsWith(s)) {
+      return lemma;
+    }
   }
 
   for (let s in Suffixes) {
@@ -73,12 +93,15 @@ export function lemmatizeWord(word: string, dict: Record<string, any>, options?:
     return word;
   }
 
-  //drivers
-  if ((suffix == "ers") || (suffix == "ers'")) {
-    if (dict[lemma + 'er']) {
-      return lemma + 'er';
+  for (let s of DoubleConsonants) {
+    //hopp -> hop
+    if (lemma.endsWith(s)) {
+      lemma = lemma.slice(0, -1);
+      return lemma;
     }
   }
+
+  if (WhiteList.has(lemma)) return lemma;
 
   if (suffix == "s'") {
     suffix = "s";
@@ -95,19 +118,13 @@ export function lemmatizeWord(word: string, dict: Record<string, any>, options?:
   //promises
   //biases
   if ((suffix == "s") && lemma.endsWith('se')) {
-    if (dict[lemma]) {
+    if (dict.has(lemma)) {
       return lemma;
     }
     return lemma.slice(0, -1);
   }
 
-  for (let s of DoubleConsonants) {
-    //hopp -> hop
-    if (lemma.endsWith(s)) {
-      lemma = lemma.slice(0, -1);
-      return lemma;
-    }
-  }
+
 
   //fif ->five
   if (suffix == "th" && lemma.endsWith('f')) {
@@ -117,7 +134,7 @@ export function lemmatizeWord(word: string, dict: Record<string, any>, options?:
   //goe
   //toche
   //bushe
-  let ss = ["she", "che", "oe"];
+  ss = ["she", "che", "oe"];
   for (const s of ss) {
     if (lemma.endsWith(s)) {
       return lemma.slice(0, -1);
@@ -130,7 +147,7 @@ export function lemmatizeWord(word: string, dict: Record<string, any>, options?:
   for (const s of ss) {
     if (lemma.endsWith(s)) {
       let l = lemma.slice(0, -s.length);
-      if (dict[l + 'y']) {
+      if (dict.has(l + 'y')) {
         return l + 'y';
       }
     }
@@ -140,40 +157,92 @@ export function lemmatizeWord(word: string, dict: Record<string, any>, options?:
   //dy -> die
   if (lemma.endsWith("y")) {
     let l = lemma.slice(0, -1);
-    if (dict[l + 'ie']) {
+    if (dict.has(l + 'ie')) {
       return l + 'ie';
     }
   }
 
   //hop -> hope
-  if (dict[lemma + 'e']) {
+  if (dict.has(lemma + 'e')) {
     return lemma + 'e';
   }
 
   if (lemma.endsWith("ve")) {
     //serve
-    if (dict[lemma]) {
+    if (dict.has(lemma)) {
       return lemma;
     }
     //wolve
     let l = lemma.slice(0, -2);
-    if (dict[l + 'f']) {
+    if (dict.has(l + 'f')) {
       return l + 'f';
     }
   }
 
-  if (dict[lemma]) {
+  if (dict.has(lemma)) {
     return lemma;
   }
 
   return word;
 }
 
+
+export function cutPrefix(word: string, dict: Set<string>, options: LemmatizerOptionsInner): string {
+  const cutPrefixes: Record<string, boolean> = options.cutPrefixes;
+
+  for (const key in cutPrefixes) {
+    if (cutPrefixes[key] && word.startsWith(key)) {
+      const lemma = word.slice(key.length);
+      if (dict.has(lemma)) {
+        return lemma;
+      }
+    }
+  }
+
+  return word;
+}
+
+
+export function lemmatizeWord(word: string, dict?: Set<string>, options?: LemmatizerOptions) {
+  if (!dict) dict = WordsDict;
+  const opts: LemmatizerOptionsInner = _.merge({}, LemmatizeWordOptionsDefault, options);
+  if (WhiteList.has(word)) {
+    return word;
+  }
+
+
+  let lemma = "";
+  while (true) {
+    lemma = cutPrefix(word, dict, opts);
+    if (WhiteList.has(lemma)) return lemma;
+    if (lemma == word) break;
+    word = lemma;
+  }
+
+  while (true) {
+    lemma = cutSuffix(word, dict, opts);
+    if (WhiteList.has(lemma)) return lemma;
+    if (lemma == word) break;
+    word = lemma;
+  }
+
+  return lemma;
+}
+
 const suffixesToRemove = ["'m", "'ve", "'re", "'d", "n't", "'s", "'ll"];
-export default function lemmatize(text: string): Record<string, LemmatizeResult> {
+export default function lemmatize(text: string, options?: LemmatizerOptions): Record<string, LemmatizeResult> {
+
+
+  // {
+  //   // ...rfs("/grab_data/words_dict.json"),
+  //   ...arrToDict(rfs(LEMMATIZER_WHITELIST))
+  // };
+
+
+
+
   let dict: Record<string, LemmatizeResult> = {};
   const sentences = text.split(/[.!?—]/);
-  const isLemmaInDict: Record<string, boolean> = {};
 
   for (const sentence of sentences) {
 
@@ -207,7 +276,7 @@ export default function lemmatize(text: string): Record<string, LemmatizeResult>
         lemma,
         count: 1,
         sentence,
-        isInDictionary: !!WordsDict[lemma],
+        isInDictionary: WordsDict.has(lemma),
       } as LemmatizeResult;
     }).filter(({ lemma }) => {
       lemma = lemma.replace(/[']/, '');

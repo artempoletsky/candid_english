@@ -17,7 +17,7 @@ function toDict(arr: string[]): Record<string, number> {
 
 
 
-export default function simplify(): Record<string, number> {
+export default function simplify(): Set<string> {
   // const noSuffixes = toDict(words.filter(w => {
   //   for (const s of suffixes) {
   //     if (w.endsWith(s)) {
@@ -27,49 +27,59 @@ export default function simplify(): Record<string, number> {
   //   return true;
   // }));
 
-  const WhiteList: Record<string, number> = {
-    ...rfs("/grab_data/words_dict.json"),
-    ...toDict(rfs(LEMMATIZER_WHITELIST))
-  };
+  const WhiteListArray: string[] = rfs(LEMMATIZER_WHITELIST);
+  const WhiteList: Set<string> = new Set(WhiteListArray);
 
-  const BlackList: Record<string, number> = toDict(rfs(LEMMATIZER_BLACKLIST));
+  // {
+  //   ...rfs("/grab_data/words_dict.json"),
+  //   ...toDict()
+  // };
+
+  const BlackList: Set<string> = new Set(rfs(LEMMATIZER_BLACKLIST));
 
   const Overrides: Record<string, string> = rfs(LEMMATIZER_OVERRIDES);
 
-  const fullDict = toDict(words);
+  const fullDict: Set<string> = new Set([...words, ...WhiteListArray]);
 
-  for (const word in WhiteList) {
-    fullDict[word] = 1;
+  
+  for (const word of BlackList) {
+    fullDict.delete(word);
   }
 
-  for (const word in fullDict) {
-    if (BlackList[word] || Overrides[word]) {
-      delete fullDict[word];
-      continue;
-    }
+  // for (const word in Overrides) {
+    // fullDict.delete(word);
+  // }
+  // for (const word in WhiteList) {
+  //   fullDict.ad
+  // }
 
-    if (WhiteList[word]) {
-      continue;
-    }
+  // const removedWords = new Set<string>();
+  // for (const word in fullDict) {
+   
+    // if (WhiteList[word]) {
+    //   continue;
+    // }
 
-    const lemma = lemmatizeWord(word, fullDict, {
-      searchWordInDict: false
-    });
+    // const lemma = lemmatizeWord(word, fullDict, {
+    //   searchWordInDict: false,
+    //   cutPrefixes: {
+    //     re: true,
+    //     un: true,
+    //   }
+    // });
 
-    if (word != lemma) {
-      delete fullDict[word];
-    }
-  }
+    // if (word != lemma) {
+    //   // delete fullDict[word];
+    //   removedWords.add(word);
+    // }
+  // }
 
-  for (const word in fullDict) {
-    if (WhiteList[word + "e"]) {
-      continue;
-    }
-    if (fullDict[word + "e"]) {
-      delete fullDict[word + "e"];
-    }
-  }
-  wfs(LEMMATIZER_ALL, fullDict);
+  // for (const word of removedWords) {
+  //   delete fullDict[word];
+  // }
+
+
+  wfs(LEMMATIZER_ALL, Array.from(fullDict));
 
   invalidateDict();
   return fullDict;
