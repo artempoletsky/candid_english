@@ -93,6 +93,13 @@ export function cutSuffix(word: string, dict: Set<string>, options: LemmatizerOp
     return word;
   }
 
+  //humbly -> humble
+  if (suffix == "ly") {
+    if (dict.has(lemma + "le")) {
+      return lemma + "le";
+    }
+  }
+
   for (let s of DoubleConsonants) {
     //hopp -> hop
     if (lemma.endsWith(s)) {
@@ -212,15 +219,16 @@ export function lemmatizeWord(word: string, dict?: Set<string>, options?: Lemmat
 
 
   let lemma = "";
+
   while (true) {
-    lemma = cutPrefix(word, dict, opts);
+    lemma = cutSuffix(word, dict, opts);
     if (WhiteList.has(lemma)) return lemma;
     if (lemma == word) break;
     word = lemma;
   }
 
   while (true) {
-    lemma = cutSuffix(word, dict, opts);
+    lemma = cutPrefix(word, dict, opts);
     if (WhiteList.has(lemma)) return lemma;
     if (lemma == word) break;
     word = lemma;
