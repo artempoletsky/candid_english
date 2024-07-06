@@ -17,7 +17,7 @@ export default function Home() {
               The site will filter words you already know and show you new words to learn.
               <br /> Learn this new words and add them to your vocabulary.
             </p>
-            <p>For best results use <a href="https://apps.ankiweb.net/" className="href">Anki</a>.</p>
+            <p>For best results use <a target="_blank" href="https://apps.ankiweb.net/" className="href">Anki</a>.</p>
           </li>
           <li>Watch the content for fun!</li>
         </ol>
