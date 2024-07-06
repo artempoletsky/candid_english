@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  font-size: 18px;
+}
+
+a {
+  @apply underline text-blue-600;
+}
+
+h1 {
+  @apply text-[4em]/[120%] font-bold text-orange-500 mb-10;
+}
+
+h2 {
+  @apply text-[2em] font-bold text-orange-700 mb-3;
+}
+
+ol {
+  list-style-type: decimal;
+  @apply pl-7;
+}
+
+li {
+  @apply mb-1;
+}
