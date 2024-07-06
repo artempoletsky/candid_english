@@ -367,4 +367,8 @@ describe("Lemmatizer", () => {
   test("unneeded", () => {
     expect(lemmatizeWord("unneeded")).toBe("need");
   });
-});
+
+  test("unpunished", () => {
+    expect(lemmatizeWord("unpunished")).toBe("punish");
+  });
+}); 

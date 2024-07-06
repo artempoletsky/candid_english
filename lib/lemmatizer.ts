@@ -12,7 +12,7 @@ export type LemmatizeResult = {
   isInDictionary: boolean,
 };
 
-const DoubleConsonants = ['rr', 'tt', 'pp', 'dd', 'gg', 'kk', 'zz', 'cc', 'bb', 'nn', 'mm'];
+const DoubleConsonants = ['rr', 'tt', 'pp', 'dd', 'gg', 'kk', 'zz', 'cc', 'bb', 'nn', 'mm', 'vv'];
 const Suffixes = {
   "ing": "",
   "in'": "",
@@ -52,6 +52,7 @@ export type LemmatizerOptionsInner = {
   cutPrefixes: {
     un: boolean;
     re: boolean;
+    out: boolean;
   },
 };
 
@@ -67,6 +68,7 @@ const LemmatizeWordOptionsDefault: LemmatizerOptionsInner = {
   cutPrefixes: {
     un: true,
     re: true,
+    out: true,
   },
 };
 
@@ -93,6 +95,8 @@ export function cutSuffix(word: string, dict: Set<string>, options: LemmatizerOp
     return word;
   }
 
+  if (WhiteList.has(lemma)) return lemma;
+
   //humbly -> humble
   if (suffix == "ly") {
     if (dict.has(lemma + "le")) {
@@ -108,7 +112,6 @@ export function cutSuffix(word: string, dict: Set<string>, options: LemmatizerOp
     }
   }
 
-  if (WhiteList.has(lemma)) return lemma;
 
   if (suffix == "s'") {
     suffix = "s";
@@ -170,7 +173,7 @@ export function cutSuffix(word: string, dict: Set<string>, options: LemmatizerOp
   }
 
   //hop -> hope
-  if (dict.has(lemma + 'e')) {
+  if (dict.has(lemma + 'e') && (suffix == "ed" ||  suffix == "er" ||  suffix == "ing" || suffix == "est")) {
     return lemma + 'e';
   }
 
@@ -229,6 +232,14 @@ export function lemmatizeWord(word: string, dict?: Set<string>, options?: Lemmat
 
   while (true) {
     lemma = cutPrefix(word, dict, opts);
+    if (WhiteList.has(lemma)) return lemma;
+    if (lemma == word) break;
+    word = lemma;
+  }
+
+  // unpunished
+  while (true) {
+    lemma = cutSuffix(word, dict, opts);
     if (WhiteList.has(lemma)) return lemma;
     if (lemma == word) break;
     word = lemma;

@@ -54,7 +54,7 @@ export default function PageLemmatizer() {
 
   function formatSentence(word: AtomizedWord) {
     const { time, text } = parseSentence(word);
-    return (<span title={time} dangerouslySetInnerHTML={{ __html: text }}></span>);
+    return (<span onClick={e => copySentenceToClipboard(e.currentTarget)} title={time} dangerouslySetInnerHTML={{ __html: text }}></span>);
   }
 
   function copySentenceToClipboard(el: HTMLElement) {
@@ -100,9 +100,9 @@ export default function PageLemmatizer() {
                 <AdjustLemmatizerDropdown sentence={parseSentence(w).text} word={w} removeCall={discardWord} />
               </Table.Td>
               <Table.Td className="w-0">{w.count}</Table.Td>
-              <Table.Td className="w-0" onClick={e => copySentenceToClipboard(e.target as HTMLElement)} >
+              <Table.Td className="w-0" onClick={e => copySentenceToClipboard(e.currentTarget)} >
                 {w.id}</Table.Td>
-              <Table.Td onClick={e => copySentenceToClipboard(e.target as HTMLElement)} >{formatSentence(w)}</Table.Td>
+              <Table.Td>{formatSentence(w)}</Table.Td>
               <Table.Td className="w-0 whitespace-nowrap">
                 <DictLink className="mr-1" word={w} service="google" />
                 <DictLink className="mr-1" word={w} service="oxford" />
@@ -149,7 +149,7 @@ export default function PageLemmatizer() {
           <h3>Probably not English words:</h3>
           {printTable(notInDict)}
         </>}
-      </> : <>        
+      </> : <>
         <p>Upload text here, and we will disassemble it to a list of words that you can learn.</p>
         <p>Only .srt files are suppoted for now.</p>
         <p>You can download subtitles for your favorite movies and TV shows here: <a target="_blank" href="https://www.opensubtitles.org/en/search/sublanguageid-eng">www.opensubtitles.org</a></p>

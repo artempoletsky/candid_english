@@ -1,0 +1,17 @@
+services:
+  next:
+    build:
+      context: .
+    environment:
+      NODE_ENV: production
+
+    ports:
+      - 3000:3000
+    container_name: next
+    image: artempoletsky/interdrill
+    
+    volumes:
+          - database:/usr/src/app/kurgandb_data
+
+volumes:
+  database:

@@ -16,6 +16,9 @@ const nextConfig = {
     optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
   },
   output: 'standalone',
-}
+  eslint: {
+    ignoreDuringBuilds: true,
+  }
+};
 
 module.exports = nextConfig
