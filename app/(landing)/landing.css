@@ -11,7 +11,7 @@ a {
 }
 
 h1 {
-  @apply text-[4em]/[120%] font-bold text-orange-500 mb-10;
+  @apply text-[2em]/[120%] sm:text-[3em] lg:text-[4em] font-bold text-orange-500 mb-10;
 }
 
 h2 {
