@@ -83,7 +83,7 @@ export default function LargeTable({
           // Call the original callback
           rest.onItemsRendered && rest.onItemsRendered(props)
         }}
-        ref={el => (listRef.current = el)}
+        ref={((el:any) => (listRef.current = el)) as any}
       >
         {row}
       </FixedSizeList>

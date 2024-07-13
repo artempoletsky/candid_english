@@ -30,6 +30,11 @@
 **/values.dev.yaml
 **/build
 **/dist
-**/.swc
 LICENSE
 README.md
+
+**/kurgandb_data
+**/kurgandb_log
+**/.swc
+# **/.env.local
+docker_pkg.js

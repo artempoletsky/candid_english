@@ -8,7 +8,7 @@ import { clearSession, createOrGetUser } from "../methods";
 import { authorize } from "./adapter";
 
 const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } = process.env;
-if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) throw new Error("Google ENV credentials is invalid!");
+// if (process.env.NODE_ENV !== "build" && (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET)) throw new Error("Google ENV credentials is invalid!");
 
 const handler = NextAuth({
   callbacks: {
@@ -40,8 +40,8 @@ const handler = NextAuth({
       authorize,
     }),
     GoogleProvider({
-      clientId: GOOGLE_CLIENT_ID,
-      clientSecret: GOOGLE_CLIENT_SECRET,
+      clientId: GOOGLE_CLIENT_ID!,
+      clientSecret: GOOGLE_CLIENT_SECRET!,
     }),
   ]
 });

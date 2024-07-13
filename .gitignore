@@ -43,3 +43,4 @@ next-env.d.ts
 /kurgandb_data/
 /kurgandb_log/
 /app/kurgandb/
+/docker/

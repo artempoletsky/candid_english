@@ -2,16 +2,34 @@ services:
   next:
     build:
       context: .
+    env_file: ".env.local"
+
     environment:
       NODE_ENV: production
 
-    ports:
-      - 3000:3000
-    container_name: next
+    # ports:
+    #   - 3000:3000
+    container_name: drillnext
     image: artempoletsky/interdrill
     
     volumes:
-          - database:/usr/src/app/kurgandb_data
+      - database:/usr/src/app/kurgandb_data
+      - public:/usr/src/app/public
+      - static:/usr/src/app/.next/static
+
+  nginx:
+    container_name: drillnginx
+    env_file: ".env.local"
+    ports: 
+      - 80:80
+    image: nginx
+    volumes:
+      - public:/usr/share/nginx/public:ro
+      - static:/usr/share/nginx/_next/static:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/mime.types:/etc/nginx/mime.types:ro
 
 volumes:
   database:
+  public:
+  static:
