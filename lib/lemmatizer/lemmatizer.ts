@@ -1,7 +1,7 @@
 
 
 import _ from "lodash";
-
+import fs from "fs";
 
 
 export type LemmatizeResult = {
@@ -25,28 +25,68 @@ const Suffixes = {
   "ly": "",
 };
 
-import { rfs, createIfNotExists, arrToDict } from "./util";
-import { LEMMATIZER_ALL, LEMMATIZER_IRREGULAR, LEMMATIZER_OVERRIDES, LEMMATIZER_WHITELIST, OXFORD_LIST_LIGHT } from "./paths";
 
+import WordsDictRaw from "./all_words.json";
+import OverridesRaw from "./lemma_overrides.json";
+import IrregularRaw from "./irregular_verbs.json";
+import WhiteListRaw from "./whitelist.json";
+import BlackListRaw from "./blacklist.json";
+import OxfordRaw from "./words_light.json";
 
+let WordsDict: Set<string> = new Set(WordsDictRaw);
+let Overrides: Record<string, string> = OverridesRaw;
+let Irregular: Record<string, string> = IrregularRaw;
+let WhiteList: Set<string> = new Set([...WhiteListRaw, ...OxfordRaw.map((w: any) => w.word)]);
+let BlackList: Set<string> = new Set(BlackListRaw);
 
-createIfNotExists(LEMMATIZER_ALL, {});
-
-let WordsDict: Set<string>;
-let Overrides: Record<string, string>;
-let Irregular: Record<string, string>;
-let WhiteList: Set<string>;
-const CWD = process.cwd();
-export function invalidateDict() {
-  // delete require.cache[Object.keys(require.cache).find(k => k.endsWith('all_words.json')) as string];
-  WordsDict = new Set(rfs(LEMMATIZER_ALL));
-  Overrides = rfs(LEMMATIZER_OVERRIDES);
-  Irregular = rfs(LEMMATIZER_IRREGULAR);
-  WhiteList = new Set([...rfs(LEMMATIZER_WHITELIST), ...rfs(OXFORD_LIST_LIGHT).map((w: any) => w.word)]);
+export function saveDefaults() {
+  blacklist(BlackList);
+  whitelist(WhiteList);
+  fs.writeFileSync("./all_words.json", JSON.stringify(Array.from(WordsDict)));
+  fs.writeFileSync("./lemma_overrides.json", JSON.stringify(Overrides, undefined, 2));
+  fs.writeFileSync("./whitelist.json", JSON.stringify(Array.from(WhiteList), undefined, 2));
+  fs.writeFileSync("./blacklist.json", JSON.stringify(Array.from(BlackList), undefined, 2));
 }
-invalidateDict();
 
 
+
+function getWordsCollection(arg: string | Set<string> | string[]): Set<string> | string[] {
+  if (typeof arg == "string") {
+    return [arg];
+  }
+  return arg;
+}
+
+function blacklist(word: string): void
+function blacklist(words: Set<string> | string[]): void
+function blacklist(arg: string | Set<string> | string[]): void {
+  const words = getWordsCollection(arg);
+  for (const word of words) {
+    BlackList.add(word);
+    WordsDict.delete(word);
+    WhiteList.delete(word);
+  }
+}
+
+function whitelist(word: string): void
+function whitelist(words: Set<string> | string[]): void
+function whitelist(arg: string | Set<string> | string[]): void {
+  const words = getWordsCollection(arg);
+  for (const word of words) {
+    BlackList.delete(word);
+    WordsDict.add(word);
+    WhiteList.add(word);
+  }
+}
+
+function override(word: string, lemma: string): void
+function override(dict: Record<string, string>): void
+function override(arg1: Record<string, string> | string, arg2?: string): void {
+  let dict = typeof arg1 == "string" ? { [arg1]: arg2! } : arg1;
+  Object.assign(Overrides, dict);
+}
+
+export { blacklist, whitelist, override, WordsDict };
 
 export type LemmatizerOptionsInner = {
   cutPrefixes: {
@@ -173,7 +213,7 @@ export function cutSuffix(word: string, dict: Set<string>, options: LemmatizerOp
   }
 
   //hop -> hope
-  if (dict.has(lemma + 'e') && (suffix == "ed" ||  suffix == "er" ||  suffix == "ing" || suffix == "est")) {
+  if (dict.has(lemma + 'e') && (suffix == "ed" || suffix == "er" || suffix == "ing" || suffix == "est")) {
     return lemma + 'e';
   }
 
@@ -312,3 +352,4 @@ export default function lemmatize(text: string, options?: LemmatizerOptions): Re
   }
   return dict;
 };
+

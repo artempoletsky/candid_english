@@ -1,11 +1,10 @@
 import { ResponseError } from "@artempoletsky/easyrpc";
 import z from "zod";
 import { query, methodFactory } from "app/db";
-import { LEMMATIZER_BLACKLIST, LEMMATIZER_OVERRIDES, LEMMATIZER_WHITELIST } from "lib/paths";
-import simplify from "lib/simplify_words";
-import { rfs, wfs } from "lib/util";
+
 import { removeExamTicketImage } from "app/api/image/methods_image";
 import { CommentingModes } from "app/globals";
+import { blacklist, override, saveDefaults, whitelist } from "lib/lemmatizer/lemmatizer";
 
 
 const ZGetPage = z.object({
@@ -39,29 +38,14 @@ async function resolveProposition(payload: AResolvePropostion) {
   let { word, lemma, list } = payload;
 
   if (list == "override") {
-    const overrides: Record<string, string> = rfs(LEMMATIZER_OVERRIDES);
-    overrides[word.toLowerCase()] = lemma.toLowerCase();
-    wfs(LEMMATIZER_OVERRIDES, overrides, {
-      pretty: true
-    });
-    simplify();
-
-  } else if (list == "black" || list == "white") {
-    const filename = list == "white" ? LEMMATIZER_WHITELIST : LEMMATIZER_BLACKLIST;
-    console.log(filename);
-
-    const listData: string[] = rfs(filename);
-    word = word.toLowerCase();
-
-    if (list.includes(word)) return;
-    listData.push(word);
-    wfs(filename, listData, {
-      pretty: true
-    });
-    simplify();
+    override(word.toLowerCase(), lemma.toLowerCase());
+  } else if (list == "black") {
+    blacklist(word.toLowerCase());
+  } else if (list == "white") {
+    whitelist(word.toLowerCase());
   }
 
-
+  saveDefaults();
 
   return await query(({ lemmatizer_propositions }, { propositionId }, { $ }) => {
     lemmatizer_propositions.where("id" as any, propositionId).update(r => r.reviewed = true);

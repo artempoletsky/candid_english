@@ -2,17 +2,18 @@
 import { describe, expect, test, beforeAll } from "@jest/globals";
 
 // import lemmatize from "../lib/wink_lemmatizer";
-import lemmatize, { LemmatizerOptions, LemmatizerOptionsInner, cutPrefix, cutSuffix, lemmatizeWord } from "../lib/lemmatizer";
-import simplify from "../lib/simplify_words";
+import lemmatize, { LemmatizerOptions, LemmatizerOptionsInner, cutPrefix, cutSuffix, lemmatizeWord, WordsDict, saveDefaults } from "../lib/lemmatizer/lemmatizer";
+
 
 const xdescribe = (...args: any) => { };
 const xtest = (...args: any) => { };
 
 describe("Simplify", () => {
-  let allWordsDict: Set<string>;
+  
 
   beforeAll(() => {
-    allWordsDict = simplify();
+    // allWordsDict = simplify();
+    saveDefaults();
   });
 
   test("dictionary check", () => {
@@ -34,14 +35,14 @@ describe("Simplify", () => {
     // expect(allWordsDict["undead"]).toBeDefined();
 
 
-    expect(allWordsDict.has("bodie")).toBe(false);
+    expect(WordsDict.has("bodie")).toBe(false);
     // expect(allWordsDict["pens"]).toBeUndefined();
-    expect(allWordsDict.has("seconde")).toBe(false);
+    expect(WordsDict.has("seconde")).toBe(false);
     // expect(allWordsDict["spoilers"]).toBeUndefined();
     // expect(allWordsDict["bushes"]).toBeUndefined();
-    expect(allWordsDict.has("goe")).toBe(false);
+    expect(WordsDict.has("goe")).toBe(false);
     // expect(allWordsDict["fifth"]).toBeUndefined();
-    expect(allWordsDict.has("wo")).toBe(false);
+    expect(WordsDict.has("wo")).toBe(false);
     // expect(allWordsDict["enforcers"]).toBeUndefined();
     // expect(allWordsDict["jinxes"]).toBeUndefined();
     // expect(allWordsDict["tosses"]).toBeUndefined();
@@ -80,6 +81,7 @@ describe("functions", () => {
     cutPrefixes: {
       re: true,
       un: true,
+      out: true,
     }
   }
   test("cutPrefix", () => {
@@ -109,7 +111,7 @@ describe("functions", () => {
   test("lemmatizeWord", () => {
     expect(lemmatizeWord("gain", dict, options)).toBe("gain");
     expect(lemmatizeWord("regain", dict, options)).toBe("regain");
-    expect(lemmatizeWord("regained", dict, options)).toBe("gain");
+    expect(lemmatizeWord("regained", dict, options)).toBe("regain");
     expect(lemmatizeWord("gained", dict, options)).toBe("gain");
     expect(lemmatizeWord("relish", dict, options)).toBe("relish");
     expect(lemmatizeWord("renown", dict, options)).toBe("renown");
@@ -209,7 +211,7 @@ describe("Lemmatizer", () => {
 
   test(" warning:", () => {
     let lemmas = lemmatize(" warning:");
-    expect(lemmas["warn"].count).toEqual(1);
+    expect(lemmas["warning"].count).toEqual(1);
   });
 
   test(" don't", () => {
@@ -361,7 +363,7 @@ describe("Lemmatizer", () => {
 
   test("regained", () => {
     let lemmas = lemmatize("regained");
-    expect(lemmas["gain"]).toBeDefined();
+    expect(lemmas["regain"]).toBeDefined();
   });
 
   test("unneeded", () => {

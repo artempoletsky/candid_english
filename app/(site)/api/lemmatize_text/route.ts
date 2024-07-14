@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import { reject } from 'lodash';
-import lemmatize from "lib/lemmatizer";
+import lemmatize from "lib/lemmatizer/lemmatizer";
 
 export type Subtitle = {
   id: number;
