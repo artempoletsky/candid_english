@@ -24,6 +24,7 @@ services:
     env_file: ".env.docker"
     ports:
       - 80:80
+      - 443:443
     image: nginx
     volumes:
       - drill_public:/usr/share/nginx/public:ro
