@@ -3,7 +3,7 @@
   "version": "0.1.2",
   "private": true,
   "scripts": {
-    "docker": "node docker_pkg.js && docker compose -f compose.yaml up -d --build",
+    "docker": "node docker_pkg.js && docker build . --tag artempoletsky/interdrill",
     "chat": "tsx socket/server",
     "dev": "next dev",
     "build": "next build",

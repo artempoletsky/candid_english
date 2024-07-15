@@ -38,6 +38,4 @@ volumes:
   drill_database:
     external: true
   drill_public:
-    external: true
   drill_static:
-    external: true

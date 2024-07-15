@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const pkg = require("./package.json");
 const fs = require("fs");
-const exec = require("node:child_process").exec;
+const exec = require("node:child_process").execSync;
 
 const dockerDir = process.cwd() + "/docker";
 // console.log(fs);
@@ -23,3 +23,7 @@ if (!fs.existsSync(dockerDir + "/old.json")) {
 
 
 fs.writeFileSync(dockerDir + "/new.json", JSON.stringify(newDeps, undefined, 2));
+
+
+exec("docker volume rm drill_public");
+exec("docker volume rm drill_static");
