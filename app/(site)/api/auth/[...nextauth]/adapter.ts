@@ -76,7 +76,7 @@ export async function authRequest(url: string, payload: Record<string, string>) 
 }
 
 
-export async function authorize(credentials?: Record<"username" | "password", string>) {
+export async function authorize(credentials?: Record<"username" | "password", string>): Promise<UserSelf | null> {
   if (!credentials) return null;
 
   if (
@@ -84,28 +84,29 @@ export async function authorize(credentials?: Record<"username" | "password", st
     && credentials.password == process.env.KURGANDB_MASTER_PASSWORD
   ) {
     return {
-      id: "master",
+      id: 0,
       isAdmin: true,
       email: "none",
-      image: null,
-      name: "master",
-      emailVerified: null,
-      password: "",
+      image: "",
+      username: "master",
+      emailVerified: true,
+      englishLevel: "a0",
+      isPasswordSet: true,
+      fullName: "",
+      wordsCount: 0,
+      isModerator: true,
+      knownWordsVersion: new Date(),
     };
   }
 
-  const user: UserLight | undefined = await query(({ users }, { username, password }, { $ }) => {
+  const user: UserSelf | null = await query(({ users }, { username, password }, { drill, $ }) => {
     // let user: UserLight;
     const passwordEncoded = $.encodePassword(password);
-    const found = users.where("username", username).where("password", passwordEncoded).limit(1).select(r => r.$light());
-    if (found.length) return found[0];
-    return users.where("email", username).where("password", passwordEncoded).limit(1).select(u => u.$light())[0];
+    let found = users.where("username", username).where("password", passwordEncoded).limit(1).select(r => r.$light());
+    if (!found.length) found = users.where("email", username).where("password", passwordEncoded).limit(1).select(u => u.$light());
+    if (!found.length) return null;
+    return drill.userSelf(found[0]);
   }, credentials);
   if (!user) return null;
-  return {
-    id: user.username,
-    email: user.email,
-    name: user.fullName,
-    image: user.image,
-  };
+  return user;
 }

@@ -3,7 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { getSession } from "app/session/session";
 import { query } from "app/db";
-import { UserFull, UserLight } from "app/globals";
+import { UserFull, UserLight, UserSelf } from "app/globals";
 import { clearSession, createOrGetUser } from "../methods";
 import { authorize } from "./adapter";
 
@@ -18,7 +18,7 @@ const handler = NextAuth({
   },
   events: {
     async signIn(message) {
-      await createOrGetUser(message.user);
+      await createOrGetUser(message.user as unknown as UserSelf);
     },
     async signOut(message) {
       await clearSession();
@@ -37,7 +37,7 @@ const handler = NextAuth({
           type: "password",
         },
       },
-      authorize,
+      authorize: authorize as any,
     }),
     GoogleProvider({
       clientId: GOOGLE_CLIENT_ID!,
