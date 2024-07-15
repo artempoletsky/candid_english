@@ -77,6 +77,22 @@ export async function authRequest(url: string, payload: Record<string, string>) 
 
 
 export async function authorize(credentials?: Record<"username" | "password", string>) {
+  if (!credentials) return null;
+
+  if (
+    credentials.username == process.env.KURGANDB_MASTER_USER
+    && credentials.password == process.env.KURGANDB_MASTER_PASSWORD
+  ) {
+    return {
+      id: "master",
+      isAdmin: true,
+      email: "none",
+      image: null,
+      name: "master",
+      emailVerified: null,
+      password: "",
+    };
+  }
 
   const user: UserLight | undefined = await query(({ users }, { username, password }, { $ }) => {
     // let user: UserLight;
@@ -84,7 +100,7 @@ export async function authorize(credentials?: Record<"username" | "password", st
     const found = users.where("username", username).where("password", passwordEncoded).limit(1).select(r => r.$light());
     if (found.length) return found[0];
     return users.where("email", username).where("password", passwordEncoded).limit(1).select(u => u.$light())[0];
-  }, credentials as { username: string, password: string });
+  }, credentials);
   if (!user) return null;
   return {
     id: user.username,
