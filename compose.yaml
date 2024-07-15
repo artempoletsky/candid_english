@@ -11,7 +11,7 @@ services:
     #   - 3000:3000
     container_name: drillnext
     image: artempoletsky/interdrill
-    
+
     volumes:
       - database:/usr/src/app/kurgandb_data
       - public:/usr/src/app/public
@@ -20,7 +20,7 @@ services:
   nginx:
     container_name: drillnginx
     env_file: ".env.local"
-    ports: 
+    ports:
       - 80:80
     image: nginx
     volumes:
@@ -28,7 +28,8 @@ services:
       - static:/usr/share/nginx/_next/static:ro
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/mime.types:/etc/nginx/mime.types:ro
-      - /etc/letsencrypt/live/interdrill.ru/:/etc/nginx/certs:ro
+      - /etc/letsencrypt/live/interdrill.ru/fullchain.pem:/usr/share/nginx/certs/fullchain.pem:ro
+      - /etc/letsencrypt/live/interdrill.ru/privkey.pem:/usr/share/nginx/certs/privkey.pem:ro
 
 volumes:
   database:
