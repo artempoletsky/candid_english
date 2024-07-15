@@ -1,5 +1,5 @@
 
-export const OXFORD_LIST_LIGHT = "/grab_data/words_light.json";
+export const OXFORD_LIST_LIGHT = "/lib/lemmatizer/words_light.json";
 export const OXFORD_BY_LEVEL = "/grab_data/words_level.json";
 export const API_ADMIN_ADJUST_LEMMATIZER = "/admin/api/adjust_lemmatizer";
 export const API_LEMMATIZE = "/api/lemmatize_text";

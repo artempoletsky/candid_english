@@ -28,6 +28,7 @@ services:
       - static:/usr/share/nginx/_next/static:ro
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/mime.types:/etc/nginx/mime.types:ro
+      - /etc/letsencrypt/live/interdrill.ru/:/etc/nginx/certs:ro
 
 volumes:
   database:
