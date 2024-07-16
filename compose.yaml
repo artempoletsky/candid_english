@@ -14,28 +14,7 @@ services:
 
     volumes:
       - drill_database:/usr/src/app/kurgandb_data
-      - drill_public:/usr/src/app/public
-      - drill_static:/usr/src/app/.next/static
-
-  nginx:
-    depends_on: 
-      - next
-    container_name: drillnginx
-    env_file: ".env.docker"
-    ports:
-      - 80:80
-      - 443:443
-    image: nginx
-    volumes:
-      - drill_public:/usr/share/nginx/public:ro
-      - drill_static:/usr/share/nginx/_next/static:ro
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/mime.types:/etc/nginx/mime.types:ro
-      - /etc/letsencrypt/live/interdrill.ru/fullchain.pem:/usr/share/nginx/certs/fullchain.pem:ro
-      - /etc/letsencrypt/live/interdrill.ru/privkey.pem:/usr/share/nginx/certs/privkey.pem:ro
-
+    restart: on-failure
 volumes:
   drill_database:
     external: true
-  drill_public:
-  drill_static:

@@ -23,7 +23,3 @@ if (!fs.existsSync(dockerDir + "/old.json")) {
 
 
 fs.writeFileSync(dockerDir + "/new.json", JSON.stringify(newDeps, undefined, 2));
-
-
-exec("docker volume rm drill_public");
-exec("docker volume rm drill_static");
