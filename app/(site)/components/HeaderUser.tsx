@@ -16,10 +16,10 @@ function RenderUser(user: UserSelf, onLogout: () => void) {
       callbackUrl: "/",
     }).then(onLogout);
   }
-  return <div className="flex items-center gap-3">
-    {image && <Link href="/user"><img alt="avatar" className="rounded-full h-[42px]" src={image} /></Link>}
+  return <div className="flex justify-center items-center gap-3">
+    {image && <Link className="shrink-0" href="/user"><img alt="avatar" className="rounded-full h-[42px]" src={image} /></Link>}
     <Link href="/user">{user.username}</Link>
-    <Button onClick={onSignOut}>Sign out</Button>
+    <Button className="shrink-0" onClick={onSignOut}>Sign out</Button>
     {/* <Link href="/user">sign out</Link> */}
   </div>
 }
@@ -29,12 +29,12 @@ function RenderUser(user: UserSelf, onLogout: () => void) {
 export default function HeaderUser() {
   const [user, setUser] = useStore("user");
   
-  return <div className="absolute right-3 top-0 px-3 py-3">
+  return <div className="whitespace-nowrap md:pr-3 py-3">
     {user
       ? RenderUser(user, () => {
         setUser(null);
       })
-      : <div className="py-2">
+      : <div className="">
         <Link href="/user">Sign in</Link>
       </div>}
 
