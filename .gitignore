@@ -45,3 +45,5 @@ next-env.d.ts
 /app/kurgandb/
 /docker/
 .env.docker
+
+/interdrill_compose
