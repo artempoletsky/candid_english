@@ -3,7 +3,7 @@
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
 import { useContext, useEffect, useState } from "react";
 import PageGuest from "./PageGuest";
-import { FGetMyPage, FRepeatConfirmationEmail, RGetMyPage } from "../api/user/methods";
+import { FGetMyPage, FRepeatConfirmationEmail, RGetMyPage } from "../../api/user/methods";
 import { Button, Tooltip } from "@mantine/core";
 import FormUserData from "./FormUserData";
 import LanguageLevel from "components/LanguageLevel";

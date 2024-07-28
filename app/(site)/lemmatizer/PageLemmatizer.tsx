@@ -1,7 +1,7 @@
 "use client";
 
 
-import { AtomizedWord } from "app/api/lemmatize_text/route";
+import { AtomizedWord } from "../../api/lemmatize_text/route";
 import { useState, useEffect, useRef } from "react";
 
 import AdjustLemmatizerDropdown from "./AdjustLemmatizerDropdown";

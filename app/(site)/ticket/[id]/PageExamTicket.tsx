@@ -2,7 +2,7 @@
 
 
 import Discussion from "components/dicsussion/Discussion";
-import { RGetTicketDiscussion } from "app/api/discussion/methods_discussion";
+import { RGetTicketDiscussion } from "../../../api/discussion/methods_discussion";
 import { TestQuestion } from "app/globals";
 import { userView } from "lib/language_levels";
 

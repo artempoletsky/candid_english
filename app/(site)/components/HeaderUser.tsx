@@ -5,7 +5,7 @@ import { UserSelf } from "app/globals";
 import Link from "next/link";
 import { Button } from "@mantine/core";
 import { signOut } from "next-auth/react";
-import { FGetMyPage } from "../api/user/methods";
+import { FGetMyPage } from "../../api/user/methods";
 import { useStore } from "app/store";
 
 

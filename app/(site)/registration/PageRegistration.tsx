@@ -3,7 +3,7 @@
 import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
 
 import { ChangeEvent, ChangeEventHandler, useRef, useState } from "react";
-import { ARegister, register as ZRegister } from "../api/user/schemas";
+import { ARegister, register as ZRegister } from "../../api/user/schemas";
 import { useForm, zodResolver } from "@mantine/form";
 import { Button } from "@mantine/core";
 import TextInput from "./Textnput";

@@ -1,7 +1,7 @@
 import z from "zod";
-import { TestSession } from "app/test/api/route";
-import { UserFull, EmailConfirmation, TestQuestion, CommentFull, CompletedExam, Survey, UserRights } from "../kurgandb_admin/validation";
-import { LanguageLevel } from "../../lib/language_levels";
+import { TestSession } from "app/(site)/test/api/route";
+import { UserFull, EmailConfirmation, TestQuestion, CommentFull, CompletedExam, Survey, UserRights } from "./kurgandb_admin/validation";
+import { LanguageLevel } from "../lib/language_levels";
 import { zodGlobals } from "lib/zodGlobals";
 import type { GlobalScope } from "@artempoletsky/kurgandb";
 // import { logNextSide } from "./api/chat";

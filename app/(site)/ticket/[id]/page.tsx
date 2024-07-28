@@ -1,7 +1,7 @@
 
 import PageExamTicket from "./PageExamTicket";
 import { Metadata } from "next";
-import { getTicketDiscussion } from "app/api/discussion/methods_discussion";
+import { getTicketDiscussion } from "../../../api/discussion/methods_discussion";
 // import PageNotFound from "~/app/not-found";
 import { notFound } from 'next/navigation'
 

@@ -3,7 +3,7 @@ import { COOKIE_SESSION_KEY, SESSION_DIR } from "lib/paths";
 
 import { NextResponse } from "next/server";
 
-import { MiddlewareSession, SESSION_CACHE_LIFESPAN } from "../../../middleware";
+import { MiddlewareSession, SESSION_CACHE_LIFESPAN } from "../../middleware";
 import { createNewSession, getSessionById, isValidSession } from "./session";
 
 

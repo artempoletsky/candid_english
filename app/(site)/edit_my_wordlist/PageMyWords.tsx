@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { DictRange, userView } from "lib/language_levels";
 import { rpc } from "app/rpc";
 import { fetchCatch } from "@artempoletsky/easyrpc/react";
-import { WordlistsLevel } from "app/api/words/schemas_words";
+import { WordlistsLevel } from "../../api/words/schemas_words";
 import { Button, FileInput, TextInput } from "@mantine/core";
 import { saveTextFile } from "lib/utils_client";
 import { useStore, updateMyWords } from "app/store";

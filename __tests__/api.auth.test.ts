@@ -1,7 +1,7 @@
 
 
-import { createOrGetUser, login, logout } from "app/api/auth/methods";
-import { updateUserInfo } from "app/api/user/methods";
+import { createOrGetUser, login, logout } from "../app/api/auth/methods";
+import { updateUserInfo } from "../app/api/user/methods";
 import { query } from "app/db";
 import { getSession } from "app/session/session";
 // import {  } from "../app/(site)/api/auth/[...nextauth]/adapter";

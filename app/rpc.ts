@@ -1,8 +1,8 @@
 import { RPC } from "@artempoletsky/easyrpc/client";
 
-import type { API as lemmatizer } from "./lemmatizer/api/route";
-import type { API as exam } from "./test/api/route";
-import type { API as fiveWords } from "./5words/api/route";
+import type { API as lemmatizer } from "./(site)/lemmatizer/api/route";
+import type { API as exam } from "./(site)/test/api/route";
+import type { API as fiveWords } from "./(site)/5words/api/route";
 import type * as user from "./api/user/methods";
 import type * as discussion from "./api/discussion/methods_discussion";
 import type * as words from "./api/words/methods_words";

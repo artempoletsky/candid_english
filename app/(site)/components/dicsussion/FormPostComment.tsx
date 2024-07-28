@@ -4,7 +4,7 @@ import { Commentary } from "app/globals";
 import ErrorMessage from "../ErrorMessage";
 import { Button, TextInput, Textarea } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
-import { APostComment, postComment as zPostComment } from "app/api/discussion/schemas";
+import { APostComment, postComment as zPostComment } from "../../../api/discussion/schemas";
 import { rpc } from "app/rpc";
 import { useStore } from "app/store";
 

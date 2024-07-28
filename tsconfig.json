@@ -24,7 +24,7 @@
       // "@/*": ["./app/(drill)/components/*"],
       "components/*": ["./app/(site)/components/*"],
       "lib/*": ["./lib/*"],
-      "app/*": ["./app/(site)/*"],
+      "app/*": ["./app/*"],
       "kdb/*": ["./app/kurgandb/*"],
       "kdbUser/*": ["./app/kurgandb_admin/*"],
     }

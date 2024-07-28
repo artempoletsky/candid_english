@@ -3,13 +3,18 @@ import { AuthData, Session, UserLight } from "app/globals";
 import { COOKIE_SESSION_KEY, SESSION_DIR } from "lib/paths";
 import md5 from "md5";
 import { rfs, wfs } from "lib/util";
-import { existsSync } from "fs";
+import { existsSync, mkdirSync } from "fs";
 import { NextRequest, userAgent } from "next/server";
 import { cookies, headers } from "next/headers";
 import debounce from "lodash.debounce";
 import { getServerSession } from "next-auth";
 import { methodFactory, query } from "app/db";
 
+if (!existsSync(process.cwd() + SESSION_DIR)) {
+  mkdirSync(process.cwd() + SESSION_DIR, {
+    recursive: true,
+  });
+}
 
 function getSessionFileName(token: string) {
   return SESSION_DIR + token + ".json";

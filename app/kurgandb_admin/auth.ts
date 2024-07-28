@@ -1,7 +1,7 @@
 
 import { getSession } from "app/session/session";
 
-import { login as fLogin, logout as fLogout } from "app/api/auth/methods";
+import { login as fLogin, logout as fLogout } from "../api/auth/methods";
 import { query } from "app/db";
 
 

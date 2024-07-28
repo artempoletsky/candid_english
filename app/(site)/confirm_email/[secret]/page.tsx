@@ -3,7 +3,7 @@
 import { Metadata } from "next";
 
 import Link from "next/link";
-import { confirmEmail } from "app/api/user/methods";
+import { confirmEmail } from "../../../api/user/methods";
 
 export const metadata: Metadata = {
   title: "Confirm your email",

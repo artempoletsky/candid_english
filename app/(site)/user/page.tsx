@@ -3,7 +3,7 @@ import PageUser from "./PageUser";
 import { Metadata } from "next";
 
 import ComponentLoader from "components/ComponentLoader";
-import { FGetMyPage } from "app/api/user/methods";
+import { FGetMyPage } from "../../api/user/methods";
 import { rpc } from "app/rpc";
 
 

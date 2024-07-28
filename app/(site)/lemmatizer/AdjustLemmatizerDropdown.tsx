@@ -1,4 +1,4 @@
-import { AtomizedWord } from "app/api/lemmatize_text/route";
+import { AtomizedWord } from "../../api/lemmatize_text/route";
 import { useState } from "react";
 
 import { ActionIcon, Button, Menu, TextInput } from "@mantine/core";
