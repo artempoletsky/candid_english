@@ -22,7 +22,7 @@ const {
 type Props = TableComponentProps & {
   unreviewed: LemmatizerProposition[];
 }
-export default function LemmatizerPropositions({ scheme, unreviewed: unreviewedInitial }: Props) {
+export default function LemmatizerPropositions({ unreviewed: unreviewedInitial }: Props) {
 
   const [unreviewed, setUnreviewed] = useState(unreviewedInitial);
 

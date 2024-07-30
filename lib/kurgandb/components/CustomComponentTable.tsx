@@ -1,16 +1,17 @@
 
-import { TableComponentProps } from "../../kurgandb/globals";
+import { TableComponentProps } from "../../../app/kurgandb/globals";
 import { Button } from "@mantine/core"
 import LemmatizerPropositions from "./CustomTableLemmatizerPropositions";
 import TableMeta from "./TableMeta";
 import { FGetUnreviewedLemmatizerPropositions } from "../api";
-import ComponentLoader from "../../kurgandb/comp/ComponentLoader";
+import ComponentLoader from "../../../app/kurgandb/comp/ComponentLoader";
 import CustomTableComments from "./CustomTableComments";
+import { Store } from "app/kurgandb/store";
 
 
 
 export default function CustomComponentTable(props: TableComponentProps) {
-  const { tableName } = props;
+  const tableName = Store.tableName;
   if (tableName == "lemmatizer_propositions") {
     const method = "getUnreviewedLemmatizerPropositions" as unknown as FGetUnreviewedLemmatizerPropositions;
     return <ComponentLoader

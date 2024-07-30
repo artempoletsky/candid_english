@@ -19,7 +19,7 @@ RUN npm install
 
 COPY app app
 COPY lib lib
-COPY grab grab
+# COPY grab grab
 COPY socket socket
 COPY data data
 
@@ -35,10 +35,10 @@ COPY next-env.d.ts .
 COPY .eslintrc.json .
 COPY .env.local .
 
-COPY grab_data/words.json grab_data/
-COPY grab_data/words_dict.json grab_data/
-COPY grab_data/words_level.json grab_data/
-COPY grab_data/words_light.json grab_data/
+# COPY grab_data/words.json grab_data/
+# COPY grab_data/words_dict.json grab_data/
+# COPY grab_data/words_level.json grab_data/
+# COPY grab_data/words_light.json grab_data/
 
 RUN npm run build
 

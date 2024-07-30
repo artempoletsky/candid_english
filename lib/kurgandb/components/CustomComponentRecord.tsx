@@ -1,17 +1,9 @@
-import { JSONErrorResponse, RequestErrorSetter } from "@artempoletsky/easyrpc/client";
-// import { DocumentComponentProps } from "../../kurgandb/globals";
+
 import { Button, Checkbox, TextInput } from "@mantine/core";
 import CustomRecordTicket from "./CustomRecordTicket";
+import { DocumentComponentProps } from "../../../app/kurgandb/globals";
+import { Store } from "../../../app/kurgandb/store";
 
-
-export type DocumentComponentProps<Type> = {
-  onRequestError: RequestErrorSetter;
-  // onUpdateRecord: (record: PlainObject) => void
-  tableName: string;
-  record: Type;
-  insertMode?: boolean;
-  recordId: string | number | undefined;
-}
 
 export function bind(record: any, prop: string) {
   return {
@@ -21,7 +13,7 @@ export function bind(record: any, prop: string) {
 }
 
 export default function CustomComponentRecord(params: DocumentComponentProps<any>) {
-  if (params.tableName == "test_questions") return <CustomRecordTicket {...params} />
+  if (Store.tableName == "test_questions") return <CustomRecordTicket {...params} />
   return (
     <div className="max-w-[550px]">
       {"username" in params.record &&

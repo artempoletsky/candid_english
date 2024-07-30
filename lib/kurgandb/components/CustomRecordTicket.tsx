@@ -1,9 +1,10 @@
 
 import { API_UPLOAD_IMAGE, TestQuestion } from "app/globals";
-import { DocumentComponentProps, bind } from "./CustomComponentRecord";
+
 import { ReactNode, useState, DragEvent, ClipboardEvent } from "react";
 import { Button, FileInput, Loader, Radio, RadioGroup, TextInput } from "@mantine/core";
-import { adminRPCCustom } from "kdb/globals";
+import { adminRPCCustom, DocumentComponentProps } from "kdb/globals";
+import { onRequestError } from "app/kurgandb/store";
 
 
 const removeTicketImage = adminRPCCustom().method("removeTicketImage");
@@ -29,7 +30,7 @@ async function uploadFile(file: File, id: number): Promise<string> {
   });
 }
 
-export default function CustomRecordTicket({ record, onRequestError }: DocumentComponentProps<TestQuestion>) {
+export default function CustomRecordTicket({ record }: DocumentComponentProps<TestQuestion>) {
   // console.log(record.difficulty);
   // console.log(record.options);
 

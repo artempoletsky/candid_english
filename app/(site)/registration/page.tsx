@@ -3,9 +3,7 @@ import PageRegistration from "./PageRegistration";
 import { Metadata } from "next";
 
 import { SITE_NAME } from "app/globals";
-import { getSession } from "../session/session";
-import { NextResponse } from "next/server";
-import { headers } from "next/headers";
+import { getSession } from "../../session/session";
 import { redirect } from "next/navigation";
 export const metadata: Metadata = {
   title: "",

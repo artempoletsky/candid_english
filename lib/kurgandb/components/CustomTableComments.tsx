@@ -15,9 +15,8 @@ const setCommentingMode = adminRPCCustom().method("setCommentingMode");
 
 type Props = {
   meta: CommentsMeta;
-  scheme: TableScheme;
 }
-export default function CustomTableComments({ scheme, meta: metaInitial }: Props) {
+export default function CustomTableComments({ meta: metaInitial }: Props) {
 
 
 

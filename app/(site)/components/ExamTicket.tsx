@@ -1,4 +1,4 @@
-import { ExamTicketLight } from "app/test/api/route";
+import { ExamTicketLight } from "site/test/api/route";
 import Select from "components/select";
 import { TestQuestion } from "kdbUser/validation";
 import LanguageLevel from "./LanguageLevel";
