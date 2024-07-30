@@ -2,7 +2,7 @@ import { ResponseError } from "@artempoletsky/easyrpc";
 import z from "zod";
 import { query, methodFactory } from "app/db";
 
-import { removeExamTicketImage } from "../api/image/methods_image";
+import { removeExamTicketImage } from "../../app/api/image/methods_image";
 import { CommentingModes } from "app/globals";
 import { blacklist, override, saveDefaults, whitelist } from "lib/lemmatizer/lemmatizer";
 

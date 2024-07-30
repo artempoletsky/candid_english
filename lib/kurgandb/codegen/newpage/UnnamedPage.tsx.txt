@@ -1,9 +1,14 @@
 "use client";
 
-import { fetchCatch, getAPIMethod, useErrorResponse } from "@artempoletsky/easyrpc/client";
+import { getAPIMethod } from "@artempoletsky/easyrpc/client";
+import { fetchCatch, useErrorResponse } from "@artempoletsky/easyrpc/react";
 import type { FSayHello } from "./api/methods";
 import { useState } from "react";
+import { rpc } from "@/rpc";
 
+
+// it is recommended to replace getAPIMethod with
+// const sayHello = rpc("$$PATH$$").method("sayHello")
 const sayHello = getAPIMethod<FSayHello>("/$$PATH$$/api", "sayHello");
 
 

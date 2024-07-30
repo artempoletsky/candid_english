@@ -1,11 +1,13 @@
 
 
-import { createOrGetUser, login, logout } from "../app/api/auth/methods";
+
+import { createOrGetUser } from "app/api/auth/[...nextauth]/options";
 import { updateUserInfo } from "../app/api/user/methods";
 import { query } from "app/db";
 import { getSession } from "app/session/session";
 // import {  } from "../app/(site)/api/auth/[...nextauth]/adapter";
 import zod from "zod";
+import { loginCredentials, logout } from "app/kurgandb/lib/nextauthAdapter";
 
 jest.mock("../app/(site)/session/session");
 jest.mock("../app/(site)/api/auth/[...nextauth]/adapter");
@@ -73,10 +75,7 @@ describe("API auth", () => {
   });
 
   test("login with credentials", async () => {
-    let result = await login({
-      password: "qwerty1",
-      username: "batman",
-    });
+    let result = await loginCredentials(password: "qwerty1", username: "batman",);
     let session = await getSession();
     expect(result).toBe(false);
     expect(session.user).toBe(undefined);

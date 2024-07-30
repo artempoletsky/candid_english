@@ -1,7 +1,7 @@
 import { Predicate, queryUniversal } from "@artempoletsky/kurgandb";
 import type { PlainObject, Table } from "@artempoletsky/kurgandb/globals";
 import type * as types from "./globals";
-import { Plugins } from "./kurgandb_admin/plugins";
+import { Plugins } from "lib/kurgandb/plugins";
 
 
 export type Tables = {

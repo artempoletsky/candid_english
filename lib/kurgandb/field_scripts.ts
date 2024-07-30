@@ -1,8 +1,8 @@
 
 import { RPC } from "@artempoletsky/easyrpc/client";
 
-import { API_ENDPOINT } from "../kurgandb/generated";
-import { FieldScriptsObject, adminRPCCustom } from "../kurgandb/globals";
+import { API_ENDPOINT } from "../../app/kurgandb/generated";
+import { FieldScriptsObject, adminRPCCustom } from "../../app/kurgandb/globals";
 import { encodePassword } from "@artempoletsky/kurgandb/globals";
 import { TestQuestion, UserFull } from "app/globals";
 

@@ -25,8 +25,9 @@
       "components/*": ["./app/(site)/components/*"],
       "lib/*": ["./lib/*"],
       "app/*": ["./app/*"],
+      "site/*": ["./app/(site)/*"],
       "kdb/*": ["./app/kurgandb/*"],
-      "kdbUser/*": ["./app/kurgandb_admin/*"],
+      "kdbUser/*": ["./lib/kurgandb/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
