@@ -4,8 +4,9 @@ import LanguageLevel from "../LanguageLevel";
 
 function author(author: string, guest: boolean) {
   if (!author) return "Anonymous";
-  if (!guest) return author;
-  return <Link href={`user/${author}`}>{author}</Link>;
+  return <span className="text-orange-600">{author}</span>;
+  // if (!guest) return author;
+  // return <Link href={`/user/${author}`}>{author}</Link>;
 }
 export default function CompComment(comment: Commentary) {
   const date = new Date(comment.date);

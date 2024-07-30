@@ -16,7 +16,7 @@ type Props = {
 }
 export default function FormPostComment({ discussionId, onPost }: Props) {
   const [user] = useStore("user");
-  const [setErrorResponse, mainErrorMessage] = useErrorResponse();
+
   const form = useForm<APostComment>({
     initialValues: {
       discussionId,
@@ -25,6 +25,8 @@ export default function FormPostComment({ discussionId, onPost }: Props) {
     },
     validate: zodResolver(zPostComment),
   });
+
+  const [setErrorResponse, mainErrorMessage] = useErrorResponse(form);
 
   const fc = fetchCatch(postComment)
     .before<APostComment>(({ text, guestName }) => {
@@ -40,7 +42,9 @@ export default function FormPostComment({ discussionId, onPost }: Props) {
       onPost(comment);
     });
 
-  return <form action="#" onSubmit={form.onSubmit(fc.handle)}>
+  return <form action="#" onSubmit={form.onSubmit((values) => {
+    fc.handle(values);
+  })}>
     <p className="font-semibold text-gray-800">Add comment:</p>
     {!user && <TextInput
       label="Nickname"
