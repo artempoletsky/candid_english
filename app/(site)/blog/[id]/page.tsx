@@ -1,10 +1,11 @@
 
-import Link from 'next/link';
-import { getAllIds, getArticle } from '../methods_blog';
-import { Metadata } from 'next'
-import { SITE_NAME } from 'app/globals';
-import ArticleAuthor from 'components/ArticleAuthor';
-import DiscussionAJAX from 'components/dicsussion/DiscussionAJAX';
+import Link from "next/link";
+import { getAllIds, getArticle } from "../methods_blog";
+import { Metadata } from "next"
+import { SITE_NAME } from "app/globals";
+import ArticleAuthor from "components/ArticleAuthor";
+import DiscussionAJAX from "components/dicsussion/DiscussionAJAX";
+
 
 export const dynamicParams = false;
 

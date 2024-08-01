@@ -1,3 +1,4 @@
+import { formWrapper } from "./FormPostComment";
 
 
 export function postLinkOver(discussion: HTMLDivElement, link: HTMLSpanElement) {
@@ -56,4 +57,21 @@ export function scrollToComment(commentId: number) {
     behavior: "smooth",
     top: offsetTop - 10,
   });
+}
+
+
+export function replyClick(commentId: number) {
+
+  const val = formWrapper.form!.getValues().text;
+  let add = ">>" + (commentId == 0 ? "OP" : commentId) + "\n";
+  formWrapper.form!.setFieldValue("text", val + add);
+  const form = document.getElementById("FormPostComment")! as HTMLFormElement;
+  if (commentId == 0) {
+    const container = document.getElementById("CommentsContainer")!;
+    container.prepend(form);
+  } else {
+    const commentDiv = document.getElementById(`comment${commentId}`)! as HTMLDivElement;
+    commentDiv.after(form);
+  }
+
 }

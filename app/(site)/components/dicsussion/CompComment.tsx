@@ -3,6 +3,7 @@ import { Commentary } from "app/globals";
 import LanguageLevel from "../LanguageLevel";
 import { formWrapper } from "./FormPostComment";
 import { useRef } from "react";
+import { replyClick } from "./discussionEvents";
 
 
 function author(author: string, guest: boolean) {
@@ -20,15 +21,7 @@ export default function CompComment(comment: Commentary) {
 
 
   const addPostLink = () => {
-    const val = formWrapper.form!.getValues().text;
-    let add = ">>" + comment.id;
-    if (val.length) {
-      add = "\n" + add;
-    }
-    formWrapper.form!.setFieldValue("text", val + add);
-    const self = refSelf.current!;
-    const form = document.getElementById("FormPostComment")! as HTMLFormElement;
-    self.after(form);
+    replyClick(comment.id);
   }
 
   return <div
@@ -42,7 +35,7 @@ export default function CompComment(comment: Commentary) {
       {admin && <span className="">admin</span>}
       <LanguageLevel level={comment.authorLvl} />
       &nbsp;{date.toJSON()}
-      <a className="pseudo ml-2" onClick={addPostLink}>№{comment.id}</a>
+      <span className="pseudo ml-2" onClick={addPostLink}>№{comment.id}</span>
     </div>
     <div dangerouslySetInnerHTML={{ __html: comment.html }}></div>
   </div>

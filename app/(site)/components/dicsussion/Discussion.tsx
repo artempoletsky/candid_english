@@ -3,7 +3,7 @@ import { Commentary } from "app/globals";
 import CompComment from "./CompComment";
 import FormPostComment from "./FormPostComment";
 import { useEffect, useRef, useState } from "react";
-import { postLinkOver, postLinkOut, scrollToComment } from "./discussionEvents";
+import { postLinkOver, postLinkOut, scrollToComment, replyClick } from "./discussionEvents";
 
 type Props = {
   comments: Commentary[];
@@ -64,7 +64,7 @@ export default function Discussion({ comments: commentsInitial, discussionId, cl
   }, []);
 
   return <div ref={refSelf} className={className + " mt-3"}>
-    <div className="mb-6">
+    <div id="CommentsContainer" className="mb-6">
       {!comments.length && <div>No comments yet</div>}
       {comments.map(item => <CompComment key={item.id} {...item} />)}
     </div>

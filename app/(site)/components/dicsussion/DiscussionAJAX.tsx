@@ -7,6 +7,7 @@ import { Loader } from "@mantine/core";
 import { useErrorResponse } from "@artempoletsky/easyrpc/react";
 import ErrorMessage from "components/ErrorMessage";
 import { Commentary } from "app/globals";
+import ReplyOP from "./ReplyOP";
 
 type Props = {
   discussionId: number;
@@ -33,5 +34,8 @@ export default function DiscussionAJAX(props: Props) {
   if (loading) {
     return <Loader type="dots" />
   }
-  return <Discussion {...props} comments={comments} />
+  return <>
+    <ReplyOP />
+    <Discussion {...props} comments={comments} />
+  </>
 }

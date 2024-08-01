@@ -80,7 +80,7 @@ export default function FormPostComment({ discussionId, onPost }: Props) {
       />}
       <Textarea
         resize="vertical"
-        label="Comment"
+        label={<>Comment {form.getValues().text.length}/255</>}
         {...form.getInputProps("text")}
         className="mb-3"
         classNames={{
