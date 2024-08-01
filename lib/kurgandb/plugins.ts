@@ -2,6 +2,7 @@ import { GlobalScope } from "@artempoletsky/kurgandb";
 import { Tables } from "app/db";
 import aes from "lib/aes";
 import zodRules from "lib/zodGlobals";
+import txt from "lib/txt";
 
 import {
   Commentary,
@@ -43,7 +44,7 @@ export const drill = {
         avatar: author ? author.image : "",
         date: c.date,
         flags,
-        text: c.text,
+        html: c.html,
       };
     }
     return {
@@ -105,10 +106,10 @@ export const drill = {
 }
 
 
-export { aes as aes };
-export { zodRules as zodRules };
+export { aes, zodRules, txt };
 export type Plugins = {
   drill: Awaited<ReturnType<typeof drill.install>>;
   zodRules: Awaited<ReturnType<typeof zodRules.install>>;
   aes: Awaited<ReturnType<typeof aes.install>>;
+  txt: Awaited<ReturnType<typeof txt.install>>;
 }

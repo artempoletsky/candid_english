@@ -64,7 +64,8 @@ export type TestQuestion = zod.infer<ReturnType<typeof test_questions>>;
 export const comments = (table: Table, { z, zodRules }: Scope) => {
   return z.object({
     id: z.number(),
-    text: z.string().min(1).max(255),
+    originalText: z.string().min(1).max(255),
+    html: z.string(),
     date: z.date(),
     author: z.string(),
     guestNickName: z.string(),

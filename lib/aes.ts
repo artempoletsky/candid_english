@@ -6,7 +6,12 @@ import type Aesjs from "aes-js";
 const pluginDef = {
   npm: ["aes-js"],
   install({ $ }: GlobalScope) {
-    if (!process.env.AES_KEY) throw new Error("No AES key in env variables");
+    if (!process.env.AES_KEY) {
+      if (process.env.NODE_ENV != "test")
+        throw new Error("KurgandbAES plugin: No AES key in env variables");
+      // console.warn("KurgandbAES plugin: No AES key in env variables");
+      return {} as any;
+    }
 
     const aesjs: typeof Aesjs = $.require("aes-js");
     const key = parseKey(process.env.AES_KEY);

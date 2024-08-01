@@ -10,7 +10,7 @@ export async function postComment(payload: APostComment): Promise<Commentary> {
   const session = await getSession();
   // console.log(session);
 
-  return await query(({ comments, users }, { user, sessid, guestName, text, discussionId, englishLevel, ip }, { $, drill }) => {
+  return await query(({ comments, users }, { user, sessid, guestName, text, discussionId, englishLevel, ip }, { $, drill, txt }) => {
     const { commentingMode } = comments.meta;
     if (commentingMode == "none") throw new $.ResponseError("Commenting is temporary turned off");
     if (commentingMode != "guest" && !user) throw new $.ResponseError("Only registered users can post comments");
@@ -26,7 +26,8 @@ export async function postComment(payload: APostComment): Promise<Commentary> {
       author: dbUser ? dbUser.username : "",
       date: new Date(),
       discussionId,
-      text,
+      originalText: text,
+      html: txt.prepareComment(text),
       guestNickName: guestName || "",
       sessid,
       ip,

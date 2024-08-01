@@ -56,13 +56,6 @@ export type Tables = {
     types.CommentsMeta,
     types.CommentInsert
   >;
-  posts: Table<
-    types.Post,
-    number,
-    types.PostsMeta,
-    types.PostInsert,
-    types.PostLight
-  >;
   email_confirmations: Table<
     types.EmailConfirmation,
     string
@@ -81,6 +74,14 @@ export type Tables = {
     , types.SurveyInsert
     , types.SurveyLight
   >;
+  articles: Table<
+    types.ArticleFull
+    , string
+    , {}
+    , types.ArticleFull
+    , types.ArticleLight
+    , types.Article
+  >
 };
 
 

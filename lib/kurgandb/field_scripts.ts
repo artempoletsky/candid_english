@@ -36,7 +36,7 @@ href="https://www.oxfordlearnersdictionaries.com/definition/english/${rec.word.r
       }
     }
   },
-  posts: {
+  articles: {
     discussionId,
   },
 }

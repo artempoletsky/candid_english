@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import styles from './custom.module.css';
-import { getSortedPostsData } from 'lib/posts';
+import { getBlogPage } from './methods_blog';
+import ArticleAuthor from 'components/ArticleAuthor';
 
 
 export const metadata: Metadata = {
@@ -11,25 +12,19 @@ export const metadata: Metadata = {
 
 
 export default async function Page() {
-  const allPostsData = getSortedPostsData();
+  const { articles, authors } = await getBlogPage({ page: 1 });
   return (
-    <>
-      <h1 className="foo">Welcome</h1>
-      <Link href="/">Back to the main page</Link>
-      <section>
-        <h2>Blog</h2>
-        <h3>H3</h3>
-        <button>test</button>
-        <ul>
-          {allPostsData.map(({ id, date, title }) => (
-            <li key={id}>
-              <Link href={`/blog/${id}`}>{title}</Link>
-              <small className={styles.date}>{date.toString()}</small>
-            </li>
-          ))}
-        </ul>
-      </section>
-    </>
+    <section>
+      <ul>
+        {articles.map(({ slug, createdAt, h1, authorId }) => (
+          <li key={slug}>
+            <Link href={`/blog/${slug}`}>{h1}</Link>
+            <small className={styles.date}>{createdAt.toString()}</small>
+            <ArticleAuthor author={authors[authorId]} />
+          </li>
+        ))}
+      </ul>
+    </section>
   )
 }
 

@@ -4,6 +4,7 @@ import { UserFull, EmailConfirmation, TestQuestion, CommentFull, CompletedExam, 
 import { LanguageLevel } from "../lib/language_levels";
 import { zodGlobals } from "lib/zodGlobals";
 import type { GlobalScope } from "@artempoletsky/kurgandb";
+
 // import { logNextSide } from "./api/chat";
 // import "./api/chat";
 // import "../../socket/server";
@@ -129,12 +130,12 @@ export type CommentInsert = Omit<CommentFull, "id">;
 
 export type Commentary = {
   id: number;
-  text: string;
   author: string;
   authorLvl: LanguageLevel | "";
   avatar: string;
   flags: (1 | 0)[];
   date: Date;
+  html: string;
 }
 
 export const CommentingModes = ["guest", "registered", "emailVerified", "none"] as const;
@@ -144,24 +145,6 @@ export type CommentsMeta = {
   commentingMode: CommentingMode;
 };
 
-
-
-export const ZPost = z.object({
-  id: z.number(),
-  date: z.date(),
-  text: z.string(),
-  cut: z.string(),
-  author: z.string(),
-  discussionId: z.number().int(),
-});
-
-export type Post = z.infer<typeof ZPost>;
-
-export type PostInsert = Omit<Post, "id">;
-
-export type PostLight = Omit<Post, "text">;
-
-export type PostsMeta = {};
 
 export type { EmailConfirmation as EmailConfirmation };
 
@@ -174,4 +157,33 @@ export type CompletedExamLight = Omit<CompletedExam, "answers">
 export type { Survey as Survey };
 export type SurveyInsert = Omit<Survey, "id">;
 export type SurveyLight = Omit<Survey, "data">;
+
+
+export const zArticleSlug = z.string().min(1);
+export const zArticleH1 = z.string().min(3);
+
+export const zAuthorSeo = z.object({
+  url: z.string().url(),
+  name: z.string().min(1),
+});
+
+export const ZArticle = z.object({
+  slug: zArticleSlug,
+  html: z.string(),
+  h1: zArticleH1,
+  description: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+  canonical: z.string(),
+  tags: z.array(z.string()),
+  authorId: z.number(),
+  authorsSEO: z.array(zAuthorSeo),
+  discussionId: z.number().int(),
+});
+
+export type ArticleFull = z.infer<typeof ZArticle>;
+
+export type ArticleLight = Omit<ArticleFull, "html">;
+
+export type Article = Omit<ArticleFull, "html" | "canonical" | "description" | "updatedAt" | "authorsSEO">;
 

@@ -39,11 +39,11 @@ body {
   background: linear-gradient(to top,
       transparent,
       var(--background-end)) #ddd8cc no-repeat;
+  overflow-y: scroll;
 }
 
 html {
   height: 100%;
-  overflow-y: scroll;
 }
 
 .txt-vol {
@@ -116,4 +116,27 @@ a {
 
 .h1 {
   @apply text-xl font-bold mb-3 mt-3;
+}
+
+.comp_comment {
+  overflow-wrap: break-word;
+  @apply border border-gray-400 rounded px-3 py-1 mb-3 bg-stone-200;
+}
+
+.comp_comment .pl {
+  @apply text-blue-900;
+  cursor: pointer;
+}
+
+.comp_comment .pl_op {
+  @apply text-green-800;
+  cursor: pointer;
+}
+.comp_comment.highlighted {
+  box-shadow: 0 0 3px 4px var(--tw-shadow-color);
+  @apply shadow-orange-300;
+}
+
+.comp_comment .q {
+  @apply text-green-800;
 }
