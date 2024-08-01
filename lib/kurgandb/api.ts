@@ -111,6 +111,20 @@ const setCommentingMode = methodFactory(({ comments }, { commentingMode }: ASetC
 
 export type FSetCommentingMode = typeof setCommentingMode;
 //////////////////////////////////////////////////////////////////////////
+
+
+const ZRemoveComment = z.object({
+  commentId: z.number().int(),
+});
+
+export type ARemoveComment = z.infer<typeof ZRemoveComment>;
+
+const removeComment = methodFactory(({ comments }, { commentId }: ARemoveComment) => {
+  comments.where("id", commentId).delete();
+});
+
+//////////////////////////////////////////////////////////////////////////
+
 export const customRules = {
   unreviewAll: ZEmpty,
   getUnreviewedLemmatizerPropositions: ZGetPage,
@@ -118,6 +132,7 @@ export const customRules = {
   removeTicketImage: ZRemoveTicketImage,
   getFreeDiscussionId: ZEmpty,
   setCommentingMode: ZSetCommentingMode,
+  removeComment: ZRemoveComment,
 };
 
 export const customAPI = {
@@ -127,4 +142,5 @@ export const customAPI = {
   removeTicketImage,
   getFreeDiscussionId,
   setCommentingMode,
+  removeComment,
 }

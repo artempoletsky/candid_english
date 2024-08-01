@@ -1,3 +1,4 @@
+import BlogMainPage from "app/(site)/blog/page"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -8,7 +9,7 @@ export default function Home() {
         <h1><span className="relative">Deal with</span> <br /> Your intermediate plato <br /> For good!</h1>
 
         <h2>How to use this site</h2>
-        <ol>
+        <ol className="mt-3">
           <li>Take a <Link href="/test">quick test</Link> to determine your English level.</li>
           <li>Track your <Link href="/edit_my_wordlist">list of known words</Link> starting from this level.</li>
           <li>
@@ -21,6 +22,8 @@ export default function Home() {
           </li>
           <li>Watch the content for fun!</li>
         </ol>
+        <h2>Latest blog articles</h2>
+        <BlogMainPage />
       </div>
     </main>
   )

@@ -75,3 +75,9 @@ export function replyClick(commentId: number) {
   }
 
 }
+
+export function removeComment(commentId: number) {
+  const commentDiv = document.getElementById(`comment${commentId}`)! as HTMLDivElement;
+  if (!commentDiv) return;
+  commentDiv.remove();
+}

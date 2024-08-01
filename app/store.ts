@@ -39,16 +39,19 @@ function getWordsVersionLS(): number {
   return result;
 }
 
-const Store = createStore<Store>({
-  user: null,
-  myWords: new Set(),
-  myWordsVersion: 0,
-}, () => {
-  StoreDispatchers.myWords(getWordsLS());
-  StoreDispatchers.myWordsVersion(getWordsVersionLS());
-  getMyPage().then(({ user }) => {
-    Store.user = user;
-  });
+export const Store = createStore<Store>({
+  initialValues: {
+    user: null,
+    myWords: new Set(),
+    myWordsVersion: 0,
+  },
+  useEffect() {
+    StoreDispatchers.myWords(getWordsLS());
+    StoreDispatchers.myWordsVersion(getWordsVersionLS());
+    getMyPage().then(({ user }) => {
+      Store.user = user;
+    });
+  }
 });
 
 export function useStore<KeyT extends keyof Store>(key: KeyT) {

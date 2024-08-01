@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 
-export default async function Page() {
+export default async function BlogMainPage() {
   const { articles, authors } = await getBlogPage({ page: 1 });
   return (
     <section>

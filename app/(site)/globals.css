@@ -140,3 +140,7 @@ a {
 .comp_comment .q {
   @apply text-green-800;
 }
+
+.prose h1 {
+  @apply text-2xl my-3;
+}

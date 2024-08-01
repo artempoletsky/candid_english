@@ -4,6 +4,7 @@ import LanguageLevel from "../LanguageLevel";
 import { formWrapper } from "./FormPostComment";
 import { useRef } from "react";
 import { replyClick } from "./discussionEvents";
+import CommentModBlock from "./CommentModBlock";
 
 
 function author(author: string, guest: boolean) {
@@ -35,7 +36,8 @@ export default function CompComment(comment: Commentary) {
       {admin && <span className="">admin</span>}
       <LanguageLevel level={comment.authorLvl} />
       &nbsp;{date.toJSON()}
-      <span className="pseudo ml-2" onClick={addPostLink}>№{comment.id}</span>
+      <span className="pseudo mx-2" onClick={addPostLink}>№{comment.id}</span>
+      <CommentModBlock {...comment} />
     </div>
     <div dangerouslySetInnerHTML={{ __html: comment.html }}></div>
   </div>
